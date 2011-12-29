@@ -1,0 +1,36 @@
+/*!
+ * @file <%= class_name %>.h
+ * @author <%= author %>
+ * @date Date Created: <%= date %>
+ * @date Last Change:<%= date+dot %>
+ */
+#ifndef __<%= macro_for_prevent_dup %>_H__
+#define __<%= macro_for_prevent_dup %>_H__
+
+<% if baseclass_name.empty? then %>
+<%= namespace_begin %>
+/*!
+ * @class クラスの説明
+ */
+class <%= class_name %>{
+<% else %>
+<%= baseclass_filename_include %>
+
+<%= namespace_begin %>
+/*!
+ * @class クラスの説明
+ */
+ class <%= class_name %>:<%= baseclass_name.each{|c| "public "+c}.join(",") %>{
+<% end %>
+	public:
+		<%= class_name %>();
+		virtual ~<%= class_name %>();
+	protected:
+		
+	private:
+		
+};
+
+<%= namespace_end %>
+__<%= macro_for_prevent_dup %>_H__
+

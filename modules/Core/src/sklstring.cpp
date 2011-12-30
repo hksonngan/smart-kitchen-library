@@ -1,4 +1,4 @@
-#include "sklstring.h"
+﻿#include "sklstring.h"
 #include <cassert>
 #include <iostream>
 #include <fstream>

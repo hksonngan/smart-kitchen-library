@@ -1,4 +1,4 @@
-/*!
+﻿/*!
  * @file OptParser.cpp
  * @author a_hasimoto
  * @date Date Created: 2011/Dec/27

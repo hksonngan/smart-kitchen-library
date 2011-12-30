@@ -1,4 +1,4 @@
-#include <iostream>
+﻿#include <iostream>
 #include "sklstring.h"
 
 int main(int argc, char* argv[]){

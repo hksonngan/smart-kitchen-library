@@ -16,7 +16,7 @@ void ParallelCalcEdgeCapacity::operator()(const cv::BlockedRange& range)const{
 
 		bool ignore_data_term = false;
 		if(isOverUnderExposure(src,roi) || isOverUnderExposure(bg_img,roi)){
-			data_term.at<int>(gy,gx) = 0.5f;
+			data_term.at<int>(gy,gx) = QUANTIZATION_LEVEL_HARF;
 #ifdef DEBUG
 			tex_int.at<float>(gy,gx) = 0.0f;
 #endif
@@ -142,7 +142,7 @@ void ParallelCalcEdgeCapacity::calcDataTerm(
 		float* tex_int, float* gh, float* tex_diff)const{
 	float auto_cor_src(0),auto_cor_bg(0);
 	float cross_cor(0);
-	int square_size = std::pow(TEXCUT_BLOCK_SIZE,2);
+	int square_size = TEXCUT_BLOCK_SIZE * TEXCUT_BLOCK_SIZE;
 	std::vector<float> sort_tar_x(square_size,0);
 	std::vector<float> sort_tar_y(sort_tar_x),bg_sort_tar_x(sort_tar_x),bg_sort_tar_y(sort_tar_x);
 	for(int y=0,i=0;y<TEXCUT_BLOCK_SIZE;y++){
@@ -165,7 +165,8 @@ void ParallelCalcEdgeCapacity::calcDataTerm(
 	// calc texture intenxity
 	*tex_int = auto_cor_src > auto_cor_bg ? auto_cor_src : auto_cor_bg;
 	*tex_int = sqrt(*tex_int/square_size);
-	*tex_int = normalize(*tex_int, sqrt(3) * nsd);
+	*tex_int = static_cast<float>(
+		normalize(*tex_int,sqrt(3.0f) * nsd));
 
 	// calc gradient heterogenuity
 	float grad_hetero = calcGradHetero(sort_tar_x);
@@ -184,7 +185,7 @@ void ParallelCalcEdgeCapacity::calcDataTerm(
 		*tex_diff = 0.0f;
 		return;
 	}
-	float normalized_correlation_dist = 1.0f - (2.0 * cross_cor)/auto_cor;
+	float normalized_correlation_dist = 1.0f - (2.0f * cross_cor)/auto_cor;
 	assert(0 <= normalized_correlation_dist && normalized_correlation_dist <= 1.0);
 	*tex_int = exp((grad_hetero * *tex_int) - 1.0f);
 //	*tex_int = grad_hetero * *tex_int;
@@ -241,7 +242,7 @@ void ParallelCalcEdgeCapacity::calcSmoothingTerm(
 	float diff = diff_l2r > diff_r2l ? diff_l2r : diff_r2l;
 //	std::cerr << diff << " > " << (2*nsd * sqrt(2.0/TEXCUT_BLOCK_SIZE)) << std::endl;
 	diff /= TEXCUT_BLOCK_SIZE;
-	*smoothing_term = normalize(diff, nsd / sqrt(TEXCUT_BLOCK_SIZE));
+	*smoothing_term = static_cast<float>(normalize(diff, nsd / sqrt(static_cast<float>(TEXCUT_BLOCK_SIZE))));
 //	*smoothing_term = 1.0f - *smoothing_term;
 	*smoothing_term = 1.0f - exp(*smoothing_term - 1.0f);
 }

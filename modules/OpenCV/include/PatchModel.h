@@ -1,6 +1,6 @@
 /*!
  * @file PatchModel.h
- * @author ∂∂À‹∆ÿªÀ
+ * @author a_hasimoto
  * @date Last Change:2011/Nov/01.
  */
 #ifndef __PATCH_MODEL_H__
@@ -18,11 +18,9 @@
 #define HIDDEN_OBJECT_MIN_RECALL_RATE 0.0
 #define IS_THERE_OBJECT_MIN_RECALL_RATE 0.4
 
-namespace mmpl{
-	namespace image{
+namespace skl{
 
 #define PATCH_DILATE 32
-#define BLOCK_SIZE 4
 
 		class Patch{
 			public:
@@ -32,65 +30,51 @@ namespace mmpl{
 			};
 			public:
 				Patch();
-				Patch(const Image& mask, const Image& newest_image, const Image& current_bg);
+				Patch(const cv::Mat& mask, const cv::Mat& newest_image, const cv::Mat& current_bg);
 				~Patch();
 
-				void set(const Image& mask, const Image& newest_image, const Image& current_bg);
+				void set(const cv::Mat& mask, const cv::Mat& newest_image, const cv::Mat& current_bg);
 
-				void setVisibility(const CvRect& rect,const Image& mask,bool visibility);
+				void setCoveredState(const cv::Rect& rect,const cv::Mat& mask,bool covered_state);
 
-				// noch nicht
-				// homography§ÀΩæ§√§∆mask[original],∂…ΩÍ∆√ƒß§Œ∞Ã√÷§‰√Õ§Ú —¥π
-				// newest_image§»∂…ΩÍ∆√ƒß§¨…‘∞Ï√◊§ §Èmask[original]§Ú0.0§À°£
-				// ∫«∏Â§Àmask§À¥§≈§§§∆¬æ§Œ≤Ë¡¸§ÚºË∆¿
-//				void move(const cv::mat& homography,const Image& newest_image);
-//
-				void save(const std::string& filename,Type type,int width,int height,const std::string& edge_filename="")const;
+
+				void save(const std::string& filename, Type type, int width, int height, const std::string& edge_filename="")const;
 
 				/*** Accessor ***/
 				float maskValue(int x,int y, Type type=original)const;
 				const unsigned char* operator()(int x,int y, Type type=original)const;
 				unsigned char* operator()(int x,int y,Type type=original);
-				const CvRect& getRect(Type type=original)const;
-				bool isVisible(int x,int y);
-				Image& getImage(Type type=original);
-				const Image& getImage(Type type=original)const;
-				Image& getBG(Type type=original);
-				const Image& getBG(Type type=original)const;
-				const Image& getMask(Type type=original)const;
-				static CvRect getRect(const Image& mask,size_t* pix_num=NULL);
 
-				const Image& getEdgeImage()const;
-				void setEdgeImage(const Image& _edge);
-				size_t getEdgePixelNum()const;
+				const cv::Rect& roi(Type type=original)const{return roi[type];}
+				cv::Mat& image(Type type=original){return _image[type];}
+				const cv::Mat& image(Type type=original)const{return _image[type];}
+				cv::Mat& background(Type type=original){return _background[type];}
+				const cv::Mat& background(Type type=original)const{return _background[type];}
+				const cv::Mat& mask(Type type=original)const{return _mask[type];}
 
-				void setVisibility(int x,int y,bool isVisible);
+				const cv::Mat& edge()const{return edge;}
+				void edge(const cv::Mat& __edge){_edge = __edge.clone()};
+				size_t edge_count()const{return _edge_count;};
 
-				static CvRect getCommonRectanglarRegion(const CvRect& r1,const CvRect& r2);
-				const std::vector<CvPoint>& getPoints()const;
-			protected:
-				Image mask[2];
-				Image image[2];
-				Image hidden[2];
-				Image edge;
-				CvRect rect[2];
-				CvPoint center;
-				Image visibility;
-				std::vector<CvPoint> points;
-				size_t edge_pixel_num;
+				void covered_state(int x,int y,bool isCovered);
+
+		protected:
+				cv::Mat _mask[2];
+				cv::Mat _image[2];
+				cv::Mat _hidden[2];
+				cv::Mat _edge;
+				cv::Rect _roi[2];
+				cv::Point center;
+				cv::Mat _covered_state;
+				size_t edge_count;
+				int base_width;
+				int base_height;
 			private:
-				void convXY_G2L(int* x,int* y, Type type)const;
+				void cvtG2L(int* x,int* y, Type type)const;
 				bool isIn(int local_x,int local_y, Type type)const;
-				void setPoints();
-				void setDilate(
-						const CvRect& rect,
-						const Image& mask,
-						const Image& src,
-						const Image& bg);
-				static void crop(Image* dist,const Image& src,const CvRect& rect,const IplImage* mask=NULL);
-				CvRect extractEdges(Image* edge,const Image& mask,const Image& src,const Image& bg,size_t* edge_pix_num=NULL)const;
+				cv::Rect extractEdges(cv::Mat& edge,const cv::Mat& mask,const cv::Mat& src,const cv::Mat& bg,size_t* edge_pix_num=NULL)const;
 		};
-
+/*
 		class PatchLayer{
 			public:
 				PatchLayer(std::map<size_t,Patch>* patches);
@@ -99,8 +83,8 @@ namespace mmpl{
 				void push(size_t ID);
 				void erase(size_t ID);
 
-				// Ω≈§ §√§∆§§§Î•—•√•¡§Œ§¶§¡°¢1§ƒ§¿§±æÂ§Œ§‚§Œ§Ú ÷§π
-				// § §±§Ï§–UINT_MAX§Ú ÷§π
+				// Ω≈§ §√§∆§§§ÅE—•√•¡§Œ§¶§¡°¢1§ƒ§¿§±æÂ§Œ§‚§Œ§Ú ÷§π
+				// § §±§ÅE–UINT_MAX§Ú ÷§π
 				size_t getUpperPatch(size_t ID, Patch::Type)const;
 				std::vector<size_t> getAllBeneathPatch(size_t ID,Patch::Type type);
 				size_t getOrder(size_t ID)const;
@@ -111,7 +95,7 @@ namespace mmpl{
 				std::list<size_t> layer_order;
 				std::map<size_t,Patch>* patches;
 			private:
-				static bool isOverlayed(const CvRect& common_rect,const Patch& p1,const Patch& p2, Patch::Type type, Image* mask=NULL);
+				static bool isOverlayed(const cv::Rect& common_rect,const Patch& p1,const Patch& p2, Patch::Type type, Image* mask=NULL);
 		};
 
 		class PatchModel{
@@ -119,28 +103,27 @@ namespace mmpl{
 			friend class PatchTracker;
 			public:
 				PatchModel();
-				PatchModel(const Image& base_bg);
+				PatchModel(const cv::Mat& base);
 				~PatchModel();
 				Patch& operator()(size_t ID);
-				void setBaseBG(const Image& base_bg);
-				const Image& getBaseBG()const;
+				void base(const cv::Mat& __bg);
+				const cv::Mat& base()const;
 				size_t putPatch(const Image& mask,const Image& newest_image);
-//				bool movePatch(size_t ID,const cv::Mat& homography,const Image& newest_image);
 				void takePatch(size_t ID,std::vector<size_t>* taken_patch_ids);
 				void updateNewestBG();
-				void setNewestBG(const Image& bg);
-				const Image& getNewestBG()const;
-				size_t checkMovingPatches(const Image& mask,const Image& newest_image,const Image& newest_bg)const;
-				bool isThere(size_t ID,const Image& newest_image)const;
+				void newest_bg(const Image& bg);
+				const Image& newest_bg()const;
+				size_t checkLostPatches(const cv::Mat& __mask,const cv::Mat& __newest_image,const cv::Mat& __newest_bg)const;
+				bool isThere(size_t ID,const cv::Mat& newest_image)const;
 
-				void getHiddenPatches(const Image& human_mask,std::vector<size_t>* newly_hidden_patch_ids,std::vector<size_t>* reappeared_patch_ids);
+				void getHiddenPatches(const cv::Mat& human_mask, std::vector<size_t>* newly_hidden_patch_ids, std::vector<size_t>* reappeared_patch_ids);
 
 				void save(const std::string& file_head,const std::string& ext)const;
 				const Patch& operator[](size_t ID)const;
 			protected:
 				std::map<size_t,Patch> patches;
-				Image newest_bg;
-				Image base_bg;
+				cv::Mat _newest_bg;
+				Image _base;
 				PatchLayer layer;
 
 				static double calcCommonEdge(
@@ -152,13 +135,13 @@ namespace mmpl{
 				size_t max_id;
 				std::vector<size_t> put_list;
 				std::vector<bool> isMoving;
-				Image hidden_image;
-				Image hidden_mask;
+				cv::Mat hidden_image;
+				cv::Mat hidden_mask;
 				bool changed_bg;
 				bool changed_fg;
 				std::set<size_t> patches_in_hidden;
 		};
-	}
+	*/
 }
 
 #endif // __PATCH_MODEL_H__

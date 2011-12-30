@@ -23,7 +23,7 @@ namespace skl{
 			const cv::Mat& src,
 			cv::Mat& labels){
 		cv::Mat mask = cv::Mat(src.size(),src.depth(),1);
-		compute(src,src,labels);
+		return compute(src,src,labels);
 	}
 }
 #endif // __FILTER_MAT2MAT_H__

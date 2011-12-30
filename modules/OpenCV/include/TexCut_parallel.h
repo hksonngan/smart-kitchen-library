@@ -41,11 +41,11 @@ namespace skl{
 					float* gh_std_dev)const{
 				size_t iteration_time = GRADIENT_HETEROGENUITY;
 				float moment1(0),moment2(0);
-				int elem_num = std::pow(TEXCUT_BLOCK_SIZE,2);
+				int elem_num = TEXCUT_BLOCK_SIZE * TEXCUT_BLOCK_SIZE;
 				std::vector<float> powers(elem_num,0.0);
 				for(size_t i = 0; i < iteration_time; i++){
 					for(int e = 0; e < elem_num; e++){
-						powers[e] = rayleigh_rand(sqrt(6)*noise_std_dev);
+						powers[e] = static_cast<float>(rayleigh_rand(std::sqrt(6.0)*noise_std_dev));
 					}
 					std::sort(powers.begin(),powers.end(),std::greater<float>());
 					float factor = powers[powers.size()/2];
@@ -76,7 +76,7 @@ namespace skl{
 							static_cast<int>(img1.at<unsigned char>(y,x))
 							- img2.at<unsigned char>(y,x);
 						temp1 += diff;
-						temp2 += pow(diff,2);
+						temp2 += diff * diff;
 					}
 					moment1 += temp1/img1.cols;
 					moment2 += temp2/img2.cols;

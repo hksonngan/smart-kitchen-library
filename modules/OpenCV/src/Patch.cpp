@@ -1,11 +1,11 @@
 /*!
  * @file Patch.cpp
- * @author ∂∂À‹∆ÿªÀ
+ * @author a_hasimoto
  * @date Last Change:2011/Nov/01.
  */
 
 #include "PatchModel.h"
-#include "cvBlending.h"
+#include "sklcvutils.h"
 #include <iostream>
 
 using namespace mmpl;
@@ -19,120 +19,36 @@ Patch::~Patch(){
 
 }
 
-Patch::Patch(const Image& mask, const Image& newest_image, const Image& current_bg){
-	set(mask,newest_image,current_bg);
+Patch::Patch(const cv::Mat& __mask, const cv::Mat& __newest_image, const cv::Mat& __current_bg, const cv::Rect& roi){
+	set(__mask,__newest_image,__current_bg,roi);
 }
 
-/*Patch::Patch(const Patch& other){
-	for(size_t i=0;i<2;i++){
-		image[i] = other.image[i];
-		mask[i] = other.mask[i];
-		hidden[i] = other.hidden[i];
-		rect[i] = other.rect[i];
-	}
-	visibility = other.visibility;
-	local_features = other.local_features;
-}*/
 
-void Patch::convXY_G2L(int* x,int* y, Type type)const{
-	*x -= rect[type].x;
-	*y -= rect[type].y;
+void Patch::cvtG2L(int* x,int* y, Type type)const{
+	*x -= _roi[type].x;
+	*y -= _roi[type].y;
 }
 
 bool Patch::isIn(int local_x,int local_y, Type type)const{
-	if( local_x < 0 || rect[type].width <= local_x ) return false;
-	if( local_y < 0 || rect[type].height <= local_y ) return false;
+	if( local_x < 0 || _roi[type].width <= local_x ) return false;
+	if( local_y < 0 || _roi[type].height <= local_y ) return false;
 	return true;
 }
 
-void Patch::set(const Image& mask, const Image& newest_image,const Image& current_bg){
-
-	setDilate(getRect(mask),mask,newest_image,current_bg);
-
-	// get edge
-	CvRect edge_bounding_rect = extractEdges(
-			&this->edge,
-			this->mask[dilate],
-			this->image[dilate],
-			this->hidden[dilate],
-			&this->edge_pixel_num);
-//	std::cerr << edge_bounding_rect.x << ", " << edge_bounding_rect.y << ", " << edge_bounding_rect.width << ", " << edge_bounding_rect.height << std::endl;
-
-	if(edge_bounding_rect.width<=1 || edge_bounding_rect.height<=1){
-		// failed to extract edge -> not an object.
-		this->edge.setWidth(1);
-		this->edge.setHeight(1);
-	}
-	else{
-		rect[original] = edge_bounding_rect;
-		setDilate(edge_bounding_rect,mask,newest_image,current_bg);
-	}
-
-	crop(&(this->image[original]),newest_image,rect[original]);
-	crop(&(this->hidden[original]),current_bg,rect[original]);
-
-	visibility = this->mask[original];
-	setPoints();
-}
-
-void Patch::crop(Image* dist,const Image& _src,const CvRect& rect,const IplImage* mask){
-	Image src(_src);
-	src.setROI(rect);
-	dist->setWidth(rect.width);
-	dist->setHeight(rect.height);
-	dist->setChannels(src.getChannels());
-	dist->setDepth(src.getDepth());
-	cvCopy(src.getIplImage(),dist->getIplImage(),mask);
-}
-
-CvRect Patch::getRect(const Image& mask,size_t* pix_num){
-	CvRect rect;
-	rect.x = INT_MAX;
-	rect.y = INT_MAX;
-	rect.width = 0;
-	rect.height = 0;
-
-	size_t count = 0;
-
-	for(int y=0;y<mask.getHeight();y++){
-		unsigned char* pmask = (unsigned char*)(mask.getIplImage()->imageData
-				+ mask.getIplImage()->widthStep * y);
-		for(int x=0;x<mask.getWidth();x++){
-			if(pmask[x]!=0){
-				count++;
-				rect.x = rect.x < x ? rect.x : x;
-				rect.y = rect.y < y ? rect.y : y;
-				rect.width = x < rect.width ? rect.width : x;
-				rect.height = y < rect.height ? rect.height : y;
-			}
-		}
-	}
-	rect.width -= rect.x;
-	rect.height -= rect.y;
-	if(pix_num!=NULL){
-		*pix_num = count;
-	}
-	return rect;
-}
-
-
-void Patch::setVisibility(const CvRect& rect, const Image& mask, bool isVisible){
-	CvRect common_region = getCommonRectanglarRegion(
-			rect,
-			this->getRect(original)
-			);
+void Patch::setCoveredState(const cv::Rect& rect, const cv::Mat& mask, bool isCovered){
+	cv::Rect common_region = rect & _roi[original];
 	common_region.height += common_region.y;
 	common_region.width += common_region.x;
+	unsigned char val = 0;
+	if(isCovered) val = 255;
 	for(int y = common_region.y;y < common_region.height;y++){
 		for(int x=common_region.x;x < common_region.width;x++){
-			if(((float*)(mask.getIplImage()->imageData + 
-							mask.getIplImage()->widthStep * (y - rect.y)
-							))[x - rect.x]>0.0f){
-				this->setVisibility(x,y,isVisible);
-			}
+			if(mask.at<float>(y,x)>0.0)
+				setCoveredState(x,y,val);
 		}
 	}
 
+	//CHECK!
 //	cvShowImage("visibility",this->visibility.getIplImage());
 //	cvShowImage("patch",this->image[original].getIplImage());
 //	cvWaitKey(-1);
@@ -140,143 +56,120 @@ void Patch::setVisibility(const CvRect& rect, const Image& mask, bool isVisible)
 }
 
 
-void Patch::save(const std::string& filename,Type type,int width,int height,const std::string& edge_filename)const{
-	CvRect rect = getRect(type);
-	assert(rect.width <= width);
-	assert(rect.height <= height);
+bool Patch::set(const cv::Mat& __mask, const cv::Mat& __newest_image,const cv::Mat& __current_bg, cv::Rect roi){
+	base_width = __mask.cols;
+	base_height = __mask.rows;
 
-	Image temp(width,height,image[type].getDepth(),image[type].getChannels());
-	cvSet(temp.getIplImage(),CV_RGB(128,128,128));
-	temp.setROI(rect);
+	_roi[dilate] = cv::Rect(
+		roi.x - PATCH_DILATE,
+		roi.y - PATCH_DILATE,
+		roi.x + roi.width + PATCH_DILATE,
+		roi.y + roi.height + PATCH_DILATE);
+	_roi[dilate].x = _roi[dilate].x > 0 ? _roi[dilate].x : 0;
+	_roi[dilate].y = _roi[dilate].y > 0 ? _roi[dilate].y : 0;
+	_roi[dilate].width = _roi[dilate].width < __newest_image.cols ? _roi[dilate].width - _roi[dilate].x : __newest_image.cols - _roi[dilate].x;
+	_roi[dilate].height = _roi[dilate].height < __newest_image.rows ? _roi[dilate].height - _roi[dilate].y : __newest_image.rows - _roi[dilate].y;
 
-	cvBlending(
-			image[type].getIplImage(),
-			temp.getIplImage(),
-			mask[type].getIplImage(),
-			temp.getIplImage());
-	temp.removeROI();
-	temp.saveImage(filename);
-	if(!edge_filename.empty()){
-		temp.setChannels(1);
-		temp.setDepth(edge.getDepth());
+	_image[dilate] = cv::Mat(__newest_image, _roi[dilate]).clone();
+	_hidden[dilate] = cv::Mat(__current_bg, _roi[dilate]).clone();
+	_mask[dilate] = cv::Mat(__mask, _roi[dilate]).clone();
+	std::vector<cv::Point> edge_points;
 
-//		std::cerr << edge.getWidth() << ", " << edge.getHeight() << std::endl;
-//		std::cerr << this->rect[original].width << ", " << this->rect[original].height << std::endl;
+	_edge = get_edge(_image[dilate],_mask[dilate],&edge_points);
 
-		cvZero(temp.getIplImage());
-		temp.setROI(this->rect[original]);
-		cvCopy(edge.getIplImage(),temp.getIplImage());
-		temp.removeROI();
-		temp.saveImage(edge_filename);
+	edge_counts = edge_points.size()  // è„éËÇ¢Ç‚ÇËï˚Ç™Ç†ÇËÇªÇ§
+	if(_edge_count == 0) return;
+
+	roi = fitRect(edge_points);
+	_roi[original] = roi;
+	_image[original] = cv::Mat(__newest_image,roi).clone();
+	_hidden[original] = cv::Mat(__current_bg,roi).clone();
+	_mask[original] = cv::Mat(__mask,roi).clone();	
+	_covered_state = _mask[original].clone();
+
+	cv::Rect roi_dilate = _roi[dilate];
+	_roi[dilate] = cv::Rect(
+	roi.x - PATCH_DILATE,
+	roi.y - PATCH_DILATE,
+	roi.x + roi.width + PATCH_DILATE,
+	roi.y + roi.height + PATCH_DILATE);
+	_roi[dilate].x = _roi[dilate].x > 0 ? _roi[dilate].x : 0;
+	_roi[dilate].y = _roi[dilate].y > 0 ? _roi[dilate].y : 0;
+	_roi[dilate].width = _roi[dilate].width < __newest_image.cols ? _roi[dilate].width - _roi[dilate].x : __newest_image.cols - _roi[dilate].x;
+	_roi[dilate].height = _roi[dilate].height < __newest_image.rows ? _roi[dilate].height - _roi[dilate].y : __newest_image.rows - _roi[dilate].y;
+
+	if(roi_dilate != _roi[dilate]){
+		_image[dilate] = cv::Mat(__newest_image,_roi[dilate]).clone();
+		_hidden[dilate] = cv::Mat(__current_bg,_roi[dilate]).clone();
+		_mask[dilate] = cv::Mat(__mask,_roi[dilate]).clone();	
 	}
+	CvMat ___mask = _mask[dilate];
+	cv::Mat _temp = _mask[dilate].clone();
+	CvMat ___temp = _temp;
+
+	cvSmooth(&___mask,&___mask,CV_BLUR,PATCH_DILATE,PATCH_DILATE);
+	cvThreshold(&__mask,&___mask,0.0f,1.0f,CV_THRESH_BINARY);
+	cvSmooth(&___mask,&___mask,CV_BLUR,PATCH_DILATE,PATCH_DILATE);
 }
 
-void Patch::setPoints(){
-	points.clear();
-	CvPoint base;
-	base.x = rect[original].x;
-	base.y = rect[original].y;
-	for(int y=0;y<mask[original].getHeight();y+=BLOCK_SIZE){
-		float* pmask = (float*)(mask[original].getIplImage()->imageData + mask[original].getIplImage()->widthStep * y);
-		for(int x=0;x<mask[original].getWidth();x+=BLOCK_SIZE){
-			if(pmask[x]!=0){
-				points.push_back(cvPoint(x + base.x,y + base.y));
-			}
-		}
+void Patch::save(const std::string& filename,Type type,const std::string& edge_filename)const{
+	CvRect roi = roi(type);
+	assert(rect.width <= base_width);
+	assert(rect.height <= base_height);
+
+	cv::Mat dest = cv::Mat(base_width,base_height,image[type].depth(),image[type].height(),skl::GRAY);
+	cv::Mat temp = cv::Mat(dest,_roi[type]);
+	skl::blending<cv::Vec3b,float>(temp,_image[type],_mask[type],temp);
+	// CHECK!
+
+	cv::imwrite(filename,dest);
+	if(!edge_filename.empty()){
+		dest = cv::Mat::zeros(dest.size(),_edge.type());
+		temp = cv::Mat(dest,_roi[type]);
+		// cv::MatÇ…ïîï™ìIÇ…èëÇ´Ç±Çﬁï˚ñ@Çå„Ç≈í≤Ç◊ÇÈ
+
+		cv::imwrite(edge_filename,dest);
 	}
 }
 
 /********** Accessor **********/
-const CvRect& Patch::getRect(Type type)const{
-	return rect[type];
-}
-
 float Patch::maskValue(int x, int y, Type type)const{
-	convXY_G2L(&x,&y,type);
+	cvtG2L(&x,&y,type);
 	if(!isIn(x,y,type)) return 0.0;
-
-	return ((float*)(mask[type].getIplImage()->imageData
-			+ mask[type].getIplImage()->widthStep * y) )[x];
+	return mask[type].at<float>(y,x);
 }
 
-Image& Patch::getImage(Type type){
-	return image[type];
+
+void Patch::covered_state(int x,int y,bool isCovered){
+	CvRect roi = _roi[original];
+	assert(roi.x <= x && x < roi.x + rect.width);
+	assert(roi.y <= y && y < roi.y + rect.height);
+	cvtG2L(&x,&y,original);
+
+	unsigned char val = 0;
+	if(isCovered) val = 255;
+	_covered_state.at<unsigned char>(y,x) = val;
 }
 
-const Image& Patch::getImage(Type type)const{
-	return image[type];
-}
 
-Image& Patch::getBG(Type type){
-	return hidden[type];
-}
 
-const Image& Patch::getBG(Type type)const{
-	return hidden[type];
-}
-const Image& Patch::getMask(Type type)const{
-	return mask[type];
-}
-
-const Image& Patch::getEdgeImage()const{
-	return edge;
-}
-
-void Patch::setEdgeImage(const Image& _edge){
-	assert(edge.getWidth()==_edge.getWidth());
-	assert(edge.getHeight()==_edge.getHeight());
-	assert(edge.getDepth()==_edge.getDepth());
-	assert(edge.getChannels()==_edge.getChannels());
-	edge = _edge;
-}
-
-const std::vector<CvPoint>& Patch::getPoints()const{
-	return points;
-}
-
-CvRect Patch::getCommonRectanglarRegion(const CvRect& r1,const CvRect& r2){
-	CvRect dst = r1;
-	dst.width += dst.x;
-	dst.height += dst.y;
-
-	dst.x = dst.x > r2.x ? dst.x:r2.x;
-	dst.y = dst.y > r2.y ? dst.y:r2.y;
-	dst.width = dst.width < r2.x+r2.width ? dst.width:r2.x+r2.width;
-	dst.height = dst.height < r2.y+r2.height ? dst.height:r2.y+r2.height;
-	dst.width -= dst.x;
-	dst.height -= dst.y;
-	return dst;
-}
-
-void Patch::setVisibility(int x,int y,bool isVisible){
-	CvRect rect = this->getRect(original);
-	assert(rect.x <= x && x < rect.x + rect.width);
-	assert(rect.y <= y && y < rect.y + rect.height);
-	convXY_G2L(&x,&y,original);
-
-	unsigned char val = 0.0f;
-	if(isVisible) val = 1.0f;
-	((float*)(visibility.getIplImage()->imageData
-			+ visibility.getIplImage()->widthStep * y) )[x] = val;
-}
-
-CvRect Patch::extractEdges(Image* edge,const Image& mask,const Image& _src,const Image& _bg,size_t* edge_pix_num)const{
-	assert(1==mask.getChannels());
-	assert(IPL_DEPTH_32F==mask.getDepth());
-	assert(mask.getWidth()==_src.getWidth());
-	assert(mask.getHeight()==_src.getHeight());
-	assert(mask.getWidth()==_bg.getWidth());
-	assert(mask.getHeight()==_bg.getHeight());
+CvRect Patch::extractEdges(cv::Mat& edge,const cv::Mat& mask,const cv::Mat& _src,const cv::Mat& _bg, size_t* edge_pix_num)const{
+	assert(CV_32FC1 = mask.type());
+	assert(mask.cols ==_src.cols);
+	assert(mask.rows ==_src.rows);
+	assert(mask.cols ==_bg.cols);
+	assert(mask.rows ==_bg.rows);
 	assert(edge!=NULL);
 
-	Image _edge(mask.getWidth(),mask.getHeight(),IPL_DEPTH_8U,1);
+	cv::Mat _edge(mask.size(),CV_8UC1,0);
 
 	// blending diff, bg with black color bg by dilated mask
-	Image diff = _src;
+	cv::Mat diff = _src.clone();
 	cvAbsDiff(_src.getIplImage(),_bg.getIplImage(),diff.getIplImage());
-	Image black(_src);
-	cvZero(black.getIplImage());
-	cvBlending(diff.getIplImage(),black.getIplImage(),mask.getIplImage(),diff.getIplImage());
+	// CHECK How to calc cvAbsDiff in OpenCV2.0
+
+	cv::Mat black = cv::Mat::zeros(_src.size(),CV_8UC3);
+	skl::blending(diff.getIplImage(),black.getIplImage(),mask.getIplImage(),diff.getIplImage());
 	cvSmooth(diff.getIplImage(),diff.getIplImage(),CV_GAUSSIAN,0,0,1);
 
 	Image bg(_bg);
@@ -313,30 +206,31 @@ CvRect Patch::extractEdges(Image* edge,const Image& mask,const Image& _src,const
 
 //	std::cerr << "orig_rect: " << eb_rect.x << "," << eb_rect.y << "," << eb_rect.width << ", " << eb_rect.height << std::endl;
 
-	// shift eb_rect from rect[dilate]-relative to
+	// shift eb_rect from _roi[dilate]-relative to
 	// to image-absolute coordinate.
 	CvRect abs_eb_rect = eb_rect;
-	abs_eb_rect.x += rect[dilate].x;
-	abs_eb_rect.y += rect[dilate].y;
+	abs_eb_rect.x += _roi[dilate].x;
+	abs_eb_rect.y += _roi[dilate].y;
 
-	// edge bounding box must be smaller then rect[original].
+	// edge bounding box must be smaller then _roi[original].
 	abs_eb_rect.width += abs_eb_rect.x;
 	abs_eb_rect.height += abs_eb_rect.y;
 
-	if(abs_eb_rect.x < rect[original].x){
-		eb_rect.x += rect[original].x - abs_eb_rect.x;
-		abs_eb_rect.x = rect[original].x;
+
+	if(abs_eb_rect.x < _roi[original].x){
+		eb_rect.x += _roi[original].x - abs_eb_rect.x;
+		abs_eb_rect.x = _roi[original].x;
 	}
-	if(abs_eb_rect.y < rect[original].y){
-		eb_rect.y += rect[original].y - abs_eb_rect.y;
-		abs_eb_rect.y = rect[original].y;
+	if(abs_eb_rect.y < _roi[original].y){
+		eb_rect.y += _roi[original].y - abs_eb_rect.y;
+		abs_eb_rect.y = _roi[original].y;
 	}
 
-	if(abs_eb_rect.width > rect[original].x + rect[original].width){
-		abs_eb_rect.width = rect[original].x + rect[original].width;
+	if(abs_eb_rect.width > _roi[original].x + _roi[original].width){
+		abs_eb_rect.width = _roi[original].x + _roi[original].width;
 	}
-	if(abs_eb_rect.height > rect[original].y + rect[original].height){
-		abs_eb_rect.height = rect[original].y + rect[original].height;
+	if(abs_eb_rect.height > _roi[original].y + _roi[original].height){
+		abs_eb_rect.height = _roi[original].y + _roi[original].height;
 	}
 
 	abs_eb_rect.width -= abs_eb_rect.x;
@@ -367,8 +261,8 @@ CvRect Patch::extractEdges(Image* edge,const Image& mask,const Image& _src,const
 
 //	std::cerr << mask_8U.getDepth() << ", " << mask_8U.getChannels() << ", " << mask_8U.getWidth() << ", " << mask_8U.getHeight() << std::endl;
 	CvRect ro_rect = abs_eb_rect;
-	ro_rect.x -= rect[original].x;
-	ro_rect.y -= rect[original].y;
+	ro_rect.x -= _roi[original].x;
+	ro_rect.y -= _roi[original].y;
 //	std::cerr << ro_rect.x << ", " << ro_rect.y << ", " << ro_rect.width << ", " << ro_rect.height << std::endl;
 	crop(&mask_8U,mask_8U,ro_rect);
 	cvCopy(temp.getIplImage(),edge->getIplImage(),mask_8U.getIplImage());
@@ -395,55 +289,3 @@ CvRect Patch::extractEdges(Image* edge,const Image& mask,const Image& _src,const
 	return abs_eb_rect;
 }
 
-void Patch::setDilate(const CvRect& _rect, const Image& mask, const Image& src, const Image& bg){
-	rect[original] = _rect;
-
-
-	Image temp;
-	crop(&temp,mask,rect[original]);
-	this->mask[original] = Image(rect[original].width,rect[original].height,IPL_DEPTH_32F,1);
-	cvConvertScale(temp.getIplImage(),this->mask[original].getIplImage(),1.0/255,0);
-
-	// dilate≤Ë¡¸§Ú§‹§´§π¡∞§À∑◊ªª§Œ∏˙Œ®≤Ω§Œ§ø§·§À
-	// dilate∏Â§Œ≤Ë¡¸ŒŒ∞Ë§Ú¿Ë§À•Ø•Í•√•◊§π§Î
-	rect[dilate].x = rect[original].x - PATCH_DILATE;
-	rect[dilate].x = 0 > rect[dilate].x ? 0 : rect[dilate].x;
-	rect[dilate].width = rect[original].x + rect[original].width + PATCH_DILATE;
-	rect[dilate].width = rect[dilate].width > mask.getWidth() ? mask.getWidth() : rect[dilate].width;
-	rect[dilate].width -= rect[dilate].x;
-
-	rect[dilate].y = rect[original].y - PATCH_DILATE;
-	rect[dilate].y = 0 > rect[dilate].y ? 0 : rect[dilate].y;
-
-	rect[dilate].height = rect[original].y + rect[original].height + PATCH_DILATE;
-	rect[dilate].height = rect[dilate].height > mask.getHeight() ? mask.getHeight() : rect[dilate].height;
-	rect[dilate].height -= rect[dilate].y;
-	
-//	crop(&temp,mask,rect[dilate]);
-	CvRect do_roi = rect[original];
-	do_roi.x -= rect[dilate].x;
-	do_roi.y -= rect[dilate].y;
-	this->mask[dilate] = Image(rect[dilate].width,rect[dilate].height,IPL_DEPTH_32F,1);
-	cvZero(this->mask[dilate].getIplImage());
-
-	this->mask[dilate].setROI(do_roi);
-	cvCopy(this->mask[original].getIplImage(),this->mask[dilate].getIplImage());
-	this->mask[dilate].removeROI();
-//	cvShowImage("dilated mask",this->mask[dilate].getIplImage());
-//	cvWaitKey(-1);
-
-	// mask[dilate]§Œ∂≠≥¶§Ú§‹§´§π
-	cvSmooth(this->mask[dilate].getIplImage(),this->mask[dilate].getIplImage(),CV_BLUR,PATCH_DILATE,PATCH_DILATE);
-	cvThreshold(this->mask[dilate].getIplImage(),this->mask[dilate].getIplImage(),0.0f,1.0f,CV_THRESH_BINARY);
-	cvSmooth(this->mask[dilate].getIplImage(),this->mask[dilate].getIplImage(),CV_BLUR,PATCH_DILATE,PATCH_DILATE);
-
-	// ∏µ≤Ë¡¸§Ú∆˛§Ï§∆§™§Ø
-	crop(&(this->image[dilate]),src,rect[dilate]);
-
-	// º´ ¨§ŒŒ¢¬¶§Œ«ÿ∑ §‚µ≠≤±§∑§∆§™§Ø
-	crop(&(this->hidden[dilate]),bg,rect[dilate]);
-}
-
-size_t Patch::getEdgePixelNum()const{
-	return edge_pixel_num;
-}

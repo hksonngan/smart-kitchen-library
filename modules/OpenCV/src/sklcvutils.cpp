@@ -1,7 +1,52 @@
 #include "sklcvutils.h"
+
+cv::Rect operator&(const cv::Rect& left, const cv::Rect& right){
+	cv::Rect rect(left.x,left.y,left.x+left.width,left.y+left.height);
+	rect.x = rect.x > right.x ? rect.x : right.x;
+	rect.y = rect.y > right.y ? rect.y : right.y;
+	rect.width = rect.width < right.x + right.width ? rect.width : right.x + right.width;
+	rect.height = rect.height < right.y + right.height ? rect.height : right.y + right.height;
+	rect.width -= rect.x;
+	rect.height -= rect.y;
+	return rect;
+}
+bool operator&&(const cv::Rect& left, const cv::Rect& right){
+	cv::Rect rect = left & right;
+	return (rect.width > 0) && (rect.height > 0);
+}
+
+cv::Rect operator|(const cv::Rect& left, const cv::Rect& right){
+	cv::Rect rect(left.x,left.y,left.x+left.width,left.y+left.height);
+	rect.x = rect.x < right.x ? rect.x : right.x;
+	rect.y = rect.y < right.y ? rect.y : right.y;
+	rect.width = rect.width > right.x + right.width ? rect.width : right.x + right.width;
+	rect.height = rect.height > right.y + right.height ? rect.height : right.y + right.height;
+	rect.width -= rect.x;
+	rect.height -= rect.y;
+	return rect;
+}
+
+
+
 namespace skl{
 	/*!
-	 * @brief HLSからBGRの値を取得
+	 * calc minimum rect which contains points
+	 */
+	cv::Rect fitRect(const std::vector< cv::Point >& points){
+		cv::Rect rect(INT_MAX,INT_MAX,0,0);
+		for(int i=0;i<points.size();i++){
+			int x = points[i].x;
+			int y = points[i].y;
+			rect.x = rect.x < x ? rect.x : x;
+			rect.y = rect.y < y ? rect.y : y;
+			rect.width = rect.width > x ? rect.width : x;
+			rect.height = rect.height > y ? rect.height : y;
+		}
+		return rect;
+	}
+
+	/*!
+	 * @brief calc HLS value
 	 * */
 	unsigned char getHLSvalue(int min,int max,unsigned char hue){
 		if(max>255)max=255;if(min>255)min=255;
@@ -109,7 +154,7 @@ namespace skl{
 	template<> cv::Vec3b blend(const cv::Vec3b& pix1,const cv::Vec3b& pix2, double w1, double w2){
 		cv::Vec3b val;
 		for(size_t i=0;i<3;i++){
-			val[i] = w1 * pix1[i] + w2 * pix2[i];
+			val[i] = static_cast<unsigned char>(w1 * pix1[i] + w2 * pix2[i] + 0.5);
 		}
 		return val;
 	}
@@ -160,5 +205,6 @@ template<class ElemType,class WeightType> void blending(const cv::Mat& src1,cons
 				ParallelBlending<ElemType,WeightType>(src1,src2,weight_mask,dest)
 				);
 	}
+
 
 }// namespace skl

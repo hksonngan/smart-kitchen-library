@@ -1,6 +1,6 @@
 /*!
  * @file PatchModel.cpp
- * @author ∂∂À‹∆ÿªÀ
+ * @author a_hasimoto
  * @date Last Change:2011/Nov/01.
  */
 
@@ -18,18 +18,16 @@ PatchModel::PatchModel(const Image& base_bg):layer(&patches),max_id(0){
 }
 
 /*
- * @brief «ÿ∑ ≤Ë¡¸§Ú•ª•√•»§∑°¢§Ω§Ï∞ ≥∞§œ¡¥§∆•Í•ª•√•»§π§Î
- * */
-void PatchModel::setBaseBG(const Image& base_bg){
-	this->base_bg = base_bg;
-	newest_bg = base_bg;
-	hidden_image = base_bg;
-	hidden_mask = Image(
+ * @brief «ÿ∑ ≤Ë¡ÅEÚ•ª•√•»§∑°¢§Ω§ÅE ≥∞§œ¡¥§∆•ÅEª•√•»§π§ÅE * */
+void PatchModel::base(const cv::Mat& __bg){
+	this->_base = __bg.clone();
+	_newest_bg = __bg.clone();
+	hidden_image = cv::Mat::zeros(__bg.size(),CV_8UC3);
+	hidden_mask = cv::Mat::zeros(__bg.size(),CV_32FC1);
+		Image(
 			base_bg.getWidth(),
 			base_bg.getHeight(),
 			IPL_DEPTH_32F,1);
-	cvZero(hidden_image.getIplImage());
-	cvZero(hidden_mask.getIplImage());
 	patches.clear();
 	changed_bg = false;
 	changed_fg = false;
@@ -37,12 +35,10 @@ void PatchModel::setBaseBG(const Image& base_bg){
 
 
 /*
- * @brief ¥∞¡¥§Àø∑§∑§§•—•√•¡§Ú≈–œø§π§Î
- * */
+ * @brief ¥∞¡¥§Àø∑§∑§§•—•√•¡§Ú≈–œø§π§ÅE * */
 size_t PatchModel::putPatch(const Image& mask, const Image& newest_image){
 
-/*	// §ﬁ§∫§œ°¢§≥§ŒmaskŒŒ∞Ë§¨∏Ω∫ﬂ∞‹∆∞√Ê§»ª◊§Ô§Ï§Î•—•√•¡§«§ §§§´≥Œ«ß§π§Î
-	std::vector<size_t> matched_ids;
+/*	// §ﬁ§∫§œ°¢§≥§ŒmaskŒŒ∞Ë§¨∏Ω∫ﬂ∞‹∆∞√Ê§»ª◊§ÅEÅEÅE—•√•¡§«§ §§§´≥Œ«ß§π§ÅE	std::vector<size_t> matched_ids;
 	Image mask(_mask);
 	bool hasRest = true;
 std::cerr << __FILE__ << ": " << __LINE__ << std::endl;
@@ -55,8 +51,7 @@ std::cerr << __FILE__ << ": " << __LINE__ << std::endl;
 		}
 	}
 std::cerr << __FILE__ << ": " << __LINE__ << std::endl;
-	// §‚§¶¬–±˛§π§Î ™¬Œ§¨§ §§ƒ…¿◊¥Ô§Ú∫ÔΩ¸
-	for(size_t i=0;i<trackers.size();i++){
+	// §‚§¶¬–±˛§π§ÅE™¬Œ§¨§ §§ƒ…¿◊¥ÅEÚ∫ÅEÅE	for(size_t i=0;i<trackers.size();i++){
 		if(!trackers[i].hasTargets()){
 			trackers.erase(trackers.begin()+i);
 			i--;
@@ -67,8 +62,7 @@ std::cerr << __FILE__ << ": " << __LINE__ << std::endl;
 	for(size_t i=0;i<matched_ids.size();i++){
 		isMoving[matched_ids[i]] = false;
 		layer.push(matched_ids[i]);
-		// «ÿ∑ ≤Ë¡¸§Úππø∑§π§Î
-		// (Ã§º¬¡ı)
+		// «ÿ∑ ≤Ë¡ÅEÚππø∑§π§ÅE		// (Ã§º¬¡ÅE
 	}
 std::cerr << __FILE__ << ": " << __LINE__ << std::endl;
 
@@ -88,9 +82,7 @@ std::cerr << __FILE__ << ": " << __LINE__ << std::endl;
 		return UINT_MAX;
 	}
 
-	// Ω≈§ §√§ø•—•√•¡§Œvisivility mask§Úππø∑§π§Î
-	// •—•√•¡§ŒæÂ≤º¥ÿ∑∏§Úππø∑§π§Î
-	layer.push(ID);
+	// Ω≈§ §√§ø•—•√•¡§Œvisivility mask§Úππø∑§π§ÅE	// •—•√•¡§ŒæÂ≤º¥ÿ∑∏§Úππø∑§π§ÅE	layer.push(ID);
 	std::vector<size_t> lower_patches = layer.getAllBeneathPatch(ID,Patch::original);
 	for(size_t i=0;i<lower_patches.size();i++){
 		patches[lower_patches[i]].setVisibility(
@@ -109,40 +101,36 @@ std::cerr << __FILE__ << ": " << __LINE__ << std::endl;
 }
 
 /*
- * @brief isFloat§¨true§¿§√§ø ™¬Œ§Œ∞‹∆∞∞Ã√÷§Ú≥ŒƒÍ§µ§ª§Î
- * */
+ * @brief isFloat§¨true§¿§√§ø ™¬Œ§Œ∞‹∆∞∞Ã√÷§Ú≥ŒƒÍ§µ§ª§ÅE * */
 /*
 void PatchModel::movePatch(size_t ID,const cv::mat& homography, const Image& newest_image){
-	// homography§ÀΩæ§√§∆∂…ΩÍ∆√ƒß§Œ∞Ã√÷§‰√Õ§Ú —¥π
-	// newest_image§»∂…ΩÍ∆√ƒß§¨Œ‡ª˜§∑§∆§§§ø§Èmask[original]§Ú1.0§À°£
-	// ∫«∏Â§Àextract(mask[original])§π§Î
-	assert(patches[ID].isFloat);
+	// homography§ÀΩæ§√§∆∂…ΩÅE√ƒß§Œ∞Ã√÷§‰√Õ§Ú —¥π
+	// newest_image§»∂…ΩÅE√ƒß§¨Œ‡ª˜§∑§∆§§§ø§Èmask[original]§ÅE.0§À°£
+	// ∫«∏Â§Àextract(mask[original])§π§ÅE	assert(patches[ID].isFloat);
 	patches[ID].isFloat = false;
 	patches[ID].move(homography,newest_image);
 
-	// •—•√•¡§ŒæÂ≤º¥ÿ∑∏§Úππø∑§π§Î
-	layer.push(ID,patches[ID]);
+	// •—•√•¡§ŒæÂ≤º¥ÿ∑∏§Úππø∑§π§ÅE	layer.push(ID,patches[ID]);
 
 	changed = true;
-	// ø∑§∑§§•—•√•¡§Œ•ﬁ•π•Ø§Úupdate_mask§À≤√§®§Î
-	includeMaskOf(ID,Patch::dilate);
+	// ø∑§∑§§•—•√•¡§Œ•ﬁ•π•Ø§Úupdate_mask§À≤√§®§ÅE	includeMaskOf(ID,Patch::dilate);
 }
 */
 
 
 /*
- * @brief •—•√•¡§Ú•‚•«•Î§´§ÈºË§ÍΩ¸§Ø
+ * @brief •—•√•¡§Ú•‚•«•ÅE´§ÈºË§ÅEÅEØ
  * */
 void PatchModel::takePatch(size_t ID,std::vector<size_t>* taken_patch_ids){
 	std::map<size_t,Patch>::iterator ppatch;
 	ppatch = patches.find(ID);
 	assert(patches.end() != ppatch);
 
-	// ¥˚§ÀºË§ÍΩ¸§´§Ï§ø•—•√•¡§ §ÈΩ™Œª
+	// ¥˚§ÀºË§ÅEÅE´§ÅEø•—•√•¡§ §ÈΩ™Œª
 	if(isMoving[ppatch->first]) return;
 	isMoving[ppatch->first] = true;
 
-	// º´ ¨§Ë§Í≤º§À§¢§Î ™¬Œ§Œvisibility§Útrue§ÀÃ·§π
+	// º´ ¨§Ë§ÅEº§À§¢§ÅE™¬Œ§Œvisibility§Útrue§ÀÃ·§π
 	std::vector<size_t> lower_patches = layer.getAllBeneathPatch(ID,Patch::original);
 	for(size_t i=0;i<lower_patches.size();i++){
 		patches[lower_patches[i]].setVisibility(
@@ -151,8 +139,7 @@ void PatchModel::takePatch(size_t ID,std::vector<size_t>* taken_patch_ids){
 				true);
 	}
 
-	// ID§Ë§ÍæÂ§À§¢§Î•—•√•¡§Ú¿Ë§ÀºË§ÍµÓ§Î
-	size_t upper_patch_id;
+	// ID§Ë§ÅEÂ§À§¢§ÅE—•√•¡§Ú¿Ë§ÀºË§ÅE˚¿ÅE	size_t upper_patch_id;
 	while(UINT_MAX != (upper_patch_id = layer.getUpperPatch(ID,Patch::original))){
 		takePatch(upper_patch_id,taken_patch_ids);
 	}
@@ -161,12 +148,11 @@ void PatchModel::takePatch(size_t ID,std::vector<size_t>* taken_patch_ids){
 		taken_patch_ids->push_back(ID);
 	}
 
-	// º´ ¨§Œ∏Â§Ì§Œ≤Ë¡¸§Úππø∑Õ—§À∫Ó¿Æ
+	// º´ ¨§Œ∏Â§˙¿Œ≤Ë¡ÅEÚππø∑Õ—§À∫˚‹Æ
 	hidden_image.setROI(ppatch->second.getRect(Patch::dilate));
 	hidden_mask.setROI(ppatch->second.getRect(Patch::dilate));
-	// ¥˚§Àhidden_image§¨•ª•√•»§µ§Ï§∆§§§ÎŒŒ∞Ë§À¬–§∑§∆°¢
-	// hidden_image§»ppatch§«∂¶ƒÃ…Ù ¨§¨§¢§ÎæÏπÁ§Œ•÷•Ï•Û•«•£•Û•∞•ﬁ•π•Ø§Ú∫Ó§Î
-	Image common_mask = ppatch->second.getMask(Patch::dilate);
+	// ¥˚§Àhidden_image§¨•ª•√•»§µ§ÅE∆§§§ÅEŒ∞Ë§À¬–§∑§∆°¢
+	// hidden_image§»ppatch§«∂¶ƒÃ…Ù ¨§¨§¢§ÅEÅEÁ§Œ•÷•ÅEÛ•«•£•Û•∞•ﬁ•π•Ø§Ú∫˚¿ÅE	Image common_mask = ppatch->second.getMask(Patch::dilate);
 	Image temp = common_mask;
 	cvThreshold(hidden_mask.getIplImage(),temp.getIplImage(),0.0,1.0,CV_THRESH_BINARY);
 	cvSubRS(common_mask.getIplImage(),cvScalar(1.0),common_mask.getIplImage());
@@ -183,8 +169,7 @@ void PatchModel::takePatch(size_t ID,std::vector<size_t>* taken_patch_ids){
 	hidden_image.removeROI();
 //	cvShowImage("huga",hidden_image.getIplImage());
 
-	// º´ ¨§Œ∏Â§Ì§Œ≤Ë¡¸§À¬–§π§Îππø∑Œ®§Ú¿ﬂƒÍ
-	cvMax(
+	// º´ ¨§Œ∏Â§˙¿Œ≤Ë¡ÅEÀ¬–§π§ÅEπø∑Œ®§Ú¿ﬂƒÅE	cvMax(
 			hidden_mask.getIplImage(),
 			ppatch->second.getMask(Patch::dilate).getIplImage(),
 			hidden_mask.getIplImage()
@@ -193,16 +178,15 @@ void PatchModel::takePatch(size_t ID,std::vector<size_t>* taken_patch_ids){
 //	cvShowImage("hage",hidden_mask.getIplImage());
 //	cvWaitKey(-1);
 
-	// º´ ¨§ŒID§Úlayer§´§ÈºË§ÍΩ¸§Ø
+	// º´ ¨§ŒID§Úlayer§´§ÈºË§ÅEÅEØ
 	layer.erase(ID);
-	// º´ ¨§ŒID§Úpatches_in_hidden§´§ÈºË§ÍΩ¸§Ø
+	// º´ ¨§ŒID§Úpatches_in_hidden§´§ÈºË§ÅEÅEØ
 	patches_in_hidden.erase(ID);
 	changed_bg = true;
 }
 
 /*
- * @brief  —ππ§Únewest_bg§À»ø±«§µ§ª§Î
- * */
+ * @brief  —ππ§Únewest_bg§À»ø±«§µ§ª§ÅE * */
 void PatchModel::updateNewestBG(){
 	// newest_bg§Úππø∑
 
@@ -247,14 +231,14 @@ const Image& PatchModel::getNewestBG()const{
 }
 
 
-size_t PatchModel::checkMovingPatches(const Image& mask,const Image& newest_image,const Image& newest_bg)const{
+size_t PatchModel::checkLostPatches(const Image& mask,const Image& newest_image,const Image& newest_bg)const{
 	assert(mask.getWidth() == base_bg.getWidth());
 	assert(mask.getHeight() == base_bg.getHeight());
 	assert(mask.getChannels() == 1);
 	assert(mask.getDepth() == IPL_DEPTH_8U);
 
-	// mask§À Ò¥ﬁ§µ§Ï§ÎŒŒ∞Ë§Ú•¡•ß•√•Ø§∑§∆°¢∞Ï»÷•π•≥•¢§¨π‚§§§‚§Œ§Úmoving_patch_ids§Àƒ…≤√
-	//  Ò¥ﬁ§µ§Ï§∆§§§Î§´§…§¶§´§Œ§∑§≠§§√Õ=0.9
+	// mask§À Ò¥ﬁ§µ§ÅEÅEŒ∞Ë§Ú•¡•ß•√•Ø§∑§∆°¢∞ÅE÷•π•≥•¢§¨π‚§§§‚§Œ§Úmoving_patch_ids§Àƒ…≤√
+	//  Ò¥ﬁ§µ§ÅE∆§§§ÅE´§…§¶§´§Œ§∑§≠§§√Õ=0.9
 	double min_region_rate = REMOVED_OBJECT_MIN_REGION_RATE;
 	double thresh_min_score = REMOVED_OBJECT_MIN_SCORE;
 
@@ -281,14 +265,14 @@ size_t PatchModel::checkMovingPatches(const Image& mask,const Image& newest_imag
 		CvRect patch_rect = ppatch->second.getRect(Patch::original);
 		CvRect common_rect = Patch::getCommonRectanglarRegion(
 				patch_rect,mrect);
-		// ƒπ ˝∑¡§¨Ω≈§ §√§∆§§§ §±§Ï§–•π•≠•√•◊
+		// ƒπ ˝∑¡§¨Ω≈§ §√§∆§§§ §±§ÅE–•π•≠•√•◊
 		if(common_rect.width <= 0 || common_rect.height <= 0) continue;
 
 
 //ppatch->second.save("temp.png",Patch::original,mask.getWidth(),mask.getHeight());
 //Image temp("temp.png");
 
-		// •—•√•¡§ŒÃÃ¿—(≈¿§ŒøÙ)
+		// •—•√•¡§ŒÃÃ¿—(≈¿§ŒøÅE
 		size_t patch_area = ppatch->second.getPoints().size();
 		size_t count = 0;
 		for(size_t i=0;i<patch_area;i++){
@@ -300,7 +284,7 @@ size_t PatchModel::checkMovingPatches(const Image& mask,const Image& newest_imag
 			}
 		}
 
-		//  Ò¥ﬁ§µ§Ï§∆§§§Î/§∑§∆§§§Î§´§…§¶§´§Œ•¡•ß•√•Ø
+		//  Ò¥ﬁ§µ§ÅE∆§§§ÅE§∑§∆§§§ÅE´§…§¶§´§Œ•¡•ß•√•Ø
 		double recall_rate = static_cast<double>(count)/patch_area;
 		double precision_rate = static_cast<double>(count)/mask_count;
 //		std::cerr << "recall_rate: " << recall_rate << std::endl;
@@ -309,7 +293,7 @@ size_t PatchModel::checkMovingPatches(const Image& mask,const Image& newest_imag
 				&& precision_rate < min_region_rate) continue;
 
 
-		// ∞Ï√◊≈Ÿ§Œ•¡•ß•√•Ø
+		// ∞ÅE◊≈Ÿ§Œ•¡•ß•√•Ø
 		double score = calcCommonEdge(common_rect,test_patch,ppatch->second);
 
 //		std::cerr << "score: " << score << std::endl;
@@ -364,7 +348,7 @@ void PatchModel::save(
 	fout.open((file_head+"_state.txt").c_str());
 	assert(fout);
 
-	// •—•√•¡§Œæı¬÷§Ú§¢§È§Ô§π•’•°•§•Î§Ú∫Ó¿Æ
+	// •—•√•¡§Œæı¬÷§Ú§¢§È§ÅEπ•’•°•§•ÅEÚ∫˚‹Æ
 	std::map<size_t,Patch>::const_iterator ppatch;
 	for(ppatch = patches.begin();
 			ppatch != patches.end();ppatch++){
@@ -404,8 +388,7 @@ void PatchModel::getHiddenPatches(const Image& mask,std::vector<size_t>* newly_h
 	assert(mask.getWidth()==newest_bg.getWidth());
 
 
-	// mask§Œ√Ê§Œ4x4§Œ•÷•Ì•√•Ø§ŒøÙ§Ú•´•¶•Û•»§π§Î
-	size_t mask_count = 0;
+	// mask§Œ√Ê§Œ4x4§Œ•÷•˙¡√•Ø§ŒøÙ§Ú•´•¶•Û•»§π§ÅE	size_t mask_count = 0;
 	CvRect mrect;mrect.x=INT_MAX;mrect.y=INT_MAX;mrect.width=0;mrect.height=0;
 
 	for(int y = 0; y < mask.getHeight(); y += BLOCK_SIZE){
@@ -427,13 +410,13 @@ void PatchModel::getHiddenPatches(const Image& mask,std::vector<size_t>* newly_h
 //		if(isMoving[ppatch->first]) continue;
 
 		CvRect patch_rect = ppatch->second.getRect(Patch::original);
-		// ƒπ ˝∑¡§¨Ω≈§ §√§∆§§§ §±§Ï§–•π•≠•√•◊
+		// ƒπ ˝∑¡§¨Ω≈§ §√§∆§§§ §±§ÅE–•π•≠•√•◊
 		if(patch_rect.x > mrect.width
 				|| patch_rect.y > mrect.height
 				|| patch_rect.x + patch_rect.width < mrect.x
 				|| patch_rect.y + patch_rect.height < mrect.y) continue;
 
-		// •—•√•¡§ŒÃÃ¿—(≈¿§ŒøÙ)
+		// •—•√•¡§ŒÃÃ¿—(≈¿§ŒøÅE
 		size_t patch_area = ppatch->second.getPoints().size();
 		size_t count = 0;
 		for(size_t i=0;i<patch_area;i++){

@@ -1,5 +1,6 @@
 #include "TexCut.h"
 #include "TexCut_parallel.h"
+#include <iostream>
 
 using namespace skl;
 TexCut::TexCut():g(NULL){
@@ -308,7 +309,7 @@ void TexCut::setCapacity(
 			QUANTIZATION_LEVEL - _data_term,
 			_data_term);
 	if(x!=nodes[0].size()-1){
-		int _smoothing_term_x = smoothing_term_weight * smoothing_term_x.at<int>(y,x);
+		int _smoothing_term_x = static_cast<int>(smoothing_term_weight * smoothing_term_x.at<int>(y,x));
 		if(_smoothing_term_x < 0){
 			std::cerr << smoothing_term_x.at<int>(y,x) << std::endl;
 			std::cerr << smoothing_term_weight << std::endl;

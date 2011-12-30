@@ -1,3 +1,4 @@
+VisualStudioProjects = ["Core","OpenCV"]
 
 ModuleDependency = {}
 ModuleDependency["Core"] = []

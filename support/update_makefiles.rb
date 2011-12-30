@@ -68,9 +68,11 @@ end
 # generate module MakeFiles
 for mod in MODULE_LIST do
 	module_makefile = "#{MODULE_DIR}/#{mod}/Makefile"
-	next if File.exist?(module_makefile)
+#	next if File.exist?(module_makefile)
 	module_name = mod
 	module_downcase_name = mod.downcase
+
+	visual_studio = (VisualStudioProjects.include?(module_name))
 	erb = ERB.new(open(MOD_MAKEFILE_TEMPLATE).read)
 	File.open(module_makefile,"w").write(erb.result(binding))
 

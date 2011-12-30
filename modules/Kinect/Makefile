@@ -1,7 +1,7 @@
 all:
 	cd src;$(MAKE)
 	cp src/libskl_kinect.a ../../lib
-#	cd Windows; ./generate_vcproj.rb > KinectBase.vcproj
+
 
 .PHONY: clean debug
 

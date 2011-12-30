@@ -1,8 +1,8 @@
-#include "sklutils.h"
+ï»¿#include "sklutils.h"
 
 namespace skl{
 	/*
-	 * @brief Ê¿¶Ñ0,É¸½àÊĞº¹1¤Î¥¬¥¦¥¹Ê¬ÉÛ¤òºîÀ®¤¹¤ë
+	 * @brief å¹³å‡0,æ¨™æº–åå·®1ã®ã‚¬ã‚¦ã‚¹åˆ†å¸ƒã‚’ä½œæˆã™ã‚‹
 	 * */
 	double gauss_rand(){
 		double v1,v2,s;

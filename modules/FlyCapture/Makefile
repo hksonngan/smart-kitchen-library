@@ -1,7 +1,7 @@
 all:
 	cd src;$(MAKE)
 	cp src/libskl_flycapture.a ../../lib
-#	cd Windows; ./generate_vcproj.rb > FlyCaptureBase.vcproj
+
 
 .PHONY: clean debug
 

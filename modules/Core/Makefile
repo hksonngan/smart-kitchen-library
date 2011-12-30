@@ -1,7 +1,7 @@
 all:
 	cd src;$(MAKE)
 	cp src/libskl_core.a ../../lib
-#	cd Windows; ./generate_vcproj.rb > CoreBase.vcproj
+	cd VisualStudioProject; ./generate_vcproj.rb > SKLCore.vcproj
 
 .PHONY: clean debug
 

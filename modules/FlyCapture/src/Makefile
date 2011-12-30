@@ -4,12 +4,24 @@ LIBNAME = libskl_flycapture
 
 ADDITIONALMODULE = OpenCV Core
 
+BOMCHECK_SCRIPT = ../../../support/CheckAndAddBOM.rb
+
 L_BITS := $(shell getconf LONG_BIT)
 
 CC = g++
 
+# options for OpenCV
+piriod:= .
+empty:=
+space:= $(empty) $(empty)
+OPENCVVER	= $(subst $(piriod),$(space),$(shell pkg-config --modversion opencv))
+INC += `pkg-config --cflags opencv`
+LIBS_OPT += `pkg-config --libs opencv`
 
-INC += -I../include
+CFLAGS += -DCV_MAJOR_VERSION=$(word 1,$(OPENCVVER))
+CFLAGS += -DCV_MINOR_VERSION=$(word 2,$(OPENCVVER))
+
+INC += -I../include -I../../../include
 INC += ${ADDITIONALMODULE:%=-I../../%/include/}
 
 .SUFFIXES:.cpp
@@ -34,6 +46,7 @@ ${LIBNAME}_d(%_d.o):%_d.o
 
 # hoge.cpp -> hoge_d.o
 %_d.o:%.cpp
+	ruby $(BOM_SCRIPT) $@
 	$(CC) -g -c $(CFLAGS) -o $@ $< $(INC) -DDEBUG -D__linux__
 
 clean:

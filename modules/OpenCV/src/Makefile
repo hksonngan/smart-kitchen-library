@@ -4,6 +4,8 @@ LIBNAME = libskl_opencv
 
 ADDITIONALMODULE = Core
 
+BOMCHECK_SCRIPT = ../../../support/CheckAndAddBOM.rb
+
 L_BITS := $(shell getconf LONG_BIT)
 
 CC = g++
@@ -44,6 +46,7 @@ ${LIBNAME}_d(%_d.o):%_d.o
 
 # hoge.cpp -> hoge_d.o
 %_d.o:%.cpp
+	ruby $(BOM_SCRIPT) $@
 	$(CC) -g -c $(CFLAGS) -o $@ $< $(INC) -DDEBUG -D__linux__
 
 clean:

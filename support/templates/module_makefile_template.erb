@@ -1,7 +1,7 @@
 all:
 	cd src;$(MAKE)
 	cp src/libskl_<%= module_downcase_name %>.a ../../lib
-#	cd Windows; ./generate_vcproj.rb > <%= module_name %>Base.vcproj
+<%if visual_studio %>	cd VisualStudioProject; ./generate_vcproj.rb > SKL<%= module_name %>.vcproj<%else%><%end%>
 
 .PHONY: clean debug
 

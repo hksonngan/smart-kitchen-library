@@ -34,7 +34,7 @@ namespace skl{
 	 */
 	cv::Rect fitRect(const std::vector< cv::Point >& points){
 		cv::Rect rect(INT_MAX,INT_MAX,0,0);
-		for(int i=0;i<points.size();i++){
+		for(size_t i=0;i<points.size();i++){
 			int x = points[i].x;
 			int y = points[i].y;
 			rect.x = rect.x < x ? rect.x : x;

@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <cassert>
 #include "sklstring.h"
+
 namespace skl{
 
 /*!
@@ -26,9 +27,9 @@ class OptParser{
 		virtual ~OptParser();
 		void on(const std::string& long_form, const std::string& expression, const std::string& explanation);
 		void on(const std::string& short_form, const std::string& long_form,const std::string& expression, const std::string& explanation);
-		template<class T> bool get(const std::string& var_name, T* var)const;
-		template<class T> bool get_vector(const std::string& var_name, std::vector<T>* var, const std::string& deliminator=":")const;
+		bool get(const std::string& var_name, std::string* var)const;
 		std::vector<std::string> parse(int argc,char* argv[]);
+		std::vector<std::string> parse(const std::vector<std::string>& args);
 		void usage()const;
 		bool help()const;
 	protected:
@@ -52,56 +53,83 @@ class OptParser{
 		bool _help;
 	private:
 		int parse_error(const std::string& str)const;
-		static const int true_string_num;
-		static const std::string true_strings[];
-		static const int false_string_num;
-		static const std::string false_strings[];
 };
 
 /*
  * @class parser for indivisual valiables (interface)
  * */
-class OptParserAtom{
+class OptParserAtomInterface{
 	public:
-		OptParserAtom(){
+		OptParserAtomInterface(){
 			next = atom_top;
 			atom_top = this;
 		}
-		virtual ~OptParserAtom(){};
+		virtual ~OptParserAtomInterface(){};
 		virtual void on(OptParser* parser)=0;
 		virtual void get(OptParser* parser)=0;
-		OptParserAtom* next;
-		static OptParserAtom* atom_top;
+		OptParserAtomInterface* next;
+		static OptParserAtomInterface* atom_top;
+	protected:
 };
 
+template<class T> class OptParserAtom : public OptParserAtomInterface{
+	public:
+		OptParserAtom(
+			const std::string& short_form,
+			const std::string& var_name,
+			const std::string& expression,
+			const std::string& explanation,
+			T* dest);
+		~OptParserAtom();
+		void on(OptParser* parser);
+		void get(OptParser* parser);
+	protected:
+		std::string short_form;
+		std::string var_name;
+		std::string expression;
+		std::string explanation;
+		T* dest;
+};
 
+template<class T> OptParserAtom<T>::OptParserAtom(
+			const std::string& short_form,
+			const std::string& var_name,
+			const std::string& expression,
+			const std::string& explanation,
+			T* dest):short_form(short_form),var_name(var_name),expression(expression),explanation(explanation),dest(dest){}
+template<class T> OptParserAtom<T>::~OptParserAtom(){}
 
-template<class T> bool OptParser::get(const std::string& var_name,T* var)const{
-	std::stringstream ss;
-	std::map<std::string,std::string>::const_iterator pp = option_values.find(var_name);
-	if(option_values.end()==pp) return false;
-	if("0"==pp->second) return true;
-	ss << pp->second;
-	ss >> *var;
-	return true;
+template<class T> void OptParserAtom<T>::on(OptParser* parser){
+	parser->on(short_form, "--" + var_name, expression, explanation);
 }
 
-template<class T> bool OptParser::get_vector(const std::string& var_name, std::vector<T>* var,const std::string& deliminator)const{
-	std::map<std::string,std::string>::const_iterator pp = option_values.find(var_name);
-	if(option_values.end()==pp) return false;
-	if("0"==pp->second) return true;
-
-	std::vector<std::string> buf;
-	buf = split(pp->second,deliminator);
-	var->resize(buf.size());
-	for(size_t i=0;i<buf.size();i++){
-		std::stringstream ss;
-		ss << buf[i];
-		ss >> var->at(i);
-	}
-	return true;
+template<class T> void OptParserAtom<T>::get(OptParser* parser){
+	std::string buf;
+	parser->get(var_name,&buf);
+	convert<T>(buf,dest);
 }
 
+template<class T> class OptParserAtomhoge : public OptParserAtomInterface{
+};
+template<class T, class Container> class OptParserAtomContainer : public OptParserAtomInterface{
+	public:
+		OptParserAtomContainer(
+				const std::string& short_form,
+				const std::string& var_name,
+				const std::string& expression,
+				const std::string& explanation,
+				Container<T>* dest,
+				const std::string& deliminator=":",
+				int length);
+		~OptParserAtomContainer();
+	protected:
+		std::string short_form;
+		std::string var_name;
+		std::string expression;
+		std::string explanation;
+		Container<T>* dest;
+		int length;
+};
 
 #define opt_on_bool(VAR,SHORT_FORM,EXPLANATION)\
 	opt_on(bool, VAR, false, SHORT_FORM, "", EXPLANATION)
@@ -110,62 +138,50 @@ template<class T> bool OptParser::get_vector(const std::string& var_name, std::v
 	TYPE VAR(DEFAULT_VAL);\
 generate_atomic_parser(TYPE,VAR,SHORT_FORM, EXPRESSION, EXPLANATION);\
 
-#define opt_on_vector(TYPE, VAR, SHORT_FORM, EXPRESSION, EXPLANATION, DELIM)\
-	generate_atomic_parser_vector(TYPE,VAR,SHORT_FORM, EXPRESSION, EXPLANATION, DELIM);\
+//#define opt_on_vector(TYPE, VAR, SHORT_FORM, EXPRESSION, EXPLANATION, DELIM)\
+//	generate_atomic_parser_vector(TYPE,VAR,SHORT_FORM, EXPRESSION, EXPLANATION, DELIM);\
 
-
+#ifdef __linux__
 #define opt_parse(PARSER,ARGC, ARGV, ARGS)\
-	skl::OptParserAtom* __opt_parser_func_list__ = skl::OptParserAtom::atom_top;\
+skl::OptParserAtomInterface* __opt_parser_func_list__ = skl::OptParserAtomInterface::atom_top;\
 while(__opt_parser_func_list__!=NULL){\
 	__opt_parser_func_list__->on(& PARSER);\
 	__opt_parser_func_list__ = __opt_parser_func_list__->next;\
 }\
 ARGS = PARSER.parse(ARGC,ARGV);\
-__opt_parser_func_list__ = skl::OptParserAtom::atom_top;\
+__opt_parser_func_list__ = skl::OptParserAtomInterface::atom_top;\
 while(__opt_parser_func_list__!=NULL){\
 	__opt_parser_func_list__->get(& PARSER);\
 	__opt_parser_func_list__ = __opt_parser_func_list__->next;\
 }
+#elif _WIN32
+#define opt_parse(PARSER,ARGC, ARGV, ARGS)\
+std::vector<std::string> __SKL_OPT_PARSER_ARGV__(ARGC);\
+for(int i = 0; i < ARGC; i++){\
+	char __SKL_OPT_PARSER_TEMP_BUF__[256];\
+	sprintf_s(__SKL_OPT_PARSER_TEMP_BUF__,"%S", ARGV[i]);\
+	__SKL_OPT_PARSER_ARGV__[i] = __SKL_OPT_PARSER_TEMP_BUF__;\
+}\
+skl::OptParserAtomInterface* __opt_parser_func_list__ = skl::OptParserAtomInterface::atom_top;\
+while(__opt_parser_func_list__!=NULL){\
+	__opt_parser_func_list__->on(& PARSER);\
+	__opt_parser_func_list__ = __opt_parser_func_list__->next;\
+}\
+ARGS = PARSER.parse(__SKL_OPT_PARSER_ARGV__);\
+__opt_parser_func_list__ = skl::OptParserAtomInterface::atom_top;\
+while(__opt_parser_func_list__!=NULL){\
+	__opt_parser_func_list__->get(& PARSER);\
+	__opt_parser_func_list__ = __opt_parser_func_list__->next;\
+}
+#endif
 
 
 #define generate_atomic_parser(TYPE,VAR, SHORT_FORM, EXPRESSION, EXPLANATION)\
-	namespace skl{\
-		class OptParserAtom_##VAR : public OptParserAtom{\
-			public:\
-				   OptParserAtom_##VAR(TYPE* VAR):VAR(VAR){}\
-			~OptParserAtom_##VAR(){}\
-			void on(OptParser* parser){\
-				parser->on(SHORT_FORM, std::string("--")+#VAR,EXPRESSION,EXPLANATION);\
-			}\
-			void get(OptParser* parser){\
-				parser->get<TYPE>(#VAR , VAR);\
-			}\
-			protected:\
-					  TYPE* VAR;\
-		};\
-	}\
-skl::OptParserAtom_##VAR __opt_parser_atom_##VAR(&VAR)
+skl::OptParserAtom<TYPE> __opt_parser_atom_##VAR(SHORT_FORM, #VAR, EXPRESSION, EXPLANATION, &VAR)
 
 
-#define generate_atomic_parser_vector(TYPE,VAR, SHORT_FORM, EXPRESSION, EXPLANATION, DELIM)\
-	namespace skl{\
-		class OptParserAtom_##VAR : public OptParserAtom{\
-			public:\
-				   OptParserAtom_##VAR(std::vector<TYPE>* VAR):VAR(VAR){}\
-			~OptParserAtom_##VAR(){}\
-			void on(OptParser* parser){\
-				parser->on(SHORT_FORM, std::string("--")+#VAR,EXPRESSION,EXPLANATION);\
-			}\
-			void get(OptParser* parser){\
-				parser->get_vector<TYPE>(#VAR , VAR, DELIM);\
-			}\
-			protected:\
-					  std::vector<TYPE>* VAR;\
-		};\
-	}\
-skl::OptParserAtom_##VAR __opt_parser_atom_##VAR(&VAR)
+
 
 } // skl
 
 #endif //__SKL_OPT_PARSER_H__
-

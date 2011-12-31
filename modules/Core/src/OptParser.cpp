@@ -11,17 +11,13 @@
 #include <cassert>
 using namespace skl;
 
-OptParserAtom* OptParserAtom::atom_top = NULL;
+OptParserAtomInterface* OptParserAtomInterface::atom_top = NULL;
 
-const int OptParser::true_string_num = 7;
-const int OptParser::false_string_num = 7;
-const std::string OptParser::true_strings[] = {"1","true","TRUE","True","on","ON","On"};
-const std::string OptParser::false_strings[] = {"0","false","FALSE","False","off","OFF","Off"};
 /*!
  * @brief デフォルトコンストラクタ
  */
 OptParser::OptParser(const std::string& conf_deliminator):conf_deliminator(conf_deliminator){
-	option_values["help"] = "0";
+	option_values["help"] = "";
 	short_long_map["h"] = "help";
 	explanations["help"] = make_usage("h","help","","show this usage.");
 
@@ -53,7 +49,6 @@ void OptParser::on(
 		std::cerr << "\t Possibly " << var_name << " is reserved option." << std::endl;
 		assert(false);
 	}
-	option_values[var_name] = "";
 
 	if(!short_form.empty()){
 		parse_short_form(short_form,&short_name);
@@ -63,7 +58,7 @@ void OptParser::on(
 		short_long_map[short_name] = var_name;
 	}
 
-	option_values[var_name] = "0";
+	option_values[var_name] = "";
 
 	explanations[var_name] = make_usage(short_name,var_name,expression,explanation);
 }
@@ -82,34 +77,12 @@ std::string OptParser::make_usage(
 	return _usage;
 }
 
-namespace skl{
-	/* specialization of template member function get<T>*/
-	template<> bool OptParser::get<bool>(const std::string& var_name,bool* var)const{
-		std::map<std::string,std::string>::const_iterator pp = option_values.find(var_name);
-		if(option_values.end()==pp) return false;
-		if("0"==pp->second && *var) return true;
-		const std::string* match = std::find(true_strings,true_strings+true_string_num,pp->second);
-		if(match!=true_strings+true_string_num){
-			*var = true;
-			return true;
-		}
-
-		match = std::find(false_strings,false_strings+false_string_num,pp->second);
-		if(match!=false_strings+false_string_num){
-			*var = false;
-			return true;
-		}
-		parse_error(pp->second);
-		assert(false);
-		return false;
-	}
-
-}
 
 void OptParser::parse_short_form(const std::string& form,std::string* var_name){
 	std::string short_form = strip(form);
 	assert(short_form[0]=='-');
 	assert(short_form.size()==2);
+	assert(0==isdigit(short_form[1]));
 	*var_name = get_short_form(short_form);
 }
 
@@ -143,6 +116,7 @@ int OptParser::checkType(const std::string& str)const{
 		if(str.size()==1){
 			return parse_error(str);
 		}
+		if(isdigit(str[1])!=0) return 0;
 
 		if(str[1]!='-'){
 			if(str.size()!=2){
@@ -176,12 +150,21 @@ bool OptParser::help()const{
 }
 
 std::vector<std::string> OptParser::parse(int argc,char* argv[]){
+	std::vector<std::string> args(argc);
+	for(int i=0; i<argc;i++){
+		args[i] = argv[i];
+	}
+	return parse(args);
+}
+
+std::vector<std::string> OptParser::parse(const std::vector<std::string>& argv){
 	int _switch = 0;
 	std::string var_name,form;
 	std::vector<std::string> args;
 
 	std::set<std::string> directed_options;
 	std::set<std::string>::iterator p_dopt;
+	size_t argc = argv.size();
 
 	int i=0;
 	while(i!=argc){
@@ -217,7 +200,7 @@ std::vector<std::string> OptParser::parse(int argc,char* argv[]){
 					directed_options.insert(var_name);
 				}
 
-				option_values[var_name] = "1";
+				option_values[var_name] = "ON";
 				break;
 			case 2:
 				form = get_long_form(argv[i]);
@@ -233,20 +216,23 @@ std::vector<std::string> OptParser::parse(int argc,char* argv[]){
 				else{
 					directed_options.insert(var_name);
 				}
-				option_values[var_name] = "1";
+				option_values[var_name] = "ON";
 				break;
 			case 3:
 				option_values[var_name] = argv[i];
 				break;
 			default:
+				std::cerr << "ERROR: invalid option " << argv[i] << "." << std::endl;
 				assert(false);
 		}
 		i++;
 	}
 	_help = false;
-	get<bool>("help", &_help);
+	std::string help_buf;
+	get("help", &help_buf);
+	convert(help_buf,&_help);
 	std::string conffile;
-	get<std::string>("conf", &conffile);
+	get("conf", &conffile);
 
 
 	if(!conffile.empty()){
@@ -276,3 +262,10 @@ std::vector<std::string> OptParser::parse(int argc,char* argv[]){
 	return args;
 }
 
+bool OptParser::get(const std::string& var_name, std::string* var)const{
+	std::map<std::string, std::string>::const_iterator pp = option_values.find(var_name);
+	if(option_values.end()==pp) return false;
+	if(""==pp->second) return true;
+	*var = pp->second;
+	return true;
+}

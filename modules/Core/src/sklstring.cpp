@@ -14,6 +14,7 @@ namespace skl{
 				break;
 			}
 		}
+
 		assert(begin < str.size());
 
 		for(;end>=0;end--){
@@ -21,6 +22,7 @@ namespace skl{
 				break;
 			}
 		}
+
 		dest = str.substr(begin,end-begin+1);
 		return dest;
 	}
@@ -88,4 +90,35 @@ namespace skl{
 		return true;
 	}
 
+	/*****  Definition for Template Functions  *****/
+	template<> bool convert(const std::string& src, std::string* dest){
+		*dest = src;
+		return true;
+	}
+
+	template<> bool convert(const std::string& src, bool* dest){
+		const std::string* match = std::find(true_strings, true_strings + true_string_num, src);
+		if(match != true_strings + true_string_num){
+			*dest = true;
+			return true;
+		}
+
+		match = std::find( false_strings, false_strings + false_string_num, src);
+		if(match != false_strings + false_string_num){
+			*dest = false;
+			return true;
+		}
+		return false;	
+	}
+
+	template<class T> bool convert_vector(const std::string& src, std::vector<T>* dest, const std::string& deliminator, int length){
+		std::vector<std::string> buf = split(src,deliminator,length);
+		dest->resize(buf.size());
+		for(size_t i=0;i<buf.size();i++){
+			if(!convert<T>(buf[i],&dest->at(i))){
+				return false;
+			}
+		}
+		return true;
+	}
 }

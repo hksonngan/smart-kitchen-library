@@ -8,7 +8,7 @@
 
 #include <set>
 #include <map>
-#include "ImageImage.h"
+#include "sklcvutils.h"
 
 #define PATCH_EDGE_CANNY_THRESH1 16
 #define PATCH_EDGE_CANNY_THRESH2 32
@@ -30,43 +30,43 @@ namespace skl{
 			};
 			public:
 				Patch();
-				Patch(const cv::Mat& mask, const cv::Mat& newest_image, const cv::Mat& current_bg);
+				Patch(const cv::Mat& mask, const cv::Mat& newest_image, const cv::Mat& current_bg,const cv::Rect& roi);
 				~Patch();
 
-				void set(const cv::Mat& mask, const cv::Mat& newest_image, const cv::Mat& current_bg);
+				void set(const cv::Mat& mask, const cv::Mat& newest_image, const cv::Mat& current_bg, cv::Rect roi);
 
-				void setCoveredState(const cv::Rect& rect,const cv::Mat& mask,bool covered_state);
+				void setCoveredState(const cv::Rect& rect,const cv::Mat& mask,bool isCovered);
+				void setCoveredState(int x,int y,bool isCovered);
 
 
-				void save(const std::string& filename, Type type, int width, int height, const std::string& edge_filename="")const;
+				void save(const std::string& filename, Type type, const std::string& edge_filename="")const;
 
 				/*** Accessor ***/
 				float maskValue(int x,int y, Type type=original)const;
 				const unsigned char* operator()(int x,int y, Type type=original)const;
 				unsigned char* operator()(int x,int y,Type type=original);
 
-				const cv::Rect& roi(Type type=original)const{return roi[type];}
+				const cv::Rect& roi(Type type=original)const{return _roi[type];}
 				cv::Mat& image(Type type=original){return _image[type];}
 				const cv::Mat& image(Type type=original)const{return _image[type];}
 				cv::Mat& background(Type type=original){return _background[type];}
 				const cv::Mat& background(Type type=original)const{return _background[type];}
 				const cv::Mat& mask(Type type=original)const{return _mask[type];}
 
-				const cv::Mat& edge()const{return edge;}
-				void edge(const cv::Mat& __edge){_edge = __edge.clone()};
+				const cv::Mat& edge()const{return _edge;}
+				void edge(const cv::Mat& __edge){_edge = __edge.clone();}
 				size_t edge_count()const{return _edge_count;};
 
-				void covered_state(int x,int y,bool isCovered);
 
 		protected:
 				cv::Mat _mask[2];
 				cv::Mat _image[2];
-				cv::Mat _hidden[2];
+				cv::Mat _background[2];
 				cv::Mat _edge;
 				cv::Rect _roi[2];
 				cv::Point center;
 				cv::Mat _covered_state;
-				size_t edge_count;
+				size_t _edge_count;
 				int base_width;
 				int base_height;
 			private:

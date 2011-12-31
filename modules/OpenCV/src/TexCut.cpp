@@ -324,7 +324,7 @@ void TexCut::setCapacity(
 				_smoothing_term_x);
 	}
 	if(y!=nodes.size()-1){
-		int _smoothing_term_y = smoothing_term_weight * smoothing_term_y.at<int>(y,x);
+		int _smoothing_term_y = static_cast<int>(smoothing_term_weight * smoothing_term_y.at<int>(y,x));
 		g->add_edge(
 				nodes[y][x],
 				nodes[y+1][x],//QUANTIZATION_LEVEL*2,QUANTIZATION_LEVEL*2);

@@ -18,6 +18,11 @@ int main(int argc,char* argv[]){
 		return -1;
 	}
 
+	for(size_t i = 0; i < args.size(); i++){
+		std::cout << "argv[" << i << "] = " << args[i] << std::endl;
+	}
+
+
 	std::cout << "int foo = " << foo << std::endl;
 	std::cout << "bool verbose = " << verbose << std::endl;
 	std::cout << "vec =";

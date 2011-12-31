@@ -6,5 +6,6 @@
 namespace skl{
 	double gauss_rand();
 	double rayleigh_rand(double sigma);
+
 }
 #endif // __SKL_UTILS__

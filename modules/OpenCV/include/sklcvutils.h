@@ -1,3 +1,4 @@
+#pragma warning(disable:4996)
 #include <cv.h>
 
 /*
@@ -16,7 +17,7 @@ bool operator&&(const cv::Rect& left, const cv::Rect& right);
 cv::Rect operator|(const cv::Rect& left, const cv::Rect& right);
 
 namespace skl{
-	cv::Scalar GRAY = CV_RGB(127,127,127);
+#define SKL_GRAY cv::Scalar(128);
 
 	cv::Rect fitRect(const std::vector< cv::Point >& points);
 

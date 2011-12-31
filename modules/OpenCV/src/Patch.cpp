@@ -6,10 +6,10 @@
 
 #include "PatchModel.h"
 #include "sklcvutils.h"
+#include <highgui.h>
 #include <iostream>
 
-using namespace mmpl;
-using namespace mmpl::image;
+using namespace skl;
 
 Patch::Patch(){
 
@@ -39,12 +39,10 @@ void Patch::setCoveredState(const cv::Rect& rect, const cv::Mat& mask, bool isCo
 	cv::Rect common_region = rect & _roi[original];
 	common_region.height += common_region.y;
 	common_region.width += common_region.x;
-	unsigned char val = 0;
-	if(isCovered) val = 255;
 	for(int y = common_region.y;y < common_region.height;y++){
 		for(int x=common_region.x;x < common_region.width;x++){
 			if(mask.at<float>(y,x)>0.0)
-				setCoveredState(x,y,val);
+				setCoveredState(x,y,isCovered);
 		}
 	}
 
@@ -52,11 +50,22 @@ void Patch::setCoveredState(const cv::Rect& rect, const cv::Mat& mask, bool isCo
 //	cvShowImage("visibility",this->visibility.getIplImage());
 //	cvShowImage("patch",this->image[original].getIplImage());
 //	cvWaitKey(-1);
+}
 
+void Patch::setCoveredState(int x,int y,bool isCovered){
+	CvRect roi = _roi[original];
+	assert(roi.x <= x && x < roi.x + roi.width);
+	assert(roi.y <= y && y < roi.y + roi.height);
+	cvtG2L(&x,&y,original);
+
+	unsigned char val = 0;
+	if(isCovered) val = 255;
+	_covered_state.at<unsigned char>(y,x) = val;
 }
 
 
-bool Patch::set(const cv::Mat& __mask, const cv::Mat& __newest_image,const cv::Mat& __current_bg, cv::Rect roi){
+
+void Patch::set(const cv::Mat& __mask, const cv::Mat& __newest_image,const cv::Mat& __current_bg, cv::Rect roi){
 	base_width = __mask.cols;
 	base_height = __mask.rows;
 
@@ -71,19 +80,19 @@ bool Patch::set(const cv::Mat& __mask, const cv::Mat& __newest_image,const cv::M
 	_roi[dilate].height = _roi[dilate].height < __newest_image.rows ? _roi[dilate].height - _roi[dilate].y : __newest_image.rows - _roi[dilate].y;
 
 	_image[dilate] = cv::Mat(__newest_image, _roi[dilate]).clone();
-	_hidden[dilate] = cv::Mat(__current_bg, _roi[dilate]).clone();
+	_background[dilate] = cv::Mat(__current_bg, _roi[dilate]).clone();
 	_mask[dilate] = cv::Mat(__mask, _roi[dilate]).clone();
 	std::vector<cv::Point> edge_points;
 
-	_edge = get_edge(_image[dilate],_mask[dilate],&edge_points);
+	_edge = extractEdge(_image[dilate],_mask[dilate],&edge_points);
 
-	edge_counts = edge_points.size()  // è„éËÇ¢Ç‚ÇËï˚Ç™Ç†ÇËÇªÇ§
+	_edge_count = edge_points.size();
 	if(_edge_count == 0) return;
 
 	roi = fitRect(edge_points);
 	_roi[original] = roi;
 	_image[original] = cv::Mat(__newest_image,roi).clone();
-	_hidden[original] = cv::Mat(__current_bg,roi).clone();
+	_background[original] = cv::Mat(__current_bg,roi).clone();
 	_mask[original] = cv::Mat(__mask,roi).clone();	
 	_covered_state = _mask[original].clone();
 
@@ -100,7 +109,7 @@ bool Patch::set(const cv::Mat& __mask, const cv::Mat& __newest_image,const cv::M
 
 	if(roi_dilate != _roi[dilate]){
 		_image[dilate] = cv::Mat(__newest_image,_roi[dilate]).clone();
-		_hidden[dilate] = cv::Mat(__current_bg,_roi[dilate]).clone();
+		_background[dilate] = cv::Mat(__current_bg,_roi[dilate]).clone();
 		_mask[dilate] = cv::Mat(__mask,_roi[dilate]).clone();	
 	}
 	CvMat ___mask = _mask[dilate];
@@ -113,11 +122,11 @@ bool Patch::set(const cv::Mat& __mask, const cv::Mat& __newest_image,const cv::M
 }
 
 void Patch::save(const std::string& filename,Type type,const std::string& edge_filename)const{
-	CvRect roi = roi(type);
-	assert(rect.width <= base_width);
-	assert(rect.height <= base_height);
+	CvRect roi = _roi[type];
+	assert(roi.width <= base_width);
+	assert(roi.height <= base_height);
 
-	cv::Mat dest = cv::Mat(base_width,base_height,image[type].depth(),image[type].height(),skl::GRAY);
+	cv::Mat dest = cv::Mat(cv::Size(base_width,base_height),_image[type].type(),SKL_GRAY);
 	cv::Mat temp = cv::Mat(dest,_roi[type]);
 	skl::blending<cv::Vec3b,float>(temp,_image[type],_mask[type],temp);
 	// CHECK!
@@ -136,20 +145,9 @@ void Patch::save(const std::string& filename,Type type,const std::string& edge_f
 float Patch::maskValue(int x, int y, Type type)const{
 	cvtG2L(&x,&y,type);
 	if(!isIn(x,y,type)) return 0.0;
-	return mask[type].at<float>(y,x);
+	return _mask[type].at<float>(y,x);
 }
 
-
-void Patch::covered_state(int x,int y,bool isCovered){
-	CvRect roi = _roi[original];
-	assert(roi.x <= x && x < roi.x + rect.width);
-	assert(roi.y <= y && y < roi.y + rect.height);
-	cvtG2L(&x,&y,original);
-
-	unsigned char val = 0;
-	if(isCovered) val = 255;
-	_covered_state.at<unsigned char>(y,x) = val;
-}
 
 
 

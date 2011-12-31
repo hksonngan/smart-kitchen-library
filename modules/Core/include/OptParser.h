@@ -2,7 +2,7 @@
  * @file OptParser.h
  * @author a_hasimoto
  * @date Date Created: 2011/Dec/27
- * @date Last Change:2011/Dec/29.
+ * @date Last Change:2011/Dec/31.
  */
 #ifndef __SKL_OPT_PARSER_H__
 #define __SKL_OPT_PARSER_H__
@@ -109,27 +109,42 @@ template<class T> void OptParserAtom<T>::get(OptParser* parser){
 	convert<T>(buf,dest);
 }
 
-template<class T> class OptParserAtomhoge : public OptParserAtomInterface{
-};
-template<class T, class Container> class OptParserAtomContainer : public OptParserAtomInterface{
+template<class T, class Container=std::vector<T> > class OptParserAtomContainer : public OptParserAtomInterface{
 	public:
 		OptParserAtomContainer(
 				const std::string& short_form,
 				const std::string& var_name,
 				const std::string& expression,
 				const std::string& explanation,
-				Container<T>* dest,
+				Container* dest,
 				const std::string& deliminator=":",
-				int length);
-		~OptParserAtomContainer();
+				int length=-1):
+			short_form(short_form),var_name(var_name),
+			expression(expression),explanation(explanation),
+			dest(dest),deliminator(deliminator),length(length){}
+		~OptParserAtomContainer(){}
+		void on(OptParser* parser);
+		void get(OptParser* parser);
 	protected:
 		std::string short_form;
 		std::string var_name;
 		std::string expression;
 		std::string explanation;
-		Container<T>* dest;
+		Container* dest;
+		std::string deliminator;
 		int length;
 };
+
+template<class T,class Container> void OptParserAtomContainer<T,Container>::on(OptParser* parser){
+	parser->on(short_form, "--" + var_name, expression, explanation);
+}
+
+template<class T,class Container> void OptParserAtomContainer<T,Container>::get(OptParser* parser){
+	std::string buf;
+	parser->get(var_name,&buf);
+	convert2container<T,Container>(buf,dest,deliminator,length);
+}
+
 
 #define opt_on_bool(VAR,SHORT_FORM,EXPLANATION)\
 	opt_on(bool, VAR, false, SHORT_FORM, "", EXPLANATION)
@@ -138,8 +153,8 @@ template<class T, class Container> class OptParserAtomContainer : public OptPars
 	TYPE VAR(DEFAULT_VAL);\
 generate_atomic_parser(TYPE,VAR,SHORT_FORM, EXPRESSION, EXPLANATION);\
 
-//#define opt_on_vector(TYPE, VAR, SHORT_FORM, EXPRESSION, EXPLANATION, DELIM)\
-//	generate_atomic_parser_vector(TYPE,VAR,SHORT_FORM, EXPRESSION, EXPLANATION, DELIM);\
+#define opt_on_container(CONTAINER_TYPE, ELEM_TYPE, VAR, SHORT_FORM, EXPRESSION, EXPLANATION, DELIMINATOR, LENGTH)\
+generate_atomic_parser_container(CONTAINER_TYPE, ELEM_TYPE,VAR,SHORT_FORM, EXPRESSION, EXPLANATION, DELIMINATOR, LENGTH);\
 
 #ifdef __linux__
 #define opt_parse(PARSER,ARGC, ARGV, ARGS)\
@@ -179,7 +194,8 @@ while(__opt_parser_func_list__!=NULL){\
 #define generate_atomic_parser(TYPE,VAR, SHORT_FORM, EXPRESSION, EXPLANATION)\
 skl::OptParserAtom<TYPE> __opt_parser_atom_##VAR(SHORT_FORM, #VAR, EXPRESSION, EXPLANATION, &VAR)
 
-
+#define generate_atomic_parser_container(CONTAINER_TYPE,ELEM_TYPE, VAR, SHORT_FORM, EXPRESSION, EXPLANATION, DELIMINATOR, LENGTH)\
+skl::OptParserAtomContainer < ELEM_TYPE, CONTAINER_TYPE < ELEM_TYPE > > __opt_parser_atom_container_##VAR(SHORT_FORM, #VAR, EXPRESSION, EXPLANATION, &VAR, DELIMINATOR, LENGTH)
 
 
 } // skl

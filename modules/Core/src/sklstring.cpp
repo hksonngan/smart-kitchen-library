@@ -111,14 +111,4 @@ namespace skl{
 		return false;	
 	}
 
-	template<class T> bool convert_vector(const std::string& src, std::vector<T>* dest, const std::string& deliminator, int length){
-		std::vector<std::string> buf = split(src,deliminator,length);
-		dest->resize(buf.size());
-		for(size_t i=0;i<buf.size();i++){
-			if(!convert<T>(buf[i],&dest->at(i))){
-				return false;
-			}
-		}
-		return true;
-	}
 }

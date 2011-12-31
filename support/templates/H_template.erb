@@ -20,7 +20,7 @@ class <%= class_name %>{
 /*!
  * @class クラスの説明
  */
- class <%= class_name %>:<%= baseclass_name.each{|c| "public "+c}.join(",") %>{
+ class <%= class_name %>: public <%= baseclass_name.each{|c| "public "+c}.join(",") %>{
 <% end %>
 	public:
 		<%= class_name %>();

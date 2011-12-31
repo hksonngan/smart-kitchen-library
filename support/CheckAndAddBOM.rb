@@ -10,7 +10,6 @@ filename = ARGV[0]
 if !File.file?(filename) then
 	exit 0
 end
-
 fin = File.open(filename)
 if fin.read(3).unpack("h*").to_s != "febbfb" then
 	fin.rewind

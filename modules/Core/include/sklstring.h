@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <sstream>
 #include <map>
 #include <algorithm>
 
@@ -22,14 +23,24 @@ namespace skl{
 
 	template<class T> bool convert(const std::string& src, T* dest){
 		std::stringstream ss;
-		ss << src;
+		ss.str(src);
 		ss >> *dest;
 		return true;
 	};
 	template<> bool convert(const std::string& src, bool* dest);
 	template<> bool convert(const std::string& src, std::string* dest);
 
-	template<class T> bool convert_vector(const std::string& src, std::vector<T>* dest, const std::string& deliminator=":", int length=-1);
-
-}
+	template<class T,class Container> bool convert2container(const std::string& src, Container* dest, const std::string& deliminator=":", int length=-1){
+		std::vector<std::string> buf = split(src,deliminator,length);
+		std::vector<T> buf2(buf.size());
+		for(size_t i=0;i<buf.size();i++){
+			if(!convert<T>(buf[i],&buf2[i])){
+				return false;
+			}
+		}
+		dest->clear();
+		dest->insert(dest->begin(),buf2.begin(),buf2.end());
+		return true;
+	}
+} // namespace skl
 #endif // __SKL__STRING_H__

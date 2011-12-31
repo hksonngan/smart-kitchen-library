@@ -7,7 +7,7 @@ opt_on_bool(verbose, "", "an example of bool switch.");
 
 // declare std::vector option manually for flexible initialization
 std::vector<double> vec(3,0.0);
-opt_on_vector(double, vec,"-v","<D:D:D:...>", "set double vector.", ":");
+opt_on_container(std::vector,double, vec,"-v","<D:D:D>", "set double vector", ":", 3);
 
 int main(int argc,char* argv[]){
 	skl::OptParser options;

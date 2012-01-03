@@ -1,9 +1,9 @@
 ﻿/*!
- * @file FeatureClassifierDecisionStumpForJointBoost.cpp
+ * @file RegressionStump.cpp
  * @author 橋本敦史
  * @date Last Change:2011/Dec/05.
  */
-#include "FeatureClassifierDecisionStumpForJointBoost.h"
+#include "RegressionStump.h"
 #include "StringSplitter.h"
 #include <sstream>
 
@@ -23,7 +23,7 @@ namespace mmpl{
 /*!
  * @brief デフォルトコンストラクタ
  */
-FeatureClassifierDecisionStumpForJointBoostParams::FeatureClassifierDecisionStumpForJointBoostParams():
+RegressionStumpParams::RegressionStumpParams():
 	threshold(0.0),
 	a(0.0),
 	b(0.0),
@@ -36,14 +36,14 @@ FeatureClassifierDecisionStumpForJointBoostParams::FeatureClassifierDecisionStum
 /*!
  * @brief デストラクタ
  */
-FeatureClassifierDecisionStumpForJointBoostParams::~FeatureClassifierDecisionStumpForJointBoostParams(){
+RegressionStumpParams::~RegressionStumpParams(){
 
 }
 
 /*!
   @brief モデルを書き出す
   */
-std::string FeatureClassifierDecisionStumpForJointBoostParams::print()const{
+std::string RegressionStumpParams::print()const{
 	std::stringstream ss;
 	ss << std::fixed << threshold << "," << class_num << "," << focusing_feature << ",";
 	ss << std::fixed << a << "," << std::fixed << b << "," << k.size() << ",";
@@ -58,7 +58,7 @@ std::string FeatureClassifierDecisionStumpForJointBoostParams::print()const{
   @brief モデルを読み込む
   @param filename 読み込み先の文字列
   */
-void FeatureClassifierDecisionStumpForJointBoostParams::scan(const std::string& content){
+void RegressionStumpParams::scan(const std::string& content){
 	StringSplitter ssplitter(',');
 	std::vector<std::string> buf;
 	ssplitter.apply(content,&buf);
@@ -96,82 +96,82 @@ void FeatureClassifierDecisionStumpForJointBoostParams::scan(const std::string& 
  * @brief threshold に値をセットするAccessor
  * @param threshold セットしたい値
  */
-void FeatureClassifierDecisionStumpForJointBoostParams::setThreshold(double threshold ){
+void RegressionStumpParams::setThreshold(double threshold ){
         this->threshold = threshold;
 }
 
 /*!
  * @brief threshold の値を取得する
  */
-double FeatureClassifierDecisionStumpForJointBoostParams::getThreshold()const{
+double RegressionStumpParams::getThreshold()const{
         return threshold;
 }
 
 /*!
  * @brief a の値をセットする
  * */
-void FeatureClassifierDecisionStumpForJointBoostParams::setA(double a){
+void RegressionStumpParams::setA(double a){
 	this->a = a;
 }
 
 /*!
  * @brief a の値を取得する
  * */
-double FeatureClassifierDecisionStumpForJointBoostParams::getA()const{
+double RegressionStumpParams::getA()const{
 	return a;
 }
 /*!
  * @brief b の値をセットする
  * */
-void FeatureClassifierDecisionStumpForJointBoostParams::setB(double b){
+void RegressionStumpParams::setB(double b){
 	this->b = b;
 }
 
 /*!
  * @brief b の値を取得する
  * */
-double FeatureClassifierDecisionStumpForJointBoostParams::getB()const{
+double RegressionStumpParams::getB()const{
 	return b;
 }
 /*!
  * @brief k の値をセットする
  * */
-void FeatureClassifierDecisionStumpForJointBoostParams::setK(const std::vector<double>& k){
+void RegressionStumpParams::setK(const std::vector<double>& k){
 	this->k = k;
 }
 
 /*!
  * @brief k の値を取得する
  * */
-double FeatureClassifierDecisionStumpForJointBoostParams::getK(size_t idx)const{
+double RegressionStumpParams::getK(size_t idx)const{
 	return k[idx];
 }
 
 /*!
  * @brief subset_bitflag の値をセットする
  * */
-void FeatureClassifierDecisionStumpForJointBoostParams::setSubsetBitflag(const Bitflag& subset_bitflag){
+void RegressionStumpParams::setSubsetBitflag(const Bitflag& subset_bitflag){
 	this->subset_bitflag = subset_bitflag;
 }
 
 /*!
  * @brief subset_bitflag の値を取得する
  * */
-const Bitflag& FeatureClassifierDecisionStumpForJointBoostParams::getSubsetBitflag()const{
+const Bitflag& RegressionStumpParams::getSubsetBitflag()const{
 	return subset_bitflag;
 }
 
 /*!
  * @brief class_num の値をセットする
  * */
-void FeatureClassifierDecisionStumpForJointBoostParams::setClassNum(unsigned int class_num){
+void RegressionStumpParams::setClassNum(unsigned int class_num){
 	this->class_num = class_num;
 }
 
 /*!
  * @brief class_num の値を取得する
  * */
-unsigned int FeatureClassifierDecisionStumpForJointBoostParams::getClassNum()const{
+unsigned int RegressionStumpParams::getClassNum()const{
 	return class_num;
 }
 
@@ -179,14 +179,14 @@ unsigned int FeatureClassifierDecisionStumpForJointBoostParams::getClassNum()con
 /*!
  * @brief focusing_feature の値をセットする
  * */
-void FeatureClassifierDecisionStumpForJointBoostParams::setFocusingFeature(size_t focusing_feature){
+void RegressionStumpParams::setFocusingFeature(size_t focusing_feature){
 	this->focusing_feature = focusing_feature;
 }
 
 /*!
  * @brief focusing_feature の値を取得する
  * */
-size_t FeatureClassifierDecisionStumpForJointBoostParams::getFocusingFeature()const{
+size_t RegressionStumpParams::getFocusingFeature()const{
 	return focusing_feature;
 }
 
@@ -198,38 +198,38 @@ size_t FeatureClassifierDecisionStumpForJointBoostParams::getFocusingFeature()co
 /*!
  * @brief デフォルトコンストラクタ
  */
-FeatureClassifierDecisionStumpForJointBoost::FeatureClassifierDecisionStumpForJointBoost():
+RegressionStump::RegressionStump():
 	_error(DBL_MAX){
 }
 
 /*!
  * @brief コピーコンストラクタ
  * */
-FeatureClassifierDecisionStumpForJointBoost::FeatureClassifierDecisionStumpForJointBoost(const FeatureClassifierDecisionStumpForJointBoost& other):
-	FeatureClassifierWithParam<FeatureClassifierDecisionStumpForJointBoostParams>(other)
+RegressionStump::RegressionStump(const RegressionStump& other):
+	FeatureClassifierWithParam<RegressionStumpParams>(other)
 {
 };
 
 /*!
  * @brief デストラクタ
  */
-FeatureClassifierDecisionStumpForJointBoost::~FeatureClassifierDecisionStumpForJointBoost(){
+RegressionStump::~RegressionStump(){
 }
 
 /*!
   @brief 学習アルゴリズム
   */
-bool FeatureClassifierDecisionStumpForJointBoost::train(const std::vector<Feature>& trainSet,const MmplVector* weight){
+bool RegressionStump::train(const std::vector<Feature>& trainSet,const MmplVector* weight){
 	double target_class_weight_sum;
 	return train(trainSet,weight,NULL,&target_class_weight_sum,NULL);
 }
 
-bool FeatureClassifierDecisionStumpForJointBoost::train(
+bool RegressionStump::train(
 		const std::vector<Feature>& trainSet,
 		const MmplVector* weight,
-		FeatureClassifierDecisionStumpForJointBoostTrainSampleData* train_set_data,
+		RegressionStumpTrainSampleData* train_set_data,
 		double* target_class_weight_sum,
-		FeatureClassifierDecisionStumpForJointBoostIntermidiateData* current_node,
+		RegressionStumpIntermidiateData* current_node,
 		std::vector<Bitflag>* hasSelected){
 	unsigned int class_num = param.getClassNum();
 	assert(class_num <= JOINT_BOOST_MAX_CLASS_NUM);
@@ -335,13 +335,13 @@ bool FeatureClassifierDecisionStumpForJointBoost::train(
 	return true;
 }
 
-bool FeatureClassifierDecisionStumpForJointBoost::train(
+bool RegressionStump::train(
 		const std::vector<Feature>& trainSet,
 		const MmplVector* weight,
-		const FeatureClassifierDecisionStumpForJointBoostTrainSampleData& train_set_data,
+		const RegressionStumpTrainSampleData& train_set_data,
 		double* target_class_weight_sum,
-		std::map<Bitflag,FeatureClassifierDecisionStumpForJointBoostIntermidiateData,BitflagComparer>* parent_nodes,
-		FeatureClassifierDecisionStumpForJointBoostIntermidiateData* intermidiate_data,
+		std::map<Bitflag,RegressionStumpIntermidiateData,BitflagComparer>* parent_nodes,
+		RegressionStumpIntermidiateData* intermidiate_data,
 		std::vector<Bitflag>* hasSelected
 		){
 	assert(intermidiate_data!=NULL);
@@ -352,9 +352,9 @@ bool FeatureClassifierDecisionStumpForJointBoost::train(
 	// エラーのoffsetを格納する
 	_error = 0.0;
 	std::vector<std::pair<Bitflag,Bitflag> > flag_combi;
-	for(std::map<Bitflag,FeatureClassifierDecisionStumpForJointBoostIntermidiateData,BitflagComparer>::const_iterator ifb1 = parent_nodes->begin();
+	for(std::map<Bitflag,RegressionStumpIntermidiateData,BitflagComparer>::const_iterator ifb1 = parent_nodes->begin();
 			ifb1 != parent_nodes->end(); ifb1++){
-		std::map<Bitflag,FeatureClassifierDecisionStumpForJointBoostIntermidiateData,BitflagComparer>::const_iterator ifb2 = ifb1;
+		std::map<Bitflag,RegressionStumpIntermidiateData,BitflagComparer>::const_iterator ifb2 = ifb1;
 		ifb2++;
 		for(;ifb2 != parent_nodes->end(); ifb2++){
 			flag_combi.push_back(std::pair<Bitflag,Bitflag>(ifb1->first,ifb2->first));
@@ -493,7 +493,7 @@ bool FeatureClassifierDecisionStumpForJointBoost::train(
 	intermidiate_data->b.resize(feature_dim);
 	intermidiate_data->a_plus_b.resize(feature_dim);
 
-	std::map<Bitflag, FeatureClassifierDecisionStumpForJointBoostIntermidiateData,BitflagComparer>::iterator pdata1,pdata2;
+	std::map<Bitflag, RegressionStumpIntermidiateData,BitflagComparer>::iterator pdata1,pdata2;
 	pdata1 = parent_nodes->find(flag_combi[argmin_combi].first);
 	assert(pdata1 != parent_nodes->end());
 	pdata2 = parent_nodes->find(flag_combi[argmin_combi].second);
@@ -594,7 +594,7 @@ bool FeatureClassifierDecisionStumpForJointBoost::train(
 	return true;
 }
 
-void FeatureClassifierDecisionStumpForJointBoost::calcRegressionParams(const std::vector<Feature>& trainSet,const MmplVector* weight){
+void RegressionStump::calcRegressionParams(const std::vector<Feature>& trainSet,const MmplVector* weight){
 	size_t class_num = param.getClassNum();
 	// 回帰のための計算
 	std::vector<double> k(class_num,0.0);
@@ -643,7 +643,7 @@ void FeatureClassifierDecisionStumpForJointBoost::calcRegressionParams(const std
 	param.setK(k);
 }
 
-void FeatureClassifierDecisionStumpForJointBoost::calcRegressionParamsParallel(
+void RegressionStump::calcRegressionParamsParallel(
 		const std::vector<Feature>& trainSet,
 		const MmplVector* weight,
 		const std::vector<std::pair<Bitflag,Bitflag> >& flag_combi,
@@ -701,7 +701,7 @@ void FeatureClassifierDecisionStumpForJointBoost::calcRegressionParamsParallel(
  * @param testSample テスト用サンプル
  * @param useBandK bとkを加味しないならfalseを入れる。この場合は単なるpredict関数と同じになる
  * */
-double FeatureClassifierDecisionStumpForJointBoost::predict(Feature* testSample,bool useBandK)const{
+double RegressionStump::predict(Feature* testSample,bool useBandK)const{
 	if(!useBandK){
 		return predict(testSample);
 	}
@@ -733,7 +733,7 @@ double FeatureClassifierDecisionStumpForJointBoost::predict(Feature* testSample,
 /*
    @brief 学習したモデルに従って識別を行う(bとkは他のjointboostingの出力と比較するために利用しない)
    */
-double FeatureClassifierDecisionStumpForJointBoost::predict(Feature* testSample)const{
+double RegressionStump::predict(Feature* testSample)const{
 	assert(testSample!=NULL);
 	assert(testSample->size()>0);
 
@@ -757,7 +757,7 @@ double FeatureClassifierDecisionStumpForJointBoost::predict(Feature* testSample)
 	return likelihood.max();
 }
 
-FeatureClassifierDecisionStumpForJointBoostParams& FeatureClassifierDecisionStumpForJointBoostParams::operator=(const FeatureClassifierDecisionStumpForJointBoostParams& other){
+RegressionStumpParams& RegressionStumpParams::operator=(const RegressionStumpParams& other){
 	threshold = other.threshold;
 	a = other.a;
 	b = other.b;
@@ -773,7 +773,7 @@ FeatureClassifierDecisionStumpForJointBoostParams& FeatureClassifierDecisionStum
  * @param trainSet ソート対象のサンプルセット
  * @param SortingMap ソート結果。例えばd次元目の特徴量でソート結果が一番目のものへはtrainSet[SortingMap[d][0]][d]でアクセスできる。
  * */
-bool FeatureClassifierDecisionStumpForJointBoost::calcSortingMap(
+bool RegressionStump::calcSortingMap(
 				const std::vector<Feature>& trainSet,
 				std::vector<std::vector<size_t> >* SortingMap,
 				std::vector<std::vector<double> >* thresh_candidates)const{
@@ -823,7 +823,7 @@ bool FeatureClassifierDecisionStumpForJointBoost::calcSortingMap(
 	return true;
 }
 
-void FeatureClassifierDecisionStumpForJointBoost::invertSortingMap(
+void RegressionStump::invertSortingMap(
 		const std::vector<std::vector<size_t> >& SortingMap,
 		std::vector<std::vector<size_t> >* SortingMap_inv)const{
 	assert(SortingMap_inv != NULL);
@@ -836,7 +836,7 @@ void FeatureClassifierDecisionStumpForJointBoost::invertSortingMap(
 }
 
 
-bool FeatureClassifierDecisionStumpForJointBoost::getThresholdAndMinError(
+bool RegressionStump::getThresholdAndMinError(
 	const std::vector<Feature>& trainSet,
 	const std::vector<size_t>& SortingMap,
 	size_t d,
@@ -847,7 +847,7 @@ bool FeatureClassifierDecisionStumpForJointBoost::getThresholdAndMinError(
 	double* _arg_min_a,
 	double* _arg_min_b,
 	double* target_class_weight_sum,
-	FeatureClassifierDecisionStumpForJointBoostIntermidiateData* node
+	RegressionStumpIntermidiateData* node
 	)const{
 
 	double error = 0;
@@ -986,14 +986,14 @@ bool FeatureClassifierDecisionStumpForJointBoost::getThresholdAndMinError(
 	return true;
 }
 
-double FeatureClassifierDecisionStumpForJointBoost::getError()const{
+double RegressionStump::getError()const{
 	return _error;
 }
 
-void FeatureClassifierDecisionStumpForJointBoost::getTrainSampleData(
+void RegressionStump::getTrainSampleData(
 		const std::vector<Feature>& trainSet,
 		const MmplVector& weight,
-		FeatureClassifierDecisionStumpForJointBoostTrainSampleData* train_set_data)const{
+		RegressionStumpTrainSampleData* train_set_data)const{
 	assert(train_set_data!=NULL);
 	assert(!trainSet.empty());
 	calcSortingMap(trainSet,&(train_set_data->sorting_map),&(train_set_data->thresh_candidates));

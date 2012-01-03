@@ -6,9 +6,12 @@
 #ifndef __PATCH_MODEL_H__
 #define __PATCH_MODEL_H__
 
+#include <list>
 #include <set>
 #include <map>
 #include "sklcvutils.h"
+
+#define PATCH_MODEL_BLOCK_SIZE 4
 
 #define PATCH_EDGE_CANNY_THRESH1 16
 #define PATCH_EDGE_CANNY_THRESH2 32
@@ -30,10 +33,10 @@ namespace skl{
 			};
 			public:
 				Patch();
-				Patch(const cv::Mat& mask, const cv::Mat& newest_image, const cv::Mat& current_bg,const cv::Rect& roi);
+				Patch(const cv::Mat& mask, const cv::Mat& newest_image, const cv::Mat& current_bg,const std::vector<cv::Point>& points);
 				~Patch();
 
-				void set(const cv::Mat& mask, const cv::Mat& newest_image, const cv::Mat& current_bg, cv::Rect roi);
+				void set(const cv::Mat& mask, const cv::Mat& newest_image, const cv::Mat& current_bg,const std::vector<cv::Point>& points);
 
 				void setCoveredState(const cv::Rect& rect,const cv::Mat& mask,bool isCovered);
 				void setCoveredState(int x,int y,bool isCovered);
@@ -57,6 +60,7 @@ namespace skl{
 				void edge(const cv::Mat& __edge){_edge = __edge.clone();}
 				size_t edge_count()const{return _edge_count;};
 
+				const std::vector<cv::Point>& points()const{return _points;}
 
 		protected:
 				cv::Mat _mask[2];
@@ -67,18 +71,17 @@ namespace skl{
 				cv::Point center;
 				cv::Mat _covered_state;
 				size_t _edge_count;
-				int base_width;
-				int base_height;
+				cv::Size base_size;
+				std::vector<cv::Point> _points;
 			private:
 				void cvtG2L(int* x,int* y, Type type)const;
 				bool isIn(int local_x,int local_y, Type type)const;
-				cv::Rect extractEdges(cv::Mat& edge,const cv::Mat& mask,const cv::Mat& src,const cv::Mat& bg,size_t* edge_pix_num=NULL)const;
+				cv::Rect extractEdges(cv::Mat& edge, std::vector<cv::Point>* edge_points)const;
 		};
-/*
+
 		class PatchLayer{
 			public:
 				PatchLayer(std::map<size_t,Patch>* patches);
-//				PatchLayer(const PatchLayer& other);
 				~PatchLayer();
 				void push(size_t ID);
 				void erase(size_t ID);
@@ -95,7 +98,7 @@ namespace skl{
 				std::list<size_t> layer_order;
 				std::map<size_t,Patch>* patches;
 			private:
-				static bool isOverlayed(const cv::Rect& common_rect,const Patch& p1,const Patch& p2, Patch::Type type, Image* mask=NULL);
+				static bool isOverlayed(const cv::Rect& common_rect,const Patch& p1,const Patch& p2, Patch::Type type, cv::Mat& mask=cv::Mat());
 		};
 
 		class PatchModel{
@@ -108,11 +111,11 @@ namespace skl{
 				Patch& operator()(size_t ID);
 				void base(const cv::Mat& __bg);
 				const cv::Mat& base()const;
-				size_t putPatch(const Image& mask,const Image& newest_image);
+				size_t putPatch(const cv::Mat& mask,const cv::Mat& newest_image);
 				void takePatch(size_t ID,std::vector<size_t>* taken_patch_ids);
 				void updateNewestBG();
-				void newest_bg(const Image& bg);
-				const Image& newest_bg()const;
+				void newest_bg(const cv::Mat& bg);
+				const cv::Mat& newest_bg()const;
 				size_t checkLostPatches(const cv::Mat& __mask,const cv::Mat& __newest_image,const cv::Mat& __newest_bg)const;
 				bool isThere(size_t ID,const cv::Mat& newest_image)const;
 
@@ -123,13 +126,14 @@ namespace skl{
 			protected:
 				std::map<size_t,Patch> patches;
 				cv::Mat _newest_bg;
-				Image _base;
+				cv::Mat _base;
 				PatchLayer layer;
 
 				static double calcCommonEdge(
 						const CvRect& common_rect,
 						const Patch& patch_1,
 						const Patch& patch_2);
+				static void getObjectSamplePoints(const cv::Mat& mask, std::vector<cv::Point>* points);
 
 			private:
 				size_t max_id;
@@ -141,7 +145,7 @@ namespace skl{
 				bool changed_fg;
 				std::set<size_t> patches_in_hidden;
 		};
-	*/
+
 }
 
 #endif // __PATCH_MODEL_H__

@@ -5,8 +5,7 @@
  */
 
 #include "PatchModel.h"
-using namespace mmpl;
-using namespace mmpl::image;
+using namespace skl;
 
 PatchLayer::PatchLayer(std::map<size_t,Patch>* patches):patches(patches){
 
@@ -40,14 +39,14 @@ size_t PatchLayer::getUpperPatch(size_t ID, Patch::Type type)const{
 	std::map<size_t,Patch>::const_iterator psrc,ptar;
 	psrc = patches->find(ID);
 	assert(patches->end()!=psrc);
-	CvRect src_rect = psrc->second.getRect(type);
+	cv::Rect src_rect = psrc->second.roi(type);
 
 	for(;ptar_id!=layer_order.end();ptar_id++){
 		ptar = patches->find(*ptar_id);
 		assert(patches->end()!=ptar);
-		CvRect tar_rect = ptar->second.getRect(type);
+		cv::Rect tar_rect = ptar->second.roi(type);
 
-		CvRect common_rect = Patch::getCommonRectanglarRegion(src_rect,tar_rect);
+		cv::Rect common_rect = src_rect & tar_rect;
 		if(common_rect.width <= 0 || common_rect.height <= 0 ) continue;
 
 		if(isOverlayed(common_rect,psrc->second,ptar->second, type)){
@@ -69,19 +68,19 @@ std::vector<size_t> PatchLayer::getAllBeneathPatch(size_t ID,Patch::Type type){
 	std::map<size_t,Patch>::const_iterator psrc,ptar;
 	psrc = patches->find(ID);
 	assert(patches->end()!=psrc);
-	CvRect src_rect = psrc->second.getRect(type);
-	Image mask = psrc->second.getMask(type);
+	CvRect src_rect = psrc->second.roi(type);
+	cv::Mat mask = psrc->second.mask(type);
 
 	for(;ptar_id!=layer_order.rend();ptar_id++){
 		ptar = patches->find(*ptar_id);
 		assert(patches->end()!=ptar);
 
-		CvRect tar_rect = ptar->second.getRect(type);
+		CvRect tar_rect = ptar->second.roi(type);
 
-		CvRect common_rect = Patch::getCommonRectanglarRegion(src_rect,tar_rect);
+		CvRect common_rect = src_rect & tar_rect;
 		if(common_rect.width <= 0 || common_rect.height <= 0 ) continue;
 
-		if(isOverlayed(common_rect,ptar->second,psrc->second, type, &mask)){
+		if(isOverlayed(common_rect,ptar->second,psrc->second, type, mask)){
 			dst.push_back(*ptar_id);
 		}
 	}
@@ -127,21 +126,20 @@ size_t PatchLayer::size()const{
 }
 
 bool PatchLayer::isOverlayed(
-		const CvRect& common_rect,
+		const cv::Rect& common_rect,
 		const Patch& p1,
 		const Patch& p2,
 		Patch::Type type,
-		Image* mask){
+		cv::Mat& mask){
 	int max_x = common_rect.x + common_rect.width;
 	int max_y = common_rect.y + common_rect.height;
 
-	if(mask!=NULL){
-		assert(mask->getWidth()==p2.getMask(Patch::original).getWidth());
-		assert(mask->getHeight()==p2.getMask(Patch::original).getHeight());
+	if(mask.size()==cv::Size(0,0)){
+		assert(mask.size() == p2.mask(Patch::original).size());
 	}
 
 	bool flag = false;
-	CvRect rect = p2.getRect(Patch::original);
+	cv::Rect rect = p2.roi(Patch::original);
 	for(int y = common_rect.y; y < max_y; y++){
 		for(int x = common_rect.x; x < max_x; x++){
 			if( p1.maskValue(x,y,type)==0.0f
@@ -149,14 +147,12 @@ bool PatchLayer::isOverlayed(
 				continue;
 			}
 
-			if( mask==NULL){
+			if( cv::Size(0,0) == mask.size() ){
 				return true;
 			}
 
 			flag = true;
-			((float*)(mask->getIplImage()->imageData + 
-					mask->getIplImage()->widthStep * (y - rect.y)
-					))[x - rect.x] = 0.0f;
+			mask.at<float>(y - rect.y, x - rect.x) = 0.0f;
 		}
 	}
 	//if(mask!=NULL) return flag;

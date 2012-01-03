@@ -19,8 +19,8 @@ Patch::~Patch(){
 
 }
 
-Patch::Patch(const cv::Mat& __mask, const cv::Mat& __newest_image, const cv::Mat& __current_bg, const cv::Rect& roi){
-	set(__mask,__newest_image,__current_bg,roi);
+Patch::Patch(const cv::Mat& __mask, const cv::Mat& __newest_image, const cv::Mat& __current_bg, const std::vector<cv::Point>& points){
+	set(__mask,__newest_image,__current_bg,points);
 }
 
 
@@ -65,9 +65,12 @@ void Patch::setCoveredState(int x,int y,bool isCovered){
 
 
 
-void Patch::set(const cv::Mat& __mask, const cv::Mat& __newest_image,const cv::Mat& __current_bg, cv::Rect roi){
-	base_width = __mask.cols;
-	base_height = __mask.rows;
+void Patch::set(const cv::Mat& __mask, const cv::Mat& __newest_image,const cv::Mat& __current_bg,const std::vector<cv::Point>& points){
+
+	cv::Rect roi = fitRect(points);
+
+	base_size.width = __mask.cols;
+	base_size.height = __mask.rows;
 
 	_roi[dilate] = cv::Rect(
 		roi.x - PATCH_DILATE,
@@ -82,51 +85,66 @@ void Patch::set(const cv::Mat& __mask, const cv::Mat& __newest_image,const cv::M
 	_image[dilate] = cv::Mat(__newest_image, _roi[dilate]).clone();
 	_background[dilate] = cv::Mat(__current_bg, _roi[dilate]).clone();
 	_mask[dilate] = cv::Mat(__mask, _roi[dilate]).clone();
-	std::vector<cv::Point> edge_points;
 
-	_edge = extractEdge(_image[dilate],_mask[dilate],&edge_points);
+	CvMat ___mask = _mask[dilate];
+	cvSmooth(&___mask,&___mask,CV_BLUR,PATCH_DILATE,PATCH_DILATE);
+	cvThreshold(&__mask,&___mask,0.0f,1.0f,CV_THRESH_BINARY);
+	cvSmooth(&___mask,&___mask,CV_BLUR,PATCH_DILATE,PATCH_DILATE);
+
+	std::vector<cv::Point> edge_points;
+	_roi[original] = extractEdges(_edge,&edge_points);
 
 	_edge_count = edge_points.size();
 	if(_edge_count == 0) return;
 
-	roi = fitRect(edge_points);
-	_roi[original] = roi;
-	_image[original] = cv::Mat(__newest_image,roi).clone();
-	_background[original] = cv::Mat(__current_bg,roi).clone();
-	_mask[original] = cv::Mat(__mask,roi).clone();	
+	_image[original] = cv::Mat(__newest_image,_roi[original]).clone();
+	_background[original] = cv::Mat(__current_bg,_roi[original]).clone();
+	_mask[original] = cv::Mat(__mask,_roi[original]).clone();	
 	_covered_state = _mask[original].clone();
 
-	cv::Rect roi_dilate = _roi[dilate];
+	if(roi == _roi[original]){
+		_points = points;
+		for(size_t i=0;i<_points.size();i++){
+			_points[i].x -= roi.x;
+			_points[i].y -= roi.y;
+		}
+		return;
+	}
+	roi = _roi[original];
+	_points.clear();
+	for(size_t i=0;i<points.size();i++){
+		cv::Point pt(points[i].x - roi.x, points[i].y - roi.y);
+		if(pt.x < 0 || roi.width <= pt.x) continue;
+		if(pt.y < 0 || roi.height <= pt.y) continue;		
+		_points.push_back(pt);
+	}
+
+	// set dilate params again with the roi fitted to edge.
 	_roi[dilate] = cv::Rect(
-	roi.x - PATCH_DILATE,
-	roi.y - PATCH_DILATE,
-	roi.x + roi.width + PATCH_DILATE,
-	roi.y + roi.height + PATCH_DILATE);
+		roi.x - PATCH_DILATE,
+		roi.y - PATCH_DILATE,
+		roi.x + roi.width + PATCH_DILATE,
+		roi.y + roi.height + PATCH_DILATE);
 	_roi[dilate].x = _roi[dilate].x > 0 ? _roi[dilate].x : 0;
 	_roi[dilate].y = _roi[dilate].y > 0 ? _roi[dilate].y : 0;
 	_roi[dilate].width = _roi[dilate].width < __newest_image.cols ? _roi[dilate].width - _roi[dilate].x : __newest_image.cols - _roi[dilate].x;
 	_roi[dilate].height = _roi[dilate].height < __newest_image.rows ? _roi[dilate].height - _roi[dilate].y : __newest_image.rows - _roi[dilate].y;
 
-	if(roi_dilate != _roi[dilate]){
-		_image[dilate] = cv::Mat(__newest_image,_roi[dilate]).clone();
-		_background[dilate] = cv::Mat(__current_bg,_roi[dilate]).clone();
-		_mask[dilate] = cv::Mat(__mask,_roi[dilate]).clone();	
-	}
-	CvMat ___mask = _mask[dilate];
-	cv::Mat _temp = _mask[dilate].clone();
-	CvMat ___temp = _temp;
+	_image[dilate] = cv::Mat(__newest_image,_roi[dilate]).clone();
+	_background[dilate] = cv::Mat(__current_bg,_roi[dilate]).clone();
+	_mask[dilate] = cv::Mat(__mask,_roi[dilate]).clone();	
 
-	cvSmooth(&___mask,&___mask,CV_BLUR,PATCH_DILATE,PATCH_DILATE);
-	cvThreshold(&__mask,&___mask,0.0f,1.0f,CV_THRESH_BINARY);
-	cvSmooth(&___mask,&___mask,CV_BLUR,PATCH_DILATE,PATCH_DILATE);
+	cv::Mat temp = _mask[dilate].clone();
+	cvSmooth(&temp,&_mask[dilate],CV_BLUR,PATCH_DILATE,PATCH_DILATE);
+	cvThreshold(&_mask[dilate],&temp,0.0f,1.0f,CV_THRESH_BINARY);
+	cvSmooth(&temp,&_mask[dilate],CV_BLUR,PATCH_DILATE,PATCH_DILATE);
 }
 
 void Patch::save(const std::string& filename,Type type,const std::string& edge_filename)const{
 	CvRect roi = _roi[type];
-	assert(roi.width <= base_width);
-	assert(roi.height <= base_height);
-
-	cv::Mat dest = cv::Mat(cv::Size(base_width,base_height),_image[type].type(),SKL_GRAY);
+	assert(roi.width <= base_size.width);
+	assert(roi.height <= base_size.height);
+	cv::Mat dest = cv::Mat(base_size,_image[type].type(),SKL_GRAY);
 	cv::Mat temp = cv::Mat(dest,_roi[type]);
 	skl::blending<cv::Vec3b,float>(temp,_image[type],_mask[type],temp);
 	// CHECK!
@@ -150,140 +168,58 @@ float Patch::maskValue(int x, int y, Type type)const{
 
 
 
-
-CvRect Patch::extractEdges(cv::Mat& edge,const cv::Mat& mask,const cv::Mat& _src,const cv::Mat& _bg, size_t* edge_pix_num)const{
-	assert(CV_32FC1 = mask.type());
-	assert(mask.cols ==_src.cols);
-	assert(mask.rows ==_src.rows);
-	assert(mask.cols ==_bg.cols);
-	assert(mask.rows ==_bg.rows);
-	assert(edge!=NULL);
-
-	cv::Mat _edge(mask.size(),CV_8UC1,0);
+cv::Rect Patch::extractEdges(cv::Mat& edge, std::vector<cv::Point>* edge_points)const{
+	edge = cv::Mat(_mask[dilate].size(),CV_8UC1,0);
 
 	// blending diff, bg with black color bg by dilated mask
-	cv::Mat diff = _src.clone();
-	cvAbsDiff(_src.getIplImage(),_bg.getIplImage(),diff.getIplImage());
-	// CHECK How to calc cvAbsDiff in OpenCV2.0
+	cv::Mat diff = cv::Mat::zeros(_image[dilate].size(),CV_8UC3);
+	
+	cvAbsDiff(&_image[dilate],&_background[dilate],&diff);
+	cv::Mat diff_gray = cv::Mat::zeros(diff.size(),CV_8UC1);
+	cv::cvtColor(diff,diff_gray,CV_BGR2GRAY);
 
-	cv::Mat black = cv::Mat::zeros(_src.size(),CV_8UC3);
-	skl::blending(diff.getIplImage(),black.getIplImage(),mask.getIplImage(),diff.getIplImage());
-	cvSmooth(diff.getIplImage(),diff.getIplImage(),CV_GAUSSIAN,0,0,1);
-
-	Image bg(_bg);
-//	cvBlending(bg.getIplImage(),black.getIplImage(),mask.getIplImage(),bg.getIplImage());
-	bg.setChannels(1);
-	cvSmooth(bg.getIplImage(),bg.getIplImage(),CV_GAUSSIAN,0,0,1);
-	Image bg_edge(_edge);
+	diff *= _mask[dilate];
 
 	// extract edge by canny filter
-	diff.setChannels(1);
 	double thresh1 = PATCH_EDGE_CANNY_THRESH1;
 	double thresh2 = PATCH_EDGE_CANNY_THRESH2;
-	cvCanny(diff.getIplImage(),_edge.getIplImage(),thresh1,thresh2);
-	cvCanny(bg.getIplImage(),bg_edge.getIplImage(),thresh1,thresh2);
-	cvSmooth(bg_edge.getIplImage(),bg_edge.getIplImage(),CV_BLUR,4,4);
-	cvThreshold(bg_edge.getIplImage(),bg_edge.getIplImage(),0,255,CV_THRESH_BINARY);
-	cvSub(_edge.getIplImage(),bg_edge.getIplImage(),_edge.getIplImage());
-//	cvShowImage("edge",_edge.getIplImage());
-//	cvWaitKey(-1);
+	cv::Canny(diff,edge,thresh1,thresh2);
+
+
+	// extract background_gray
+	cv::Mat bg_edge = cv::Mat(_background[dilate].size(),CV_8UC1);
+	cv::Mat bg_gray = cv::Mat(_background[dilate].size(),CV_8UC1);
+	cv::cvtColor(_background[dilate],bg_gray,CV_BGR2GRAY);
+
+	cv::Canny(bg_gray,bg_edge,thresh1,thresh2);
+	cv::Mat temp = bg_gray; // reuse of bg_gray as temp
+	cvSmooth(&CvMat(bg_edge),&CvMat(temp),CV_BLUR,4,4);
+	cvThreshold(&CvMat(temp),&CvMat(bg_edge),0,255,CV_THRESH_BINARY);
+	cvSub(&CvMat(edge),&CvMat(bg_edge),&CvMat(edge));
+
+	cv::imshow("edge",edge);
+	cv::waitKey(-1);
 
 	// check if it has edge
-	CvRect eb_rect = getRect(_edge,edge_pix_num);
-
-	// exit when no edges are detect.
-	if(*edge_pix_num < 10){
-//	if(eb_rect.width <= 1 || eb_rect.height <= 1){
-		edge->setWidth(1);
-		edge->setHeight(1);
-		eb_rect.width = -1;
-		eb_rect.height = -1;
-		return eb_rect;
-	}
-
-
-//	std::cerr << "orig_rect: " << eb_rect.x << "," << eb_rect.y << "," << eb_rect.width << ", " << eb_rect.height << std::endl;
-
-	// shift eb_rect from _roi[dilate]-relative to
-	// to image-absolute coordinate.
-	CvRect abs_eb_rect = eb_rect;
-	abs_eb_rect.x += _roi[dilate].x;
-	abs_eb_rect.y += _roi[dilate].y;
-
-	// edge bounding box must be smaller then _roi[original].
-	abs_eb_rect.width += abs_eb_rect.x;
-	abs_eb_rect.height += abs_eb_rect.y;
-
-
-	if(abs_eb_rect.x < _roi[original].x){
-		eb_rect.x += _roi[original].x - abs_eb_rect.x;
-		abs_eb_rect.x = _roi[original].x;
-	}
-	if(abs_eb_rect.y < _roi[original].y){
-		eb_rect.y += _roi[original].y - abs_eb_rect.y;
-		abs_eb_rect.y = _roi[original].y;
-	}
-
-	if(abs_eb_rect.width > _roi[original].x + _roi[original].width){
-		abs_eb_rect.width = _roi[original].x + _roi[original].width;
-	}
-	if(abs_eb_rect.height > _roi[original].y + _roi[original].height){
-		abs_eb_rect.height = _roi[original].y + _roi[original].height;
-	}
-
-	abs_eb_rect.width -= abs_eb_rect.x;
-	abs_eb_rect.height -= abs_eb_rect.y;
-
-	eb_rect.width = abs_eb_rect.width;
-	eb_rect.height = abs_eb_rect.height;
-
-	if(eb_rect.width <= 1 || eb_rect.height <= 1){
-		edge->setWidth(1);
-		edge->setHeight(1);
-		return abs_eb_rect;
-	}
-
-
-/*	std::cerr << "_edge: " << _edge.getWidth() << "," << _edge.getHeight() << ", " << _edge.getDepth() << ", " << _edge.getChannels() << std::endl;
-	std::cerr << "abs_rect: " << abs_eb_rect.x << "," << abs_eb_rect.y << "," << abs_eb_rect.width << ", " << abs_eb_rect.height << std::endl;
-	std::cerr << "rect: " << eb_rect.x << "," << eb_rect.y << "," << eb_rect.width << ", " << eb_rect.height << std::endl;
-*/
-	Image temp;
-	crop(&temp,_edge,eb_rect);
-	*edge = temp;
-	cvZero(edge->getIplImage());
-
-	Image mask_8U = this->mask[original];
-	mask_8U.setDepth(IPL_DEPTH_8U);
-	cvConvertScale(this->mask[original].getIplImage(),mask_8U.getIplImage(),255.0,0);
-
-//	std::cerr << mask_8U.getDepth() << ", " << mask_8U.getChannels() << ", " << mask_8U.getWidth() << ", " << mask_8U.getHeight() << std::endl;
-	CvRect ro_rect = abs_eb_rect;
-	ro_rect.x -= _roi[original].x;
-	ro_rect.y -= _roi[original].y;
-//	std::cerr << ro_rect.x << ", " << ro_rect.y << ", " << ro_rect.width << ", " << ro_rect.height << std::endl;
-	crop(&mask_8U,mask_8U,ro_rect);
-	cvCopy(temp.getIplImage(),edge->getIplImage(),mask_8U.getIplImage());
-
-	size_t edge_num = 0;
-	for(int y=0; y < edge->getHeight(); y++){
-		unsigned char* pedge = (unsigned char*)(edge->getIplImage()->imageData + y * edge->getIplImage()->widthStep);
-		for(int x=0; x < edge->getWidth(); x++){
-			if(pedge[x]>0){
-				edge_num++;
-			}
+	cv::Rect roi_original(_roi[original].x,_roi[original].y,_roi[original].x + _roi[original].width, _roi[original].y + _roi[original].height);
+	for(int y = 0; y < _edge.rows; y++){
+		for(int x = 0; x < _edge.cols; x++){
+			int abs_x = x + _roi[dilate].x;
+			int abs_y = y + _roi[dilate].y;
+			if(abs_x < roi_original.x || roi_original.width <= abs_x ) continue;
+			if(abs_y < roi_original.y || roi_original.height <= abs_x) continue;
+			if(0 == _edge.at<unsigned char>(y,x)) continue;
+			if(0.0 == _mask[original].at<float>(abs_y - roi_original.y, abs_x - roi_original.x)) continue;
+			edge_points->push_back(cv::Point(x,y));
 		}
 	}
 
-	if(edge_pix_num != NULL){
-		*edge_pix_num = edge_num;
-		if(edge_num < 10){
-			abs_eb_rect.width = 0;
-			abs_eb_rect.height = 0;
-			return abs_eb_rect;
-		}
-	}
+	if(0 == edge_points->size()) return cv::Rect(0,0,0,0);
+	cv::Rect eb_rect = fitRect(*edge_points);
+	edge = cv::Mat(edge,eb_rect).clone();
 
-	return abs_eb_rect;
+	eb_rect.x += _roi[dilate].x;
+	eb_rect.y += _roi[dilate].y;
+	return eb_rect;
 }
 

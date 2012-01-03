@@ -1,100 +1,77 @@
 ﻿/*!
- * @file FeatureClassifierDecisionStumpForJointBoost.h
+ * @file RegressionStump.h
  * @author 橋本敦史
  * @date Last Change:2011/Nov/27.
  */
-#ifndef __FEATURE_CLASSIFIER_DECISION_STAMP_FOR_JOINT_BOOST_H__
-#define __FEATURE_CLASSIFIER_DECISION_STAMP_FOR_JOINT_BOOST_H__
+#ifndef __SKL_REGRESSION_STUMP_H__
+#define __SKL_REGRESSION_STUMP_H__
 
-#include "FeatureClassifierWithParam.h"
-#include "FeatureClassifierDecisionStumpForJointBoost_forhighspeed.h"
-#include "Printable.h"
+#include <cv.h>
+//#include "RegressionStump_parallel.h"
 
-namespace mmpl{
+namespace skl{
 
-
-/*!
- * @class 決定木のノードの値([1]A. Torralba, K.P.Murphy and W.T.Freeman,”Sharing features: efficient boosting procedures for multiclass object detection”に準拠)
- */
-class FeatureClassifierDecisionStumpForJointBoostParams:public Printable<FeatureClassifierDecisionStumpForJointBoostParams>{
-	public:
-		FeatureClassifierDecisionStumpForJointBoostParams();
-		virtual ~FeatureClassifierDecisionStumpForJointBoostParams();
-		std::string print()const;
-		void scan(const std::string& content);
-
-		/* Accessor */
-		void setThreshold(double threshold);
-		double getThreshold()const;
-		void setA(double a);
-		double getA()const;
-		void setB(double b);
-		double getB()const;
-		void setK(const std::vector<double>& k);
-		double getK(size_t idx)const;
-		unsigned int getClassNum()const;
-		void setClassNum(unsigned int class_num);
-		size_t getFocusingFeature()const;
-		void setFocusingFeature(size_t focusing_feature);
-
-		FeatureClassifierDecisionStumpForJointBoostParams& operator=(const FeatureClassifierDecisionStumpForJointBoostParams& other);
-
-		const Bitflag& getSubsetBitflag()const;
-		void setSubsetBitflag(const Bitflag& bitflag);
-
-
-	protected:
-		// 閾値
-		double threshold;
-
-		// JointBoostの論文[1]に準拠したパラメタ群
-		double a;
-		double b;
-		std::vector<double> k;
-		// その他、弱識別器を特徴づけるパラメタ
-		Bitflag subset_bitflag;
-		unsigned int class_num;
-		size_t focusing_feature;
-	private:
-};
-
+	/*!
+	 * @class 繰り返し同じ学習セットを適用する際に二回目以降のソーティング作業を省略するためのクラス
+	 */
+	class RegressionStumpTrainDataIndex{
+		
+	}
 
 /*!
- * @class 決定木のノードを表す。AdaBoostと組み合わせて特徴量選出などに用いられる
+ * @class JointBoosting等で用いられる決定木のノードの帰り値を回帰としたモデル
  */
-class FeatureClassifierDecisionStumpForJointBoost:public FeatureClassifierWithParam<FeatureClassifierDecisionStumpForJointBoostParams>{
+class RegressionStump:public CvStatModel{
 	public:
-		FeatureClassifierDecisionStumpForJointBoost();
-		FeatureClassifierDecisionStumpForJointBoost(const FeatureClassifierDecisionStumpForJointBoost& other);
-		virtual ~FeatureClassifierDecisionStumpForJointBoost();
+		RegressionStump();
+		RegressionStump(const RegressionStump& other);
+		virtual ~RegressionStump();
+
+		// pure virtual functions from CvStatModel
+		void save(const char* filename, const char* name=0);
+		void load(const char* filename, const char* name=0);
+		void write(CvFileStorage* storage, const char* name);
+		void read(CvFileStorage* storage, CvFileNode* node);
+		void clear();
+		void setWeight(cv::Mat& weight);
+		// this class support only CV_ROW_SAMPLE.
 		bool train(
+			const cv::Mat& train_data, // 1 row 1 sample. 
+			const cv::Mat& responses, // teacher signal
+			const cv::Mat& var_idx, // feature mask
+			const cv::Mat& sample_idx); // sample mask
+		float predict(const cv::Mat& sample);
+
+		// オリジナル
+		bool train(
+
 				const std::vector<Feature>& ,
 				const MmplVector* weight=NULL);
 
 		bool train(
 				const std::vector<Feature>& ,
 				const MmplVector* weight,
-				FeatureClassifierDecisionStumpForJointBoostTrainSampleData* train_set_data,
+				RegressionStumpTrainSampleData* train_set_data,
 				double* target_class_weight_sum,
-				FeatureClassifierDecisionStumpForJointBoostIntermidiateData* current_node=NULL,
+				RegressionStumpIntermidiateData* current_node=NULL,
 				std::vector<Bitflag>* hasSelected=NULL);
 
 		bool train(
 				const std::vector<Feature>& train_set,
 				const MmplVector* weight,
-				const FeatureClassifierDecisionStumpForJointBoostTrainSampleData& train_set_data,
+				const RegressionStumpTrainSampleData& train_set_data,
 				double* target_class_weight_sum,
-				std::map<Bitflag, FeatureClassifierDecisionStumpForJointBoostIntermidiateData,BitflagComparer>* parent_nodes,
-				FeatureClassifierDecisionStumpForJointBoostIntermidiateData* intermidiate_data,
+				std::map<Bitflag, RegressionStumpIntermidiateData,BitflagComparer>* parent_nodes,
+				RegressionStumpIntermidiateData* intermidiate_data,
 				std::vector<Bitflag>* hasSelected=NULL);
 
 		void getTrainSampleData(
 				const std::vector<Feature>& trainSet,
 				const MmplVector& weight,
-				FeatureClassifierDecisionStumpForJointBoostTrainSampleData* train_set_data)const;
+				RegressionStumpTrainSampleData* train_set_data)const;
 
 
-		FeatureClassifierDecisionStumpForJointBoostTrainSampleData getTrainSampleData(const std::vector<Feature>&);
+		RegressionStumpTrainSampleData getTrainSampleData(const std::vector<Feature>&);
 		double predict(Feature* testSample)const;
 		double predict(Feature* testSample,bool addBandK)const;
 
@@ -122,16 +99,27 @@ class FeatureClassifierDecisionStumpForJointBoost:public FeatureClassifierWithPa
 				double* a,
 				double* b,
 				double* target_class_weight_sum,
-				FeatureClassifierDecisionStumpForJointBoostIntermidiateData* node = NULL
+				RegressionStumpIntermidiateData* node = NULL
 				)const;
 		double _error;
 	private:
+		// 閾値
+		double threshold;
+
+		// JointBoostの論文[1]に準拠したパラメタ群
+		double a;
+		double b;
+		std::vector<double> k;
+		// その他、弱識別器を特徴づけるパラメタ
+		Bitflag subset_bitflag;
+		unsigned int class_num;
+		size_t focusing_feature;
+
 		void invertSortingMap(
 				const std::vector<std::vector<size_t> >& SortingMap,
 				std::vector<std::vector<size_t> >* SortingMap_inv)const;
 };
 
 
-} // namespace mmpl
-#endif // __FEATURECLASSIFIERDECISIONSTAMP_H__
-
+} // namespace skl
+#endif // __SKL_REGRESSION_STUMP_H__

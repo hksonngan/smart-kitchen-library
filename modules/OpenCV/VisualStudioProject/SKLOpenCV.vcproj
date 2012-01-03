@@ -163,6 +163,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\src\PatchLayer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\src\PatchModel.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\src\RegionLabelingSimple.cpp"
 				>
 			</File>

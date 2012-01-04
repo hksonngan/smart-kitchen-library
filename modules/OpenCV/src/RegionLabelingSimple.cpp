@@ -1,8 +1,8 @@
-#include "RegionLabelingSimple.h"
+﻿#include "RegionLabelingSimple.h"
 using namespace skl;
 /** 
- * @brief $BF`NI@hC<Bg!"0fB<@h@8$N%W%m%0%i%`!J7cB.!K$rMxMQ$7$?%i%Y%j%s%0(B
- * $BGX7J?'$O(B(0,0,0)$B$G$J$$$H$$$1$J$$(B
+ * @brief 奈良先端大、井村先生のプログラム（激速）を利用したラベリング
+ * 背景色は(0,0,0)でないといけない
  * */
 size_t RegionLabelingSimple::compute(
 		const cv::Mat& img,

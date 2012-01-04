@@ -1,7 +1,7 @@
 all:
 	cd src;$(MAKE)
 	cp src/libskl_opencv.a ../../lib
-	cd VisualStudioProject; ./generate_vcproj.rb > SKLOpenCV.vcproj
+#	cd VisualStudioProject; ./generate_vcproj.rb > SKLOpenCV.vcproj
 
 .PHONY: clean debug
 

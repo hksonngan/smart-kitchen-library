@@ -112,4 +112,4 @@ template <typename captype, typename tcaptype, typename flowtype>
 	}
 }
 
-#include "graph_instances.h"
+#include "graph_instances.inc"

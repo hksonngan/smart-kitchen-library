@@ -1,9 +1,9 @@
-#include "StaticRegionDetector.h"
+﻿#include "StaticRegionDetector.h"
 #include <vector>
 
 #ifdef DEBUG
 #include <highgui.h>
-#include "RegionLabelingVisualize.h"
+#include "sklcvutils.h"
 #endif
 
 using namespace skl;

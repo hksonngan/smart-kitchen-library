@@ -1,7 +1,7 @@
-/*!
+Ôªø/*!
  * @file PatchLayer.cpp
- * @author ∂∂À‹∆ÿªÀ
- * @date Last Change:2011/Oct/23.
+ * @author Ê©ãÊú¨Êï¶Âè≤
+ * @date Last Change:2012/Jan/03.
  */
 
 #include "PatchModel.h"
@@ -129,15 +129,23 @@ bool PatchLayer::isOverlayed(
 		const cv::Rect& common_rect,
 		const Patch& p1,
 		const Patch& p2,
+		Patch::Type type){
+	cv::Mat mask;
+	return isOverlayed(common_rect, p1,p2,type,mask);
+}
+bool PatchLayer::isOverlayed(
+		const cv::Rect& common_rect,
+		const Patch& p1,
+		const Patch& p2,
 		Patch::Type type,
 		cv::Mat& mask){
 	int max_x = common_rect.x + common_rect.width;
 	int max_y = common_rect.y + common_rect.height;
 
-	if(mask.size()==cv::Size(0,0)){
-		assert(mask.size() == p2.mask(Patch::original).size());
+	bool nomask = false;
+	if(cv::Size(0,0) == mask.size() ){
+		nomask = true;
 	}
-
 	bool flag = false;
 	cv::Rect rect = p2.roi(Patch::original);
 	for(int y = common_rect.y; y < max_y; y++){
@@ -147,7 +155,7 @@ bool PatchLayer::isOverlayed(
 				continue;
 			}
 
-			if( cv::Size(0,0) == mask.size() ){
+			if(nomask){
 				return true;
 			}
 

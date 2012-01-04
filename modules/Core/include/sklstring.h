@@ -42,5 +42,8 @@ namespace skl{
 		dest->insert(dest->begin(),buf2.begin(),buf2.end());
 		return true;
 	}
+	std::string DirName(const std::string& filepath);
+	std::string ExtName(const std::string& filepath);
+	std::string BaseName(const std::string& filepath,const std::string& extname="");
 } // namespace skl
 #endif // __SKL__STRING_H__

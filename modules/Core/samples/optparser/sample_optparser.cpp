@@ -4,6 +4,7 @@
 
 opt_on(int, foo, 10, "-f","<INT>", "set parameter foo.");
 opt_on_bool(verbose, "", "an example of bool switch.");
+opt_on(std::string, workspace_end_filename,"./conf/worker_detection_mask.bom","-w","<IMG_FILE>","set end of workspace by binary image.");
 
 // declare std::vector option manually for flexible initialization
 std::vector<double> vec(3,0.0);
@@ -22,6 +23,7 @@ int main(int argc,char* argv[]){
 		std::cout << "argv[" << i << "] = " << args[i] << std::endl;
 	}
 
+	std::cout << workspace_end_filename << std::endl;
 
 	std::cout << "int foo = " << foo << std::endl;
 	std::cout << "bool verbose = " << verbose << std::endl;

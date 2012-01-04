@@ -88,18 +88,18 @@ active_modules << "Core"
 argv.delete_at 0
 
 argv.each{|opt|
-	active_modules << opt.capitalize
+	active_modules << opt
 }
 
 
 # 空白区切りのモジュールのリスト(大文字と小文字)
 sklModule = ""
 sklmodule = ""
+unknown_modules = []
 ModuleOrder.reverse!
 ModuleOrder.each{|mod|
 	p mod
 	if active_modules.include?(mod) then
-		active_modules.delete(mod)
 		if sklModule!="" then
 			sklModule+=" "
 			sklmodule+=" "
@@ -107,15 +107,13 @@ ModuleOrder.each{|mod|
 		sklModule += mod
 		sklmodule += mod.downcase
 	end
-
 }
 
-if !active_modules.empty? then
-	STDERR.puts "Following modules are not listed in dependency list. Please add them in the array 'ModuleOrder'of this script."
-	for mod in active_modules do
-		STDERR.puts mod
+for mod in active_modules do
+	if !ModuleOrder.include?(mod) then
+		STDERR.puts "#{mod} is not in dependency list. Please add it in the array 'ModuleOrder'of this script."
+		exit 0
 	end
-	exit 0
 end
 
 if File.exist?("Makefile") then

@@ -4,7 +4,6 @@
 #include "sklcv.h"
 #include <highgui.h>
 #include "BackgroundSubtractAlgorithm.h"
-#include "skl.h"
 #include "TexCut_def.h"
 
 namespace skl{
@@ -13,14 +12,13 @@ namespace skl{
 			TexCut();
 			TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha=1.5, float smoothing_term_weight=1.5, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
 			~TexCut();
-			int compute(const cv::Mat& src, cv::Mat& dest);
 			void setBackground(const cv::Mat& bg);
 			void setParams(float alpha=1.5, float smoothing_term_weight=1.5, float thresh_tex_diff = 0.4, unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
 			void learnImageNoiseModel(const cv::Mat& bg2);
 
 			void updateBackgroundModel(const cv::Mat& bg, const cv::Mat& mask);
 		protected:
-			int compute(const cv::Mat& src,const cv::Mat& mask, cv::Mat& dest);
+			double compute(const cv::Mat& src,const cv::Mat& mask, cv::Mat& dest);
 			void calcEdgeCapacity(
 					const std::vector<cv::Mat>& src,
 					const std::vector<cv::Mat>& sobel_x,

@@ -1,4 +1,10 @@
-#include "sklcvutils.h"
+﻿#include "sklcvutils.h"
+#include <highgui.h>
+
+#define CLIP(in, out)\
+	in = in < 0 ? 0 : in;\
+in = in > 255 ? 255 : in;\
+out=in;
 
 cv::Rect operator&(const cv::Rect& left, const cv::Rect& right){
 	cv::Rect rect(left.x,left.y,left.x+left.width,left.y+left.height);
@@ -42,6 +48,8 @@ namespace skl{
 			rect.width = rect.width > x ? rect.width : x;
 			rect.height = rect.height > y ? rect.height : y;
 		}
+		rect.width -= (rect.x-1);
+		rect.height -= (rect.y-1);
 		return rect;
 	}
 
@@ -137,10 +145,152 @@ namespace skl{
 		return vis;
 	}
 
-	template<class T> void setWeight(const T& mask,double* w1, double* w2){
-		*w1 = mask;
-		*w2 = 1.0 - mask;
+
+
+
+
+	void cvtBayer2BGR_NN(const cv::Mat& bayer, cv::Mat& bgr, int code);
+	void cvtBayer2BGR_EDGESENSE(const cv::Mat& bayer, cv::Mat& bgr, int code);
+
+	void cvtBayer2BGR(const cv::Mat& bayer, cv::Mat& bgr, int code, int algo_type){
+		assert(bayer.isContinuous());
+		bgr = cv::Mat::zeros(bayer.rows,bayer.cols,CV_8UC3);
+		if(algo_type == BAYER_SIMPLE){
+			cv::cvtColor(bayer,bgr,code);
+		}
+		else if(algo_type == BAYER_NN){
+			cvtBayer2BGR_NN(bayer,bgr,code);
+		}
+		else if(algo_type == BAYER_EDGE_SENSE){
+			cvtBayer2BGR_EDGESENSE(bayer,bgr,code);
+		}
 	}
+
+	void cvtBayer2BGR_NN(const cv::Mat& bayer, cv::Mat& bgr, int type){
+		int sx = bayer.cols;
+		int sy = bayer.rows;
+		const unsigned char* src = bayer.ptr<unsigned char>(0);
+		unsigned char* dest = bgr.ptr<unsigned char>(0);
+
+		unsigned char *outR=NULL, *outG=NULL, *outB=NULL;
+		register int i,j;
+
+		// sx and sy should be even
+		switch (type) {
+			case CV_BayerGR2BGR:
+			case CV_BayerBG2BGR:
+				outR=&dest[0];
+				outG=&dest[1];
+				outB=&dest[2];
+				break;
+			case CV_BayerGB2BGR:
+			case CV_BayerRG2BGR:
+				outR=&dest[2];
+				outG=&dest[1];
+				outB=&dest[0];
+				break;
+			default:
+				std::cerr << "Bad Bayer pattern ID: " << type << std::endl;
+				return;
+				break;
+		}
+
+		switch (type) {
+			case CV_BayerGR2BGR: //-------------------------------------------
+			case CV_BayerGB2BGR:
+				// copy original RGB data to output images
+				for (i=0;i<sy;i+=2) {
+					for (j=0;j<sx;j+=2) {
+						outG[(i*sx+j)*3]=src[i*sx+j];
+						outG[((i+1)*sx+(j+1))*3]=src[(i+1)*sx+(j+1)];
+						outR[(i*sx+j+1)*3]=src[i*sx+j+1];
+						outB[((i+1)*sx+j)*3]=src[(i+1)*sx+j];
+					}
+				}
+				// R channel
+				for (i=0;i<sy;i+=2) {
+					for (j=0;j<sx-1;j+=2) {
+						outR[(i*sx+j)*3]=outR[(i*sx+j+1)*3];
+						outR[((i+1)*sx+j+1)*3]=outR[(i*sx+j+1)*3];
+						outR[((i+1)*sx+j)*3]=outR[(i*sx+j+1)*3];
+					}
+				}
+				// B channel
+				for (i=0;i<sy-1;i+=2)  { //every two lines
+					for (j=0;j<sx-1;j+=2) {
+						outB[(i*sx+j)*3]=outB[((i+1)*sx+j)*3];
+						outB[(i*sx+j+1)*3]=outB[((i+1)*sx+j)*3];
+						outB[((i+1)*sx+j+1)*3]=outB[((i+1)*sx+j)*3];
+					}
+				}
+				// using lower direction for G channel
+
+				// G channel
+				for (i=0;i<sy-1;i+=2)//every two lines
+					for (j=1;j<sx;j+=2)
+						outG[(i*sx+j)*3]=outG[((i+1)*sx+j)*3];
+
+				for (i=1;i<sy-2;i+=2)//every two lines
+					for (j=0;j<sx-1;j+=2)
+						outG[(i*sx+j)*3]=outG[((i+1)*sx+j)*3];
+
+				// copy it for the next line
+				for (j=0;j<sx-1;j+=2)
+					outG[((sy-1)*sx+j)*3]=outG[((sy-2)*sx+j)*3];
+
+				break;
+			case CV_BayerBG2BGR: //-------------------------------------------
+			case CV_BayerRG2BGR:
+				// copy original data
+				for (i=0;i<sy;i+=2) {
+					for (j=0;j<sx;j+=2) {
+						outB[(i*sx+j)*3]=src[i*sx+j];
+						outR[((i+1)*sx+(j+1))*3]=src[(i+1)*sx+(j+1)];
+						outG[(i*sx+j+1)*3]=src[i*sx+j+1];
+						outG[((i+1)*sx+j)*3]=src[(i+1)*sx+j];
+					}
+				}
+				// R channel
+				for (i=0;i<sy;i+=2){
+					for (j=0;j<sx-1;j+=2) {
+						outR[(i*sx+j)*3]=outR[((i+1)*sx+j+1)*3];
+						outR[(i*sx+j+1)*3]=outR[((i+1)*sx+j+1)*3];
+						outR[((i+1)*sx+j)*3]=outR[((i+1)*sx+j+1)*3];
+					}
+				}
+				// B channel
+				for (i=0;i<sy-1;i+=2) { //every two lines
+					for (j=0;j<sx-1;j+=2) {
+						outB[((i+1)*sx+j)*3]=outB[(i*sx+j)*3];
+						outB[(i*sx+j+1)*3]=outB[(i*sx+j)*3];
+						outB[((i+1)*sx+j+1)*3]=outB[(i*sx+j)*3];
+					}
+				}
+				// using lower direction for G channel
+
+				// G channel
+				for (i=0;i<sy-1;i+=2)//every two lines
+					for (j=0;j<sx-1;j+=2)
+						outG[(i*sx+j)*3]=outG[((i+1)*sx+j)*3];
+
+				for (i=1;i<sy-2;i+=2)//every two lines
+					for (j=0;j<sx-1;j+=2)
+						outG[(i*sx+j+1)*3]=outG[((i+1)*sx+j+1)*3];
+
+				// copy it for the next line
+				for (j=0;j<sx-1;j+=2)
+					outG[((sy-1)*sx+j+1)*3]=outG[((sy-2)*sx+j+1)*3];
+
+				break;
+
+			default:  //-------------------------------------------
+				std::cerr << "Bad Bayer pattern ID: " << type << std::endl;
+				return;
+				break;
+		}
+
+	}
+
 	template<> void setWeight<unsigned char>(const unsigned char& mask, double* w1, double* w2){
 		*w1 = mask;
 		*w2 = 255 - mask;
@@ -148,9 +298,6 @@ namespace skl{
 		*w2 /= 255.0;
 	}
 
-	template<class T> T blend(const T& pix1, const T& pix2, double w1,double w2){
-		return static_cast<T>(w1 * pix1 + w2 * pix2);
-	}
 	template<> cv::Vec3b blend(const cv::Vec3b& pix1,const cv::Vec3b& pix2, double w1, double w2){
 		cv::Vec3b val;
 		for(size_t i=0;i<3;i++){
@@ -159,51 +306,301 @@ namespace skl{
 		return val;
 	}
 
-	template <class ElemType,class WeightType> class ParallelBlending{
-		public:
-			ParallelBlending(
-					const cv::Mat& src1,
-					const cv::Mat& src2,
-					const cv::Mat& mask,
-					cv::Mat& dest):
-				src1(src1),src2(src2),mask(mask),dest(dest){}
-			~ParallelBlending(){}
-			void operator()(const cv::BlockedRange& range)const{
-				for(int i=range.begin();i!=range.end();i++){
-					int y = i / mask.cols;
-					int x = i % mask.cols;
-					double weight1, weight2;
-					setWeight<WeightType>(mask.at<WeightType>(y,x), &weight2,&weight1);
-					dest.at<ElemType>(y,x) = blend<ElemType>(
-							src1.at<ElemType>(y,x),
-							src2.at<ElemType>(y,x),
-							weight1,weight2);
+
+	void ClearBorders(unsigned char* dest, int sx, int sy, int w);
+	void cvtBayer2BGR_EDGESENSE(const cv::Mat& bayer, cv::Mat& bgr, int type){
+		int sx = bayer.cols;
+		int sy = bayer.rows;
+		const unsigned char* src = bayer.ptr<unsigned char>(0);
+		unsigned char* dest = bgr.ptr<unsigned char>(0);
+		unsigned char *outR=NULL, *outG=NULL, *outB=NULL;
+		register int i,j;
+		int dh, dv;
+		int tmp;
+
+		// sx and sy should be even
+		switch (type) {
+			case CV_BayerGR2BGR:
+			case CV_BayerBG2BGR:
+				outR=&dest[0];
+				outG=&dest[1];
+				outB=&dest[2];
+				break;
+			case CV_BayerGB2BGR:
+			case CV_BayerRG2BGR:
+				outR=&dest[2];
+				outG=&dest[1];
+				outB=&dest[0];
+				break;
+			default:
+				std::cerr << "Bad Bayer pattern ID: " << type << std::endl;
+				return;
+				break;
+		}
+
+		switch (type) {
+			case CV_BayerGR2BGR://---------------------------------------------------------
+			case CV_BayerGB2BGR:
+				// copy original RGB data to output images
+				for (i=0;i<sy;i+=2) {
+					for (j=0;j<sx;j+=2) {
+						outG[(i*sx+j)*3]=src[i*sx+j];
+						outG[((i+1)*sx+(j+1))*3]=src[(i+1)*sx+(j+1)];
+						outR[(i*sx+j+1)*3]=src[i*sx+j+1];
+						outB[((i+1)*sx+j)*3]=src[(i+1)*sx+j];
+					}
 				}
+				// process GREEN channel
+				for (i=3;i<sy-2;i+=2) {
+					for (j=2;j<sx-3;j+=2) {
+						dh=abs((outB[(i*sx+j-2)*3]+outB[(i*sx+j+2)*3])/2-outB[(i*sx+j)*3]);
+						dv=abs((outB[((i-2)*sx+j)*3]+outB[((i+2)*sx+j)*3])/2-outB[(i*sx+j)*3]);
+						if (dh<dv)
+							tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3])/2;
+						else {
+							if (dh>dv)
+								tmp=(outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/2;
+							else
+								tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3]+outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/4;
+						}
+						CLIP(tmp,outG[(i*sx+j)*3]);
+					}
+				}
+
+				for (i=2;i<sy-3;i+=2) {
+					for (j=3;j<sx-2;j+=2) {
+						dh=abs((outR[(i*sx+j-2)*3]+outR[(i*sx+j+2)*3])/2-outR[(i*sx+j)*3]);
+						dv=abs((outR[((i-2)*sx+j)*3]+outR[((i+2)*sx+j)*3])/2-outR[(i*sx+j)*3]);
+						if (dh<dv)
+							tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3])/2;
+						else {
+							if (dh>dv)
+								tmp=(outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/2;
+							else
+								tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3]+outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/4;
+						} 
+						CLIP(tmp,outG[(i*sx+j)*3]);
+					}
+				}
+				// process RED channel
+				for (i=0;i<sy-1;i+=2) {
+					for (j=2;j<sx-1;j+=2) {
+						tmp=outG[(i*sx+j)*3]+(outR[(i*sx+j-1)*3]-outG[(i*sx+j-1)*3]+
+								outR[(i*sx+j+1)*3]-outG[(i*sx+j+1)*3])/2;
+						CLIP(tmp,outR[(i*sx+j)*3]);
+					}
+				}
+				for (i=1;i<sy-2;i+=2) {
+					for (j=1;j<sx;j+=2) {
+						tmp=outG[(i*sx+j)*3]+(outR[((i-1)*sx+j)*3]-outG[((i-1)*sx+j)*3]+
+								outR[((i+1)*sx+j)*3]-outG[((i+1)*sx+j)*3])/2;
+						CLIP(tmp,outR[(i*sx+j)*3]);
+					}
+					for (j=2;j<sx-1;j+=2) {
+						tmp=outG[(i*sx+j)*3]+(outR[((i-1)*sx+j-1)*3]-outG[((i-1)*sx+j-1)*3]+
+								outR[((i-1)*sx+j+1)*3]-outG[((i-1)*sx+j+1)*3]+
+								outR[((i+1)*sx+j-1)*3]-outG[((i+1)*sx+j-1)*3]+
+								outR[((i+1)*sx+j+1)*3]-outG[((i+1)*sx+j+1)*3])/4;
+						CLIP(tmp,outR[(i*sx+j)*3]);
+					}
+				}
+
+				// process BLUE channel
+				for (i=1;i<sy;i+=2) {
+					for (j=1;j<sx-2;j+=2) {
+						tmp=outG[(i*sx+j)*3]+(outB[(i*sx+j-1)*3]-outG[(i*sx+j-1)*3]+
+								outB[(i*sx+j+1)*3]-outG[(i*sx+j+1)*3])/2;
+						CLIP(tmp,outB[(i*sx+j)*3]);
+					}
+				}
+				for (i=2;i<sy-1;i+=2) {
+					for (j=0;j<sx-1;j+=2) {
+						tmp=outG[(i*sx+j)*3]+(outB[((i-1)*sx+j)*3]-outG[((i-1)*sx+j)*3]+
+								outB[((i+1)*sx+j)*3]-outG[((i+1)*sx+j)*3])/2;
+						CLIP(tmp,outB[(i*sx+j)*3]);
+					}
+					for (j=1;j<sx-2;j+=2) {
+						tmp=outG[(i*sx+j)*3]+(outB[((i-1)*sx+j-1)*3]-outG[((i-1)*sx+j-1)*3]+
+								outB[((i-1)*sx+j+1)*3]-outG[((i-1)*sx+j+1)*3]+
+								outB[((i+1)*sx+j-1)*3]-outG[((i+1)*sx+j-1)*3]+
+								outB[((i+1)*sx+j+1)*3]-outG[((i+1)*sx+j+1)*3])/4;
+						CLIP(tmp,outB[(i*sx+j)*3]);
+					}
+				}
+				break;
+
+			case CV_BayerBG2BGR: //---------------------------------------------------------
+			case CV_BayerRG2BGR:
+				// copy original RGB data to output images
+				for (i=0;i<sy;i+=2) {
+					for (j=0;j<sx;j+=2) {
+						outB[(i*sx+j)*3]=src[i*sx+j];
+						outR[((i+1)*sx+(j+1))*3]=src[(i+1)*sx+(j+1)];
+						outG[(i*sx+j+1)*3]=src[i*sx+j+1];
+						outG[((i+1)*sx+j)*3]=src[(i+1)*sx+j];
+					}
+				}
+				// process GREEN channel
+				for (i=2;i<sy-2;i+=2) {
+					for (j=2;j<sx-3;j+=2) {
+						dh=abs((outB[(i*sx+j-2)*3]+outB[(i*sx+j+2)*3])/2-outB[(i*sx+j)*3]);
+						dv=abs((outB[((i-2)*sx+j)*3]+outB[((i+2)*sx+j)*3])/2-outB[(i*sx+j)*3]);
+						if (dh<dv)
+							tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3])/2;
+						else {
+							if (dh>dv)
+								tmp=(outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/2;
+							else
+								tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3]+outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/4;
+						}
+						CLIP(tmp,outG[(i*sx+j)*3]);
+					}
+				}
+				for (i=3;i<sy-3;i+=2) {
+					for (j=3;j<sx-2;j+=2) {
+						dh=abs((outR[(i*sx+j-2)*3]+outR[(i*sx+j+2)*3])/2-outR[(i*sx+j)*3]);
+						dv=abs((outR[((i-2)*sx+j)*3]+outR[((i+2)*sx+j)*3])/2-outR[(i*sx+j)*3]);
+						if (dh<dv)
+							tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3])/2;
+						else {
+							if (dh>dv)
+								tmp=(outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/2;
+							else
+								tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3]+outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/4;
+						}
+						CLIP(tmp,outG[(i*sx+j)*3]);
+					}
+				}
+				// process RED channel
+				for (i=1;i<sy-1;i+=2) { // G-points (1/2)
+					for (j=2;j<sx-1;j+=2) {
+						tmp=outG[(i*sx+j)*3]+(outR[(i*sx+j-1)*3]-outG[(i*sx+j-1)*3]+
+								outR[(i*sx+j+1)*3]-outG[(i*sx+j+1)*3])/2;
+						CLIP(tmp,outR[(i*sx+j)*3]);
+					}
+				}
+				for (i=2;i<sy-2;i+=2)  {
+					for (j=1;j<sx;j+=2) { // G-points (2/2)
+						tmp=outG[(i*sx+j)*3]+(outR[((i-1)*sx+j)*3]-outG[((i-1)*sx+j)*3]+
+								outR[((i+1)*sx+j)*3]-outG[((i+1)*sx+j)*3])/2;
+						CLIP(tmp,outR[(i*sx+j)*3]);
+					}
+					for (j=2;j<sx-1;j+=2) { // B-points
+						tmp=outG[(i*sx+j)*3]+(outR[((i-1)*sx+j-1)*3]-outG[((i-1)*sx+j-1)*3]+
+								outR[((i-1)*sx+j+1)*3]-outG[((i-1)*sx+j+1)*3]+
+								outR[((i+1)*sx+j-1)*3]-outG[((i+1)*sx+j-1)*3]+
+								outR[((i+1)*sx+j+1)*3]-outG[((i+1)*sx+j+1)*3])/4;
+						CLIP(tmp,outR[(i*sx+j)*3]);
+					}
+				}
+
+				// process BLUE channel
+				for (i=0;i<sy;i+=2) {
+					for (j=1;j<sx-2;j+=2) {
+						tmp=outG[(i*sx+j)*3]+(outB[(i*sx+j-1)*3]-outG[(i*sx+j-1)*3]+
+								outB[(i*sx+j+1)*3]-outG[(i*sx+j+1)*3])/2;
+						CLIP(tmp,outB[(i*sx+j)*3]);
+					}
+				}
+				for (i=1;i<sy-1;i+=2) {
+					for (j=0;j<sx-1;j+=2) {
+						tmp=outG[(i*sx+j)*3]+(outB[((i-1)*sx+j)*3]-outG[((i-1)*sx+j)*3]+
+								outB[((i+1)*sx+j)*3]-outG[((i+1)*sx+j)*3])/2;
+						CLIP(tmp,outB[(i*sx+j)*3]);
+					}
+					for (j=1;j<sx-2;j+=2) {
+						tmp=outG[(i*sx+j)*3]+(outB[((i-1)*sx+j-1)*3]-outG[((i-1)*sx+j-1)*3]+
+								outB[((i-1)*sx+j+1)*3]-outG[((i-1)*sx+j+1)*3]+
+								outB[((i+1)*sx+j-1)*3]-outG[((i+1)*sx+j-1)*3]+
+								outB[((i+1)*sx+j+1)*3]-outG[((i+1)*sx+j+1)*3])/4;
+						CLIP(tmp,outB[(i*sx+j)*3]);
+					}
+				}
+				break;
+			default: //---------------------------------------------------------
+				std::cerr << "Bad Bayer pattern ID: " << type << std::endl;
+				return;
+				break;
+		}
+
+		ClearBorders(dest, sx, sy, 3);
+	}
+
+	void ClearBorders(unsigned char* dest, int sx, int sy, int w)
+	{
+		int i,j;
+
+		// black edges:
+		i=3*sx*w-1;
+		j=3*sx*(sy-1)-1;
+		while (i>=0) {
+			dest[i--]=0;
+			dest[j--]=0;
+		}
+
+		i=sx*(sy-1)*3-1+w*3;
+		while (i>sx) {
+			j=6*w;
+			while (j>0) {
+				dest[i--]=0;
+				j--;
 			}
-		protected:
-			const cv::Mat& src1;
-			const cv::Mat& src2;
-			const cv::Mat& mask;
-			cv::Mat& dest;
+			i-=(sx-2*w)*3;
+		}
 
-	};
+	}
+
+	cv::Mat blur_mask(const cv::Mat& mask, size_t blur_width){
+		cv::Mat dest = mask.clone();
+		CvMat temp = dest;
+		cvSmooth(&temp,&temp,CV_BLUR,blur_width,blur_width);
+		if(mask.depth()==CV_8U){
+			cvThreshold(&temp,&temp,0,255,CV_THRESH_BINARY);
+		}
+		else if(mask.depth()==CV_32F){
+			cvThreshold(&temp,&temp,0,1.0f,CV_THRESH_BINARY);
+		}
+		else{
+			bool DepthIsNotSupported = true;
+			assert(DepthIsNotSupported);
+		}
+		cvSmooth(&temp,&temp,CV_BLUR,blur_width,blur_width);
+		return dest;
+	}
 
 
+	void edge_difference(const cv::Mat& src1, const cv::Mat& src2, cv::Mat& edge1, cv::Mat& edge2, double canny_thresh1, double canny_thresh2, int aperture_size, int dilate_size){
+		assert(src1.size()==src2.size());
+		cv::Mat gray1,gray2;
+		if(src1.channels()==1){
+			gray1 = src1.clone();
+		}
+		else{
+			gray1 = cv::Mat(src1.size(),CV_8UC1);
+			cv::cvtColor(src1,gray1,CV_BGR2GRAY);
+		}
+		if(src2.channels()==1){
+			gray2 = src2.clone();
+		}
+		else{
+			gray2 = cv::Mat(src2.size(),CV_8UC1);
+			cv::cvtColor(src2,gray2,CV_BGR2GRAY);
+		}
 
-template<class ElemType,class WeightType> void blending(const cv::Mat& src1,const cv::Mat& src2, const cv::Mat& weight_mask, cv::Mat& dest){
-		assert(weight_mask.type()==CV_32FC1);
-		int channels = src1.size();
-		int height = src1.rows;
-		int width = src1.cols;
-		assert(weight_mask.rows==height);
-		assert(weight_mask.cols==width);
-		assert(src2.rows==height);
-		assert(src2.cols==height);
-		assert(src2.channels()== channels);
-		cv::parallel_for(
-				cv::BlockedRange(0,width*height),
-				ParallelBlending<ElemType,WeightType>(src1,src2,weight_mask,dest)
-				);
+		cv::Mat _edge1 = cv::Mat(src1.size(),CV_8UC1);
+		cv::Mat _edge2 = cv::Mat(src2.size(),CV_8UC1);
+		cv::Canny(gray1,_edge1, canny_thresh1, canny_thresh2, aperture_size);
+		cv::Canny(gray2,_edge2, canny_thresh1, canny_thresh2, aperture_size);
+		cv::Size kernel_size(dilate_size,dilate_size);
+		cv::Mat dick_edge1 = cv::Mat(src1.size(),CV_8UC1);
+		cv::Mat dick_edge2 = cv::Mat(src2.size(),CV_8UC1);
+		cv::blur(_edge1,dick_edge1,kernel_size);
+		cv::threshold(dick_edge1,dick_edge1,0,255,CV_THRESH_BINARY);
+		cv::blur(_edge2,dick_edge2,kernel_size);
+		cv::threshold(dick_edge2,dick_edge2,0,255,CV_THRESH_BINARY);
+
+		edge1 = _edge1 - dick_edge2;
+		edge2 = _edge2 - dick_edge1;
 	}
 
 

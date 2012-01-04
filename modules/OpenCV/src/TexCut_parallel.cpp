@@ -1,4 +1,4 @@
-#include "TexCut_parallel.h"
+﻿#include "TexCut_parallel.h"
 #include "TexCut_def.h"
 using namespace skl;
 

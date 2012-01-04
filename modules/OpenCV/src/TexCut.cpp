@@ -1,4 +1,4 @@
-#include "TexCut.h"
+﻿#include "TexCut.h"
 #include "TexCut_parallel.h"
 #include <iostream>
 
@@ -38,12 +38,9 @@ void TexCut::setParams(float alpha, float smoothing_term_weight, float thresh_te
 	this->under_exposure_thresh = under_exposure_thresh;
 }
 
-int TexCut::compute(const cv::Mat& _src,const cv::Mat& mask,cv::Mat& dest){
-	return compute(_src,dest);
-}
-
-int TexCut::compute(const cv::Mat& _src,cv::Mat& dest){
+double TexCut::compute(const cv::Mat& _src,const cv::Mat& mask,cv::Mat& dest){
 	// compute edge capacity and construct graph model
+	// mask is not used.
 	std::vector<cv::Mat> src;
 	if(_src.channels() == 3){
 		cv::split(_src, src);
@@ -78,7 +75,7 @@ int TexCut::compute(const cv::Mat& _src,cv::Mat& dest){
 	int flow = calcGraphCut(data_term,smoothing_term_x,smoothing_term_y);
 
 	setResult(_src,dest);
-	return flow;
+	return static_cast<double>(flow);
 }
 
 void TexCut::setBackground(const cv::Mat& bg){

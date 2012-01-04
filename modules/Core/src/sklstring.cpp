@@ -111,4 +111,24 @@ namespace skl{
 		return false;	
 	}
 
+	std::string DirName(const std::string& filepath){
+		int index = filepath.rfind("/");
+		if(index == filepath.npos){
+			return "";
+		}
+		return filepath.substr(0,index);
+	}
+	std::string ExtName(const std::string& filepath){
+		std::string basename = BaseName(filepath);
+		int index = basename.rfind(".");
+		if(index == basename.npos) return "";
+		return basename.substr(index);
+	}
+	std::string BaseName(const std::string& filepath, const std::string& extname){
+		int index = filepath.rfind("/");
+		std::string basename = filepath.substr(index+1);
+		if(extname=="") return basename;
+		index = basename.rfind(extname);
+		return basename.substr(0,index);
+	}
 }

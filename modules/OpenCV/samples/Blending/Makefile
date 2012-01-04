@@ -1,9 +1,9 @@
-# @file Makefile for <%= execute_file_name %>
-# @author <%= author %>
-OBJNAME = <%= execute_file_name %>
-<% if option!="" then %>
-OPT = <%= option %>
-<% else %><% end %>
+# @file Makefile for sample_blending
+# @author a_hasimoto
+OBJNAME = sample_blending
+
+OPT = 
+
 # includeするファイルへのパス
 INC =
 # linkするライブラリへのパス
@@ -16,17 +16,28 @@ CC = g++
 CFLAGS = -Wall
 
 # skl用の設定
-PATH_TO_SKL_ROOT = <%= RelativePathToRoot %>
+PATH_TO_SKL_ROOT = ../../../../
 BINDIR = ${PATH_TO_SKL_ROOT}/bin/
-ADDITIONAL_SKL_MODULE = <%= sklModule %>
-ADDITIONAL_SKL_MODULEs = <%= sklmodule %>
+ADDITIONAL_SKL_MODULE = OpenCV Core
+ADDITIONAL_SKL_MODULEs = opencv core
 SKL_LIBDIR = ${PATH_TO_SKL_ROOT}/lib
 SKL_INCDIR += ${ADDITIONAL_SKL_MODULE:%=${PATH_TO_SKL_ROOT}modules/%/include/} ${PATH_TO_SKL_ROOT}/include/
 INC += ${SKL_INCDIR:%=-I %}
 LIBS += -L${SKL_LIBDIR} ${ADDITIONAL_SKL_MODULEs:%=-lskl_%}
 LIBS_DEBUG += -L${SKL_LIBDIR} ${ADDITIONAL_SKL_MODULEs:%=-lskl_%_d}
 
-<%= otheroptions %>
+# options for OpenCV
+piriod:= .
+empty:=
+space:= $(empty) $(empty)
+OPENCVVER	= $(subst $(piriod),$(space),$(shell pkg-config --modversion opencv))
+INC += `pkg-config --cflags opencv`
+LIBS_OPT += `pkg-config --libs opencv`
+
+CFLAGS += -DCV_MAJOR_VERSION=$(word 1,$(OPENCVVER))
+CFLAGS += -DCV_MINOR_VERSION=$(word 2,$(OPENCVVER))
+
+
 
 .SUFFIXES:.cpp
 

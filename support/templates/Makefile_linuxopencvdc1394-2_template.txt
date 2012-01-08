@@ -1,2 +1,0 @@
-# IEEE Camera用のオプション
-LIBS_OPT += `pkg-config --libs --cflags libdc1394-2`

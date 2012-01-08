@@ -16,13 +16,12 @@ CC = g++
 CFLAGS = -Wall
 
 # skl用の設定
-PATH_TO_SKL_ROOT = ../../../../
+PATH_TO_SKL_ROOT = ../../../
 BINDIR = ${PATH_TO_SKL_ROOT}/bin/
 ADDITIONAL_SKL_MODULE = Core
 ADDITIONAL_SKL_MODULEs = core
 SKL_LIBDIR = ${PATH_TO_SKL_ROOT}/lib
-SKL_INCDIR += ${ADDITIONAL_SKL_MODULE:%=${PATH_TO_SKL_ROOT}modules/%/include/}
-INC += ${SKL_INCDIR:%=-I %}
+INC += -I ${PATH_TO_SKL_ROOT}/include
 LIBS += -L${SKL_LIBDIR} ${ADDITIONAL_SKL_MODULEs:%=-lskl_%}
 LIBS_DEBUG += -L${SKL_LIBDIR} ${ADDITIONAL_SKL_MODULEs:%=-lskl_%_d}
 

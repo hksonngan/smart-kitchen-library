@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "OptParser.h"
+#include "skl.h"
 
 opt_on(int, foo, 10, "-f","<INT>", "set parameter foo.");
 opt_on_bool(verbose, "", "an example of bool switch.");

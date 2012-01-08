@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include "sklstring.h"
+#include "skl.h"
 
 int main(int argc, char* argv[]){
 

@@ -3,6 +3,6 @@
 #define QUANTIZATION_LEVEL_HARF QUANTIZATION_LEVEL/2
 #define GRADIENT_HETEROGENUITY 1000
 
-#include "graph.h"
+#include "../Core/include/graph.h"
 typedef Graph<int,int,int> TexCutGraph;
 typedef unsigned char BGPixType;

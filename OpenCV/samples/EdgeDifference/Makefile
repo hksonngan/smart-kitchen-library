@@ -1,4 +1,4 @@
-# @file Makefile for sample_edge_difference
+# @file Makefile for sample_blending
 # @author a_hasimoto
 OBJNAME = sample_edge_difference
 
@@ -16,13 +16,12 @@ CC = g++
 CFLAGS = -Wall
 
 # skl用の設定
-PATH_TO_SKL_ROOT = ../../../../
+PATH_TO_SKL_ROOT = ../../../
 BINDIR = ${PATH_TO_SKL_ROOT}/bin/
 ADDITIONAL_SKL_MODULE = OpenCV Core
 ADDITIONAL_SKL_MODULEs = opencv core
 SKL_LIBDIR = ${PATH_TO_SKL_ROOT}/lib
-SKL_INCDIR += ${ADDITIONAL_SKL_MODULE:%=${PATH_TO_SKL_ROOT}modules/%/include/} ${PATH_TO_SKL_ROOT}/include/
-INC += ${SKL_INCDIR:%=-I %}
+INC += -I ${PATH_TO_SKL_ROOT}/include
 LIBS += -L${SKL_LIBDIR} ${ADDITIONAL_SKL_MODULEs:%=-lskl_%}
 LIBS_DEBUG += -L${SKL_LIBDIR} ${ADDITIONAL_SKL_MODULEs:%=-lskl_%_d}
 

@@ -1,6 +1,6 @@
 all:
 	cd src;$(MAKE)
-	cp src/libskl_core.a ../../lib
+	cp src/libskl_core.a ../
 #	cd VisualStudioProject; ./generate_vcproj.rb > SKLCore.vcproj
 
 .PHONY: clean debug
@@ -10,7 +10,7 @@ check-syntax:
 
 debug:
 	cd src;$(MAKE) debug
-	cp src/libskl_core_d.a ../../lib
+	cp src/libskl_core_d.a ../
 
 clean:
 	cd src;$(MAKE) clean

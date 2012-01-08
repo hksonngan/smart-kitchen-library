@@ -1,6 +1,6 @@
 all:
 	cd src;$(MAKE)
-	cp src/libskl_opencv.a ../../lib
+	cp src/libskl_opencv.a ../
 #	cd VisualStudioProject; ./generate_vcproj.rb > SKLOpenCV.vcproj
 
 .PHONY: clean debug
@@ -10,7 +10,7 @@ check-syntax:
 
 debug:
 	cd src;$(MAKE) debug
-	cp src/libskl_opencv_d.a ../../lib
+	cp src/libskl_opencv_d.a ../
 
 clean:
 	cd src;$(MAKE) clean

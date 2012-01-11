@@ -33,6 +33,22 @@ namespace skl{
 
 	cv::Rect fitRect(const std::vector< cv::Point >& points);
 
+	/*!
+	 * @brief get non Zero value points
+	 * */
+	template<class ElemType> void getPoints(
+			const cv::Mat& mask, std::vector<cv::Point>& points,
+			ElemType val = 0){
+		points.clear();
+		for(int y=0;y<mask.rows;y++){
+			const ElemType* pix = mask.ptr<const ElemType>(y);
+			for(int x=0;x<mask.rows;x++){
+				if(val == pix[x]) continue;
+				points.push_back(cv::Point(x,y));
+			}
+		}
+	}
+
 	cv::Vec3b convHLS2BGR(const cv::Vec3b& hls);
 	cv::Vec3b assignColor(size_t ID);
 	cv::Mat visualizeRegionLabel(const cv::Mat& label,size_t region_num);
@@ -120,7 +136,7 @@ namespace skl{
 		}
 
 		LabelType *plabel;
-		const LabelType *plabel_small;
+		const LabelType *plabel_small = 0;
 		int y = -1, x = 0;
 		int y_counter = 0;
 		LabelType elem;

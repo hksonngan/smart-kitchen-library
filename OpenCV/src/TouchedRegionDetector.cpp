@@ -2,7 +2,7 @@
  * @file TouchedRegionDetector.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/06
- * @date Last Change: 2012/Jan/06.
+ * @date Last Change: 2012/Jan/11.
  */
 #include "TouchedRegionDetector.h"
 
@@ -31,12 +31,12 @@ size_t TouchedRegionDetector::compute(const cv::Mat& object_labels, const cv::Ma
 	motion_history_algo.compute(human_mask);
 
 	std::vector<bool> is_touched(1,false);
-	for(size_t y=0;y<object_labels.rows;y++){
+	for(int y=0;y<object_labels.rows;y++){
 		const short* label = object_labels.ptr<const short>(y);
 		const unsigned char* phuman = motion_history_algo.motion_history_image().ptr<const unsigned char>(y);
-		for(size_t x=0;x<object_labels.cols;x++,label++,phuman++){
+		for(int x=0;x<object_labels.cols;x++,label++,phuman++){
 			if(*label==0)continue;
-			if(is_touched.size()<=*label){
+			if(static_cast<int>(is_touched.size())<=*label){
 				is_touched.resize(*label+1,false);
 			}
 			if(*phuman==0)continue;
@@ -59,10 +59,10 @@ size_t TouchedRegionDetector::compute(const cv::Mat& object_labels, const cv::Ma
 
 	dest = cv::Scalar(0);
 
-	for(size_t y=0;y<object_labels.rows;y++){
+	for(int y=0;y<object_labels.rows;y++){
 		const short* label = object_labels.ptr<const short>(y);
 		short* pdest = dest.ptr<short>(y);
-		for(size_t x=0;x<object_labels.cols;x++,label++,pdest++){
+		for(int x=0;x<object_labels.cols;x++,label++,pdest++){
 			if(!is_touched[*label]) continue;
 			*pdest = id_map[*label];
 		}

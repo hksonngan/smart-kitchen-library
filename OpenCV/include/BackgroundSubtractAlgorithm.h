@@ -13,6 +13,7 @@ namespace skl{
 				return compute(src, mask, dest);
 			}
 			virtual double compute(const cv::Mat& src,const cv::Mat& mask, cv::Mat& dest)=0;
+			virtual cv::Mat background()const=0;
 			virtual void updateBackgroundModel(const cv::Mat& img)=0;
 	};
 

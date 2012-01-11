@@ -4,11 +4,11 @@ LIBNAME = libskl_opencv
 
 ADDITIONALMODULE = Core
 
-BOMCHECK_SCRIPT = ../../../support/CheckAndAddBOM.rb
-
 L_BITS := $(shell getconf LONG_BIT)
 
 CC = g++
+CFLAGS = -Wall
+CFLAGS_D = -Wall
 
 # options for OpenCV
 piriod:= .
@@ -20,8 +20,12 @@ LIBS_OPT += `pkg-config --libs opencv`
 
 CFLAGS += -DCV_MAJOR_VERSION=$(word 1,$(OPENCVVER))
 CFLAGS += -DCV_MINOR_VERSION=$(word 2,$(OPENCVVER))
+CFLAGS += -DHAVE_TBB
+CFLAGS_D += -DCV_MAJOR_VERSION=$(word 1,$(OPENCVVER))
+CFLAGS_D += -DCV_MINOR_VERSION=$(word 2,$(OPENCVVER))
+CFLAGS_D += -DHAVE_TBB
 
-INC += -I../include -I../../../include
+INC += -I../include -I../../include
 INC += ${ADDITIONALMODULE:%=-I../../%/include/}
 
 .SUFFIXES:.cpp
@@ -42,13 +46,10 @@ ${LIBNAME}_d(%_d.o):%_d.o
 
 # hoge.cpp -> hoge.o
 .cpp.o:
-	ruby $(BOMCHECK_SCRIPT) $<
 	$(CC) -O2 -c $(CFLAGS) -o $@ $< $(INC) -D__linux__
-
 # hoge.cpp -> hoge_d.o
 %_d.o:%.cpp
-	ruby $(BOMCHECK_SCRIPT) $<
-	$(CC) -g -c $(CFLAGS) -o $@ $< $(INC) -DDEBUG -D__linux__
+	$(CC) -g -c $(CFLAGS_D) -o $@ $< $(INC) -DDEBUG -D__linux__
 
 clean:
 	rm -f *.o

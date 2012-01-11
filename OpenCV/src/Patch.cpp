@@ -1,7 +1,7 @@
 ﻿/*!
  * @file Patch.cpp
  * @author a_hasimoto
- * @date Last Change:2012/Jan/05.
+ * @date Last Change:2012/Jan/10.
  */
 
 #include "PatchModel.h"
@@ -20,10 +20,22 @@ Patch::~Patch(){
 
 }
 
-Patch::Patch(const cv::Mat& mask, const cv::Mat& img, const cv::Mat& current_bg, const cv::Mat& fg_edge, const cv::Rect& roi){
-	set(mask,img,current_bg,fg_edge,roi);
+Patch::Patch(const cv::Mat& mask, const cv::Mat& img, const cv::Mat& fg_edge, const cv::Rect& roi){
+	set(mask,img,fg_edge,roi);
 }
 
+Patch::Patch(const Patch& other){
+	for(size_t i=0;i<2;i++){
+		_mask[i] = other._mask[i];
+		_image[i] = other._image[i];
+		_roi[i] = other._roi[i];
+	}
+	_edge = other._edge;
+	_covered_state = other._covered_state;
+	base_size = other.base_size;
+	_points = other._points;
+	_edge_points = other._edge_points;
+}
 
 void Patch::cvtG2L(int* x,int* y, Type type)const{
 	*x -= _roi[type].x;
@@ -66,7 +78,7 @@ void Patch::setCoveredState(int x,int y,bool isCovered){
 
 
 
-void Patch::set(const cv::Mat& __mask, const cv::Mat& img, const cv::Mat& current_bg, const cv::Mat& fg_edge, const cv::Rect& roi){
+void Patch::set(const cv::Mat& __mask, const cv::Mat& img, const cv::Mat& fg_edge, const cv::Rect& roi){
 	_roi[original] = roi;
 
 	base_size.width = __mask.cols;
@@ -82,14 +94,23 @@ void Patch::set(const cv::Mat& __mask, const cv::Mat& img, const cv::Mat& curren
 	_roi[dilate].width = _roi[dilate].width < img.cols ? _roi[dilate].width - _roi[dilate].x : img.cols - _roi[dilate].x;
 	_roi[dilate].height = _roi[dilate].height < img.rows ? _roi[dilate].height - _roi[dilate].y : img.rows - _roi[dilate].y;
 
+	cv::Rect relative_roi(
+			_roi[original].x - _roi[dilate].x,
+			_roi[original].y - _roi[dilate].y,
+			_roi[original].width, _roi[original].height);
+
 	_image[dilate] = cv::Mat(img, _roi[dilate]).clone();
-	_background[dilate] = cv::Mat(current_bg, _roi[dilate]).clone();
-	_mask[dilate] = cv::Mat(_image[dilate].size(),CV_32FC1);
-	cv::Mat(__mask, _roi[dilate]).convertTo(_mask[dilate],CV_32F,1.f/255.f);
+	_mask[dilate] = cv::Mat::zeros(_image[dilate].size(),CV_32FC1);
+
+
+	cv::Mat mask_central = cv::Mat(_mask[dilate],relative_roi);
+	cv::Mat temp_mask;
+	cv::Mat(__mask, _roi[original]).convertTo(temp_mask,CV_32F,1.f/255.f);
+	temp_mask.copyTo(mask_central);
+
 /*
 	std::cerr << "show dilate" << std::endl;
 	cv::imshow("patch_image",_image[dilate]);
-	cv::imshow("patch_bg",_background[dilate]);
 	cv::imshow("patch_mask",_mask[dilate]);
 	cv::waitKey(-1);
 */
@@ -97,10 +118,10 @@ void Patch::set(const cv::Mat& __mask, const cv::Mat& img, const cv::Mat& curren
 	_mask[dilate] = blur_mask(_mask[dilate],PATCH_DILATE);
 
 
-	_image[original] = cv::Mat(img,_roi[original]).clone();
-	_background[original] = cv::Mat(current_bg,_roi[original]).clone();
+	_image[original] = cv::Mat(_image[dilate],relative_roi);
 	_mask[original] = cv::Mat(_image[original].size(),CV_32FC1);
 	cv::Mat(__mask, _roi[original]).convertTo(_mask[original],CV_32F,1.f/255.f);
+
 	_covered_state = cv::Mat::zeros(_mask[original].size(),CV_32FC1);
 
 	for(int y = 0; y < _mask[original].rows; y += PATCH_MODEL_BLOCK_SIZE){
@@ -112,10 +133,11 @@ void Patch::set(const cv::Mat& __mask, const cv::Mat& img, const cv::Mat& curren
 
 	_edge = cv::Mat(fg_edge,roi).clone();
 	_edge &= cv::Mat(__mask,_roi[original]);
+	getPoints<unsigned char>(_edge,_edge_points);
+
 /*
 	std::cerr << "show dilate" << std::endl;
 	cv::imshow("patch_image",_image[original]);
-	cv::imshow("patch_bg",_background[original]);
 	cv::imshow("patch_mask",_mask[original]);
 	cv::imshow("patch_covered_state",_covered_state);
 	cv::imshow("patch_edge",_edge);
@@ -127,17 +149,15 @@ void Patch::save(const std::string& filename,Type type,const std::string& edge_f
 	CvRect roi = _roi[type];
 	assert(roi.width <= base_size.width);
 	assert(roi.height <= base_size.height);
-	cv::Mat dest = cv::Mat(base_size,_image[type].type(),SKL_GRAY);
+	cv::Mat dest = cv::Mat(base_size,_image[type].type(),cv::Scalar(SKL_GRAY,SKL_GRAY,SKL_GRAY));
 	cv::Mat temp = cv::Mat(dest,_roi[type]);
-	skl::blending<cv::Vec3b,float>(temp,_image[type],_mask[type],temp);
-	// CHECK!
+	skl::blending<cv::Vec3b,float>(_image[type],temp,_mask[type],temp);
 
 	cv::imwrite(filename,dest);
 	if(!edge_filename.empty()){
 		dest = cv::Mat::zeros(dest.size(),_edge.type());
-		temp = cv::Mat(dest,_roi[type]);
-		// cv::Matに部分的に書きこむ方法を後で調べる
-
+		temp = cv::Mat(dest,_roi[original]);
+		_edge.copyTo(temp);
 		cv::imwrite(edge_filename,dest);
 	}
 }
@@ -169,4 +189,19 @@ float Patch::maskValue(int x, int y, Type type)const{
 	return _mask[type].at<float>(y,x);
 }
 
+void Patch::edge(const cv::Mat& __edge){
+	_edge = __edge.clone();
+	getPoints<unsigned char>(_edge,_edge_points);
+}
 
+cv::Mat Patch::print_image()const{
+	cv::Mat dest = cv::Mat::zeros(base_size, CV_8UC3);
+	cv::Mat dest_roi = cv::Mat(dest,_roi[original]);
+	for(int y = 0; y < dest_roi.rows; y++){
+		for(int x = 0; x < dest_roi.cols; x++){
+			if(_mask[original].at<float>(y,x)==0)continue;
+			dest_roi.at<cv::Vec3b>(y,x) = _image[original].at<cv::Vec3b>(y,x);
+		}
+	}
+	return dest;
+}

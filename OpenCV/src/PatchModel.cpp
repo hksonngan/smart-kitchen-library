@@ -1,7 +1,7 @@
 ﻿/*!
  * @file PatchModel.cpp
  * @author a_hasimoto
- * @date Last Change:2012/Jan/06.
+ * @date Last Change:2012/Jan/11.
  */
 #include "sklutils.h"
 #include "PatchModel.h"
@@ -17,6 +17,8 @@ PatchModel::~PatchModel(){}
 PatchModel::PatchModel(const cv::Mat& base_bg):layer(&patches),max_id(0){
 	base(base_bg);
 }
+
+
 
 /*
  * @brief 背景画像をセットし、それ以外は全てリセットする
@@ -39,8 +41,10 @@ void PatchModel::base(const cv::Mat& __bg){
 size_t PatchModel::putPatch(const cv::Mat& img, const cv::Mat& fg_edge, const cv::Mat& mask, const cv::Rect& roi){
 
 	size_t ID = max_id;
-	patches[ID] = Patch(mask, img, _latest_bg, fg_edge, roi);
+	patches[ID] = Patch(mask, img, fg_edge, roi);
 	std::map<size_t,Patch>::iterator ppatch = patches.find(ID);
+
+	patches_underside[ID] = cv::Mat(_latest_bg,ppatch->second.roi(Patch::dilate)).clone();
 
 	// 重なったパッチのvisivility maskを更新する
 	// パッチの上下関係を更新する
@@ -53,6 +57,8 @@ size_t PatchModel::putPatch(const cv::Mat& img, const cv::Mat& fg_edge, const cv
 	put_list.push_back(ID);
 
 	max_id++;
+	on_table.resize(max_id,false);
+	on_table[ID] = true;
 	return ID;
 }
 
@@ -61,12 +67,13 @@ size_t PatchModel::putPatch(const cv::Mat& img, const cv::Mat& fg_edge, const cv
  * @brief パッチをモデルから取り除く
  * */
 void PatchModel::takePatch(size_t ID,std::vector<size_t>* taken_patch_ids){
+	assert(on_table[ID]);
+
 	std::map<size_t,Patch>::iterator ppatch;
 	ppatch = patches.find(ID);
 	assert(patches.end() != ppatch);
 
 	// 自分より下にある物体のcoveredStateをfalseに戻す
-	printLocation();
 	std::vector<size_t> lower_patches = layer.getAllBeneathPatch(ID,Patch::original);
 	for(size_t i=0;i<lower_patches.size();i++){
 		patches[lower_patches[i]].setCoveredState(
@@ -78,7 +85,6 @@ void PatchModel::takePatch(size_t ID,std::vector<size_t>* taken_patch_ids){
 	// IDより上にあるパッチを先に取り去る
 	size_t upper_patch_id;
 	while(UINT_MAX != (upper_patch_id = layer.getUpperPatch(ID,Patch::original))){
-		printLocation();
 		takePatch(upper_patch_id,taken_patch_ids);
 	}
 
@@ -106,7 +112,7 @@ void PatchModel::takePatch(size_t ID,std::vector<size_t>* taken_patch_ids){
  	cv::imshow("debug",common_mask);
 	cv::waitKey(-1);
 */
-	blending<cv::Vec3b,float>(hidden_roi,ppatch->second.background(Patch::dilate),common_mask,hidden_roi);
+	blending<cv::Vec3b,float>(hidden_roi,patches_underside[ppatch->first],common_mask,hidden_roi);
 	printLocation();
 /*
 	cv::imshow("debug",hidden_image);
@@ -114,7 +120,7 @@ void PatchModel::takePatch(size_t ID,std::vector<size_t>* taken_patch_ids){
 */
 
 	// 自分の後ろの画像に対する更新率を設定
-	hidden_mask_roi = cv::max(hidden_mask_roi,ppatch->second.mask(Patch::dilate));
+	cv::max(hidden_mask_roi,ppatch->second.mask(Patch::dilate),hidden_mask_roi);
 
 	//  自分のIDをlayerから取り除く
 	layer.erase(ID);
@@ -122,7 +128,7 @@ void PatchModel::takePatch(size_t ID,std::vector<size_t>* taken_patch_ids){
 	_hidden_objects.remove(ID);
 	_newly_hidden_objects.remove(ID);
 	_reappeared_objects.remove(ID);
-	patches.erase(ppatch);
+	on_table[ID]=false;
 	changed_bg = true;
 }
 
@@ -157,7 +163,6 @@ void PatchModel::setObjectLabels(
 			continue;
 		}
 		if(checkTakenObject(ppatch->second,bg_edge)){
-			printLocation();
 			takePatch(*iter,taken_object_ids);
 		}
 	}
@@ -270,14 +275,18 @@ void PatchModel::update(){
 		ppatch = patches.find(put_list[i]);
 		assert(patches.end()!=ppatch);
 		cv::Mat latest_bg_roi = cv::Mat(_latest_bg,ppatch->second.roi(Patch::dilate));
+
 		blending<cv::Vec3b,float>(
 				ppatch->second.image(Patch::dilate),
 				latest_bg_roi,
 				ppatch->second.mask(Patch::dilate),
 				latest_bg_roi);
 		cv::Mat _updated_mask_roi = cv::Mat(_updated_mask,ppatch->second.roi(Patch::dilate));
-//		cv::imshow("patch_image",ppatch->second.image(Patch::dilate));
-//		cv::imshow("patch_mask",ppatch->second.mask(Patch::dilate));
+
+/*		cv::imshow("patch_image",ppatch->second.image(Patch::dilate));
+		cv::imshow("patch_mask",ppatch->second.mask(Patch::dilate));
+		cv::waitKey(-1);
+*/
 		_updated_mask_roi += ppatch->second.mask(Patch::dilate);
 	}
 /*
@@ -303,8 +312,6 @@ void PatchModel::save(
 		const std::string& ext)const{
 
 	std::stringstream ss;
-	int width = _base.cols;
-	int height = _base.rows;
 
 	std::ofstream fout;
 	fout.open((file_head+"_state.txt").c_str());
@@ -314,8 +321,9 @@ void PatchModel::save(
 	std::map<size_t,Patch>::const_iterator ppatch;
 	for(ppatch = patches.begin();
 			ppatch != patches.end();ppatch++){
+		if(!on_table[ppatch->first]) continue;
 		ss.str("");
-		ss << file_head << "_p" << std::setw(2) << std::setfill('0') << ppatch->first;
+		ss << file_head << "_p" << std::setw(5) << std::setfill('0') << ppatch->first;
 		ppatch->second.save(ss.str()+"original"+ext,Patch::original);
 		ppatch->second.save(ss.str()+"dilate"+ext,Patch::dilate);
 		fout << ppatch->first << ": ";
@@ -361,6 +369,7 @@ void PatchModel::getHiddenPatches(const cv::Mat& mask,std::list<size_t>* hidden_
 	std::vector<size_t> current_hidden_patches;
 	for(std::map<size_t,Patch>::const_iterator ppatch = patches.begin();
 			ppatch != patches.end(); ppatch++){
+		if( !on_table[ppatch->first] ) continue;
 		// 長方形が重なっていなければスキップ
 		if( !( mrect && ppatch->second.roi(Patch::original)) ) continue;
 
@@ -399,19 +408,11 @@ double PatchModel::calcCommonEdge(
 	cv::Rect brect = base.roi(Patch::original);
 	cv::Rect prect = patch.roi(Patch::original);
 
-	for(int y = crect.y; y < crect.height; y++){
-		size_t by = y - brect.y;
-		size_t ry = y - prect.y;
-
-		for(int x = crect.x;x < crect.width;x++){
-			size_t bx = x - brect.x;
-			size_t rx = x - prect.x;
-			if(base.edge().at<unsigned char>(by,bx) <= 0) continue;
-			if(patch.edge().at<unsigned char>(ry,rx) <= 0) continue;
-//			cvCircle(_base_edge.getIplImage(),cvPoint(x,y),3,cvScalar(127,0,0));
-//			cvCircle(_patch_edge.getIplImage(),cvPoint(rx,ry),3,cvScalar(127,0,0));
-			common_edge_count++;
-		}
+	for(size_t i=0;i<patch.edge_count();i++){
+		size_t x = patch.edge_points()[i].x + prect.x - brect.x;
+		size_t y = patch.edge_points()[i].y + prect.y - brect.y;
+		if(base.edge().at<unsigned char>(y,x) <= 0) continue;
+		common_edge_count++;
 	}
 
 //	cvShowImage("patch_edge",_patch_edge.getIplImage());
@@ -448,6 +449,7 @@ void PatchModel::updateHiddenState(
 size_t PatchModel::checkTakenObject(const cv::Mat& bg_edge,const cv::Rect& roi)const{
 	std::map<size_t,Patch>::const_iterator pp;
 	for(pp=patches.begin();pp!=patches.end();pp++){
+		if(!on_table[pp->first]) continue;
 		if(checkTakenObject(pp->second,bg_edge,&roi)){
 			return pp->first;
 		}
@@ -482,4 +484,17 @@ bool PatchModel::checkTakenObject(const Patch& patch, const cv::Mat& bg_edge,con
 		return true;
 	}
 	return false;
+}
+
+bool PatchModel::erase(size_t ID){
+	if(on_table[ID]){
+		return false;
+	}
+	std::map<size_t,Patch>::iterator ppatch = patches.find(ID);
+	if(patches.end()==ppatch) return false;
+	patches.erase(ppatch);
+	std::map<size_t,cv::Mat>::iterator punderside = patches_underside.find(ID);
+	if(patches_underside.end()==punderside) return false;
+	patches_underside.erase(punderside);
+	return true;
 }

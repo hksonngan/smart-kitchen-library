@@ -22,7 +22,7 @@ std::list<size_t> HumanDetectorWorkspaceEnd::compute(
 		for(int x=0;x<mask.cols;x++){
 			short label = mask.at<short>(y,x);
 			if(label==0) continue;
-			if(is_human.size()<= label) is_human.resize(label+1,false);
+			if(static_cast<short>(is_human.size()) <= label) is_human.resize(label+1,false);
 			if(workspace_end.at<unsigned char>(y,x)==0) continue;
 			is_human[label] = true;
 		}

@@ -4,14 +4,12 @@ LIBNAME = libskl_core
 
 ADDITIONALMODULE = 
 
-BOMCHECK_SCRIPT = ../../../support/CheckAndAddBOM.rb
-
 L_BITS := $(shell getconf LONG_BIT)
 
 CC = g++
 
 
-INC += -I../include -I../../../include
+INC += -I../include -I../../include
 INC += ${ADDITIONALMODULE:%=-I../../%/include/}
 
 .SUFFIXES:.cpp
@@ -32,12 +30,10 @@ ${LIBNAME}_d(%_d.o):%_d.o
 
 # hoge.cpp -> hoge.o
 .cpp.o:
-	ruby $(BOMCHECK_SCRIPT) $<
 	$(CC) -O2 -c $(CFLAGS) -o $@ $< $(INC) -D__linux__
 
 # hoge.cpp -> hoge_d.o
 %_d.o:%.cpp
-	ruby $(BOMCHECK_SCRIPT) $<
 	$(CC) -g -c $(CFLAGS) -o $@ $< $(INC) -DDEBUG -D__linux__
 
 clean:

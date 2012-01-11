@@ -1,7 +1,7 @@
 ﻿/*!
  * @file PatchLayer.cpp
  * @author 橋本敦史
- * @date Last Change:2012/Jan/06.
+ * @date Last Change:2012/Jan/10.
  */
 
 #include "PatchModel.h"
@@ -62,14 +62,17 @@ std::vector<size_t> PatchLayer::getAllBeneathPatch(size_t ID,Patch::Type type){
 			layer_order.rbegin(),
 			layer_order.rend(),
 			ID);
+/*	
 	if(layer_order.rend()==ptar_id){
 		std::cerr << ID << std::endl;
 		for(std::list<size_t>::const_reverse_iterator iter = layer_order.rbegin(); iter != layer_order.rend(); iter++){
 			std::cerr << *iter << ",";
 		}
 		std::cerr << std::endl;
-		assert(layer_order.rend()!=ptar_id);
 	}
+*/
+	assert(layer_order.rend()!=ptar_id);
+
 	ptar_id++;
 
 	std::vector<size_t> dst;
@@ -77,14 +80,13 @@ std::vector<size_t> PatchLayer::getAllBeneathPatch(size_t ID,Patch::Type type){
 	psrc = patches->find(ID);
 	assert(patches->end()!=psrc);
 	CvRect src_rect = psrc->second.roi(type);
-	cv::Mat mask = psrc->second.mask(type);
+	cv::Mat mask = psrc->second.mask(type).clone();
 
 	for(;ptar_id!=layer_order.rend();ptar_id++){
 		ptar = patches->find(*ptar_id);
 		assert(patches->end()!=ptar);
 
 		CvRect tar_rect = ptar->second.roi(type);
-
 		CvRect common_rect = src_rect & tar_rect;
 		if(common_rect.width <= 0 || common_rect.height <= 0 ) continue;
 

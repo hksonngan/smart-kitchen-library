@@ -1,7 +1,7 @@
 /*!
  * @file PatchModel.h
  * @author a_hasimoto
- * @date Last Change:2012/Jan/05.
+ * @date Last Change:2012/Jan/10.
  */
 #ifndef __PATCH_MODEL_H__
 #define __PATCH_MODEL_H__
@@ -34,9 +34,10 @@ namespace skl{
 		static cv::Mat blur_mask(const cv::Mat& mask, size_t blur_width);
 		public:
 			Patch();
-			Patch(const cv::Mat& mask, const cv::Mat& img, const cv::Mat& current_bg, const cv::Mat& fg_edge, const cv::Rect& roi);
+			Patch(const cv::Mat& mask, const cv::Mat& img,  const cv::Mat& fg_edge, const cv::Rect& roi);
+			Patch(const Patch& other);
 			~Patch();
-			void set(const cv::Mat& mask, const cv::Mat& img, const cv::Mat& current_bg, const cv::Mat& fg_edge, const cv::Rect& roi);
+			void set(const cv::Mat& mask, const cv::Mat& img, const cv::Mat& fg_edge, const cv::Rect& roi);
 
 			void setCoveredState(const cv::Rect& rect,const cv::Mat& mask,bool isCovered);
 			void setCoveredState(int x,int y,bool isCovered);
@@ -50,29 +51,26 @@ namespace skl{
 			unsigned char* operator()(int x,int y,Type type=original);
 
 			const cv::Rect& roi(Type type=original)const{return _roi[type];}
+			cv::Mat print_image()const;
 			cv::Mat& image(Type type=original){return _image[type];}
 			const cv::Mat& image(Type type=original)const{return _image[type];}
-			cv::Mat& background(Type type=original){return _background[type];}
-			const cv::Mat& background(Type type=original)const{return _background[type];}
 			const cv::Mat& mask(Type type=original)const{return _mask[type];}
 
 			const cv::Mat& edge()const{return _edge;}
-			void edge(const cv::Mat& __edge){_edge = __edge.clone();}
-			size_t edge_count()const{return _edge_count;};
-
+			void edge(const cv::Mat& __edge);
+			size_t edge_count()const{return _edge_points.size();};
 			const std::vector<cv::Point>& points()const{return _points;}
+			const std::vector<cv::Point>& edge_points()const{return _edge_points;}
 
 		protected:
 			cv::Mat _mask[2];
 			cv::Mat _image[2];
-			cv::Mat _background[2];
 			cv::Mat _edge;
 			cv::Rect _roi[2];
-			cv::Point center;
 			cv::Mat _covered_state;
-			size_t _edge_count;
 			cv::Size base_size;
-			std::vector<cv::Point> _points;
+			std::vector<cv::Point> _points; // relative (_image[original] base) coordinate, rough resolution (PATCH_MODEL_BLOCK_SIZExPATCH_MODEL_BLOCK_SIZE)
+			std::vector<cv::Point> _edge_points; // relative (_image[original] base) coordinalte
 		private:
 			void cvtG2L(int* x,int* y, Type type)const;
 			bool isIn(int local_x,int local_y, Type type)const;
@@ -110,7 +108,7 @@ namespace skl{
 			~PatchModel();
 			Patch& operator()(size_t ID);
 
-			void setObjectLabels(
+			virtual void setObjectLabels(
 					const cv::Mat& img,
 					const cv::Mat& human_label,
 					const cv::Mat& object_cand_labels,
@@ -120,9 +118,10 @@ namespace skl{
 
 			void save(const std::string& file_head,const std::string& ext)const;
 			const Patch& operator[](size_t ID)const;
+			virtual bool erase(size_t ID);
 
 			/**** Accessor ****/
-			void base(const cv::Mat& __bg);
+			virtual void base(const cv::Mat& __bg);
 			const cv::Mat& base()const;
 
 			void latest_bg(const cv::Mat& bg);
@@ -135,12 +134,13 @@ namespace skl{
 
 		protected:
 			std::map<size_t,Patch> patches;
+			std::map<size_t,cv::Mat> patches_underside;
 			cv::Mat _latest_bg;
 			cv::Mat _base;
 			PatchLayer layer;
 
-			size_t putPatch(const cv::Mat& img, const cv::Mat& fg_edge, const cv::Mat& mask, const cv::Rect& roi);
-			void takePatch(size_t ID,std::vector<size_t>* taken_patch_ids);
+			virtual size_t putPatch(const cv::Mat& img, const cv::Mat& fg_edge, const cv::Mat& mask, const cv::Rect& roi);
+			virtual void takePatch(size_t ID,std::vector<size_t>* taken_patch_ids);
 			void getHiddenPatches(const cv::Mat& human_mask, std::list<size_t>* hidden_patch_ids);
 
 			static double calcCommonEdge(
@@ -152,9 +152,9 @@ namespace skl{
 
 			bool checkTakenObject(const Patch& patch, const cv::Mat& bg_edge,const cv::Rect* roi2=NULL)const;
 			size_t checkTakenObject(const cv::Mat& bg_edge,const cv::Rect& roi)const;
-			void update();
+			virtual void update();
 
-		private:
+			void updateHiddenState(std::list<size_t>& __hidden_object);
 			size_t max_id;
 			std::vector<size_t> put_list;
 			cv::Mat hidden_image;
@@ -165,7 +165,9 @@ namespace skl{
 			std::list<size_t> _hidden_objects;
 			std::list<size_t> _newly_hidden_objects;
 			std::list<size_t> _reappeared_objects;
-			void updateHiddenState(std::list<size_t>& __hidden_object);
+			std::vector<bool> on_table;
+
+		private:
 	};
 
 }

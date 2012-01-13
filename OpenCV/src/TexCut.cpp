@@ -1,17 +1,14 @@
 ﻿#include "TexCut.h"
 #include <iostream>
 
-#ifndef HAVE_TBB
-#define HAVE_TBB
-#endif
-
-#ifdef DEBUG
-#undef DEBUG
-#endif
 
 
 using namespace skl;
-TexCut::TexCut():g(NULL){
+TexCut::TexCut():
+	noise_std_dev(3,3.5),
+	gh_expectation(3,2.3),
+	gh_std_dev(3,1.12),
+	g(NULL){
 }
 
 TexCut::TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha, float smoothing_term_weight,float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh):g(NULL){
@@ -19,21 +16,21 @@ TexCut::TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha, float smooth
 	learnImageNoiseModel(bg2);
 	setParams(alpha, smoothing_term_weight,thresh_tex_diff,over_exposure_thresh,under_exposure_thresh);
 #ifdef DEBUG_TEXCUT
-	cv::namedWindow("texcut_data_term",0);
-	cv::namedWindow("texcut_tex_int",0);
-	cv::namedWindow("texcut_gradient_heterogenuity",0);
-	cv::namedWindow("texcut_smoothing_term_x",0);
-	cv::namedWindow("texcut_smoothing_term_y",0);
+	cv::namedWindow("data_term",0);
+	cv::namedWindow("tex_int",0);
+	cv::namedWindow("gradient_heterogenuity",0);
+	cv::namedWindow("smoothing_term_x",0);
+	cv::namedWindow("smoothing_term_y",0);
 #endif
 }
 
 TexCut::~TexCut(){
 #ifdef DEBUG_TEXCUT
-	cv::destroyWindow("texcut_data_term");
-	cv::destroyWindow("texcut_tex_int");
-	cv::destroyWindow("texcut_gradient_heterogenuity");
-	cv::destroyWindow("texcut_smoothing_term_x");
-	cv::destroyWindow("texcut_smoothing_term_y");
+	cv::destroyWindow("data_term");
+	cv::destroyWindow("tex_int");
+	cv::destroyWindow("gradient_heterogenuity");
+	cv::destroyWindow("smoothing_term_x");
+	cv::destroyWindow("smoothing_term_y");
 #endif
 
 }
@@ -161,6 +158,18 @@ void TexCut::learnImageNoiseModel(const cv::Mat& bg2){
 
 }
 
+void TexCut::setNoiseModel(
+		const std::vector<float>& noise_std_dev,
+		const std::vector<float>& gh_expectation,
+		const std::vector<float>& gh_std_dev){
+	assert(noise_std_dev.size()==1 || noise_std_dev.size()==3);
+	assert(noise_std_dev.size()==gh_expectation.size());
+	assert(noise_std_dev.size()==gh_std_dev.size());
+	this->noise_std_dev = noise_std_dev;
+	this->gh_expectation = gh_expectation;
+	this->gh_std_dev = gh_std_dev;
+}
+
 void TexCut::getSobel(
 		const std::vector<cv::Mat>& img,
 		std::vector<cv::Mat>* sobel_x,
@@ -269,11 +278,11 @@ void TexCut::calcEdgeCapacity(
 			);
 
 #ifdef DEBUG_TEXCUT
-	cv::imshow("texcut_data_term",data_term);
-	cv::imshow("texcut_smoothing_term_x",smoothing_term_x);
-	cv::imshow("texcut_smoothing_term_y",smoothing_term_y);
-	cv::imshow("texcut_tex_int",tex_int);
-	cv::imshow("texcut_gradient_heterogenuity",gradient_heterogenuity);
+	cv::imshow("data_term",data_term);
+	cv::imshow("smoothing_term_x",smoothing_term_x);
+	cv::imshow("smoothing_term_y",smoothing_term_y);
+	cv::imshow("tex_int",tex_int);
+	cv::imshow("gradient_heterogenuity",gradient_heterogenuity);
 //	cv::waitKey(-1);
 #endif
 
@@ -527,6 +536,7 @@ void ParallelCalcEdgeCapacity::calcDataTerm(
 		*tex_diff = 0.0f;
 		return;
 	}
+
 	float normalized_correlation_dist = 1.0f - (2.0f * cross_cor)/auto_cor;
 	assert(0 <= normalized_correlation_dist && normalized_correlation_dist <= 1.0);
 	*tex_int = exp((grad_hetero * *tex_int) - 1.0f);
@@ -557,6 +567,11 @@ float ParallelCalcEdgeCapacity::calcGradHetero(std::vector<float>& power)const{
 		}
 		else{
 			return FLT_MAX;
+		}
+	}
+	if(isnan(power[0]/factor)){
+		for(size_t i=0;i<power.size();i++){
+			std::cerr << power[i] << std::endl;
 		}
 	}
 	return power[0]/factor;

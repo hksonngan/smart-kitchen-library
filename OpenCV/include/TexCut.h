@@ -30,6 +30,10 @@ namespace skl{
 
 			void updateBackgroundModel(const cv::Mat& img);
 			cv::Mat background()const{return _background;};
+			void setNoiseModel(
+					const std::vector<float>& noise_std_dev,
+					const std::vector<float>& gh_expectation,
+					const std::vector<float>& gh_std_dev);
 		protected:
 			virtual double compute(const cv::Mat& src,const cv::Mat& mask, cv::Mat& dest);
 			void calcEdgeCapacity(

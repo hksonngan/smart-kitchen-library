@@ -2,7 +2,7 @@
  * @file TimeInterval.h
  * @author 橋本敦史
  * @date Date Created: 2010-06-21.
- * @date Last Change:2012/Jan/06.
+ * @date Last Change:2012/Jan/13.
  */
 
 #ifndef __SKL_TIME_INTERVAL_H__
@@ -28,7 +28,7 @@ class TimeInterval:public Printable<TimeInterval>{
 
 		// Printableに対応
 		std::string print()const;
-		void scan(const std::string& str);
+		bool scan(const std::string& str);
 
 		// 秒単位を基準として値を取り出す
 		double getAsSecond()const;

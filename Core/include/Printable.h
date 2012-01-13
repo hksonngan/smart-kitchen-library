@@ -1,7 +1,7 @@
 ﻿/*!
  * @file Printable.h
  * @author 橋本敦史
- * @date Last Change:2012/Jan/06.
+ * @date Last Change:2012/Jan/13.
  */
 #ifndef __SKL_PRINTABLE_H__
 #define __SKL_PRINTABLE_H__
@@ -22,7 +22,7 @@ template<class T> class Printable:public Serializable,public Comparable<T>{
 		Printable();
 		virtual ~Printable();
 		virtual std::string print()const = 0;
-		virtual void scan(const std::string& str) = 0;
+		virtual bool scan(const std::string& str) = 0;
 		virtual Printable<T>& operator=(const Printable<T>& other);
 		
 		// Comparable

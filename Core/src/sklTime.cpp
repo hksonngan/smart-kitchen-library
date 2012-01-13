@@ -1,7 +1,7 @@
 ﻿/*!
  * @file   MmTime.cpp
  * @author Takahiro Suzuki
- * @date Last Change:2012/Jan/06.
+ * @date Last Change:2012/Jan/13.
  **/
 
 /**** Header ****/
@@ -298,6 +298,38 @@ namespace skl{
 		long long msec = static_cast<long long>(this->tv_st.tv_usec)/1000;
 		msec += static_cast<long long>(this->tv_st.tv_sec) * 1000;
 		return msec % MSec;
+	}
+	///////////////////////////////
+	// Serializable
+	long Time::_buf_size()const{
+		// MM,DD,hh,mm,ssはcharで、YYYY,mmmはintで送る
+		return sizeof(int)*2+sizeof(char)*5;
+	}
+	void Time::_serialize(){
+		unsigned int offset;
+		int YY = getYear();
+		std::memcpy(buf,&YY,sizeof(int));
+		offset=sizeof(int);
+		buf[offset] = static_cast<char>(getMonth());
+		buf[offset+1] = static_cast<char>(getDay());
+		buf[offset+2] = static_cast<char>(getHour());
+		buf[offset+3] = static_cast<char>(getMinute());
+		buf[offset+4] = static_cast<char>(getSecond());
+		int msec = getMilliSecond();
+		std::memcpy(buf+offset+5,&msec,sizeof(int));
+	}
+	void Time::_deserialize(const char* buf,long buf_size){
+		// このクラスのbuf_sizeは常に固定であるので無視
+		int YYYY,msec;
+		char MM,DD,hh,mm,ss;
+		std::memcpy(&YYYY,buf,sizeof(int));
+		MM = buf[sizeof(int)];
+		DD = buf[sizeof(int)+1];
+		hh = buf[sizeof(int)+2];
+		mm = buf[sizeof(int)+3];
+		ss = buf[sizeof(int)+4];	
+		std::memcpy(&msec,buf+sizeof(int)+5,sizeof(int));	
+		*this = Time(YYYY,MM,DD,hh,mm,ss,msec);
 	}
 
 }

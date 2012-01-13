@@ -2,7 +2,7 @@
  * @file TimeInterval.cpp
  * @author 橋本敦史
  * @date Date Created: 2010-06-21.
- * @date Last Change:2012/Jan/06.
+ * @date Last Change:2012/Jan/13.
  */
 #include "TimeInterval.h"
 #include <sstream>
@@ -110,7 +110,7 @@ void TimeInterval::parseString(const std::string& str){
  * @brief 文字列から読み出す
  * @param str ([-]HH:MM:SS.mmm)という書式でかかれた文字列
  * */
-void TimeInterval::scan(const std::string& _str){
+bool TimeInterval::scan(const std::string& _str){
 	// 符号の読み取り
 	int sign = 1;
 	std::string str = _str;
@@ -121,9 +121,10 @@ void TimeInterval::scan(const std::string& _str){
 	// HHの読み取り
 	unsigned int idx = str.find(":");
 	if(idx==std::string::npos){
-		std::cerr << "at " << __FILE__ << ": "<< __LINE__ << std::endl;
+		return false;
+/*		std::cerr << "at " << __FILE__ << ": "<< __LINE__ << std::endl;
 		std::cerr << "Warning: Invalid format '" << _str << "'." <<std::endl;
-		std::cerr << "         A valid format is HH:MM:SS.mmm" << std::endl;		return;
+		std::cerr << "         A valid format is HH:MM:SS.mmm" << std::endl;		return;*/
 	}
 	std::string val = str.substr(0,idx);
 	str = str.substr(idx+1,std::string::npos);
@@ -132,10 +133,10 @@ void TimeInterval::scan(const std::string& _str){
 	// MMの読み取り
 	idx = str.find(":");
 	if(idx==std::string::npos){
-		std::cerr << "at " << __FILE__ << ": "<< __LINE__ << std::endl;
+/*		std::cerr << "at " << __FILE__ << ": "<< __LINE__ << std::endl;
 		std::cerr << "Warning: Invalid format '" << _str << "'." <<std::endl;
 		std::cerr << "         A valid format is HH:MM:SS.mmm" << std::endl;
-		return;
+*/		return false;
 	}
 	val = str.substr(0,idx);
 	str = str.substr(idx+1,std::string::npos);
@@ -144,9 +145,10 @@ void TimeInterval::scan(const std::string& _str){
 	// SSの読み取り
 	idx = str.find(".");
 	if(idx==std::string::npos){
-		std::cerr << "at " << __FILE__ << ": "<< __LINE__ << std::endl;
+/*		std::cerr << "at " << __FILE__ << ": "<< __LINE__ << std::endl;
 		std::cerr << "Warning: Invalid format '" << _str << "'." <<std::endl;
-		std::cerr << "         A valid format is HH:MM:SS.mmm" << std::endl;		return;
+		std::cerr << "         A valid format is HH:MM:SS.mmm" << std::endl;
+*/		return false;
 	}
 	val = str.substr(0,idx);
 	str = str.substr(idx+1,std::string::npos);
@@ -154,9 +156,10 @@ void TimeInterval::scan(const std::string& _str){
 
 	// mmmの読み取り(小数点4桁以下は無視)
 	if(str==""){
-		std::cerr << "at " << __FILE__ << ": "<< __LINE__ << std::endl;
+/*		std::cerr << "at " << __FILE__ << ": "<< __LINE__ << std::endl;
 		std::cerr << "Warning: Invalid format '" << _str << "'." <<std::endl;
-		std::cerr << "         A valid format is HH:MM:SS.mmm" << std::endl;		return;
+		std::cerr << "         A valid format is HH:MM:SS.mmm" << std::endl;
+*/		return false;
 	}
 	int millisec = atoi(str.substr(0,3).c_str());
 
@@ -169,6 +172,7 @@ void TimeInterval::scan(const std::string& _str){
 	msec *= 1000;
 	msec += millisec;
 	msec *= sign;
+	return true;
 }
 
 /*

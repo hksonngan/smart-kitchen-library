@@ -25,7 +25,7 @@ opt_on_cam_prop(CONVERT_RGB);
 opt_on_cam_prop(RECTIFICATION);
 
 #define opt_set_cap_prop(prop_name,params) \
-if(prop_name!=0.0){ std::cerr << #prop_name << " = " << prop_name << std::endl; assert(params.set(CV_CAP_PROP_##prop_name,prop_name));}
+if(prop_name!=0.0){ assert(params.set(CV_CAP_PROP_##prop_name,prop_name));}
 
 #define opt_parse_cap_prop(params) \
 opt_set_cap_prop(POS_MSEC,params)\

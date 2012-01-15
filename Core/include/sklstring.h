@@ -19,6 +19,7 @@ namespace skl{
 	std::string join(const std::vector<std::string>& buf, const std::string& separator);
 	std::vector<std::string> split_strip(const std::string& str, const std::string& deliminator, int length=-1);
 
+	bool parse_conffile(std::istream& in, std::map<std::string,std::string>& param_map, const std::string& deliminator=":");
 	bool parse_conffile(const std::string& filename, std::map<std::string,std::string>& param_map, const std::string& deliminator=":");
 
 	template<class T> bool convert(const std::string& src, T* dest){

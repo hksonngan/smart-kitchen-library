@@ -72,21 +72,27 @@ namespace skl{
 		if(!fin){
 			return false;
 		}
+		bool result = parse_conffile(fin,param_map,deliminator);
+		fin.close();
+		return result;
+	}
+	bool parse_conffile(std::istream& in,std::map<std::string,std::string>& param_map,const std::string& deliminator){
 		std::vector<std::string> buf;
 		std::string str;
-		while(fin && std::getline(fin,str)){
+		while(in && std::getline(in,str)){
 			if(str.empty()) continue;
 			str = strip(str);
 			buf = split(str,"#",2);
 			if(buf[0].empty()) continue;
 			buf = split_strip(buf[0],deliminator,2);
 			if(buf.size()<2 || buf[0].empty()){
-				std::cerr << "WARNING: invalid format '" << str << "' in file '" << filename << "'." << std::endl;
-				continue;
+#ifdef DEBUG
+				std::cerr << "WARNING: invalid format '" << str << "'." << std::endl;
+#endif
+				return false;
 			}
 			param_map[buf[0]] = buf[1];
 		}
-		fin.close();
 		return true;
 	}
 

@@ -2,7 +2,7 @@
  * @file OptParser.h
  * @author a_hasimoto
  * @date Date Created: 2011/Dec/27
- * @date Last Change:2012/Jan/03.
+ * @date Last Change:2012/Jan/15.
  */
 #ifndef __SKL_OPT_PARSER_H__
 #define __SKL_OPT_PARSER_H__
@@ -143,6 +143,7 @@ template<class T,class Container> void OptParserAtomContainer<T,Container>::on(O
 template<class T,class Container> void OptParserAtomContainer<T,Container>::get(OptParser* parser){
 	std::string buf;
 	parser->get(var_name,&buf);
+	if(buf.empty()) return;
 	convert2container<T,Container>(buf,dest,deliminator,length);
 }
 

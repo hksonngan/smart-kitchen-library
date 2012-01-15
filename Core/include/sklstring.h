@@ -16,6 +16,7 @@ namespace skl{
 
 	std::string strip(const std::string& str);
 	std::vector<std::string> split(const std::string& str, const std::string& deliminator, int length=-1);
+
 	template<class InputIterator> std::string join(InputIterator first,InputIterator last, const std::string& separator){
 		std::stringstream ss;
 		for(InputIterator iter = first;iter != last;iter++){

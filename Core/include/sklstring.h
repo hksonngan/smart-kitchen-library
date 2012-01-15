@@ -16,7 +16,17 @@ namespace skl{
 
 	std::string strip(const std::string& str);
 	std::vector<std::string> split(const std::string& str, const std::string& deliminator, int length=-1);
-	std::string join(const std::vector<std::string>& buf, const std::string& separator);
+	template<class InputIterator> std::string join(InputIterator first,InputIterator last, const std::string& separator){
+		std::stringstream ss;
+		for(InputIterator iter = first;iter != last;iter++){
+			if(iter != first){
+				ss << separator;
+			}
+			ss << *iter;
+		}
+		return ss.str();
+	}
+
 	std::vector<std::string> split_strip(const std::string& str, const std::string& deliminator, int length=-1);
 
 	bool parse_conffile(std::istream& in, std::map<std::string,std::string>& param_map, const std::string& deliminator=":");

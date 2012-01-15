@@ -46,18 +46,6 @@ namespace skl{
 		return buf;
 	}
 
-	std::string join(const std::vector<std::string>& buf, const std::string& separator){
-		std::string str;
-		for(size_t i=0;i<buf.size();i++){
-			if(i!=0){
-				str.insert(str.end(),separator.begin(),separator.end());
-			}
-			str.insert(str.end(),buf[i].begin(),buf[i].end());
-		}
-		return str;
-	}
-
-
 	std::vector<std::string> split_strip(const std::string& str, const std::string& deliminator, int length){
 		std::vector<std::string> buf = split(str,deliminator,length);
 		for(size_t i=0;i<buf.size();i++){

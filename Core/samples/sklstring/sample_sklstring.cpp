@@ -20,13 +20,8 @@ int main(int argc,char* argv[]){
 		std::cout << std::endl;
 	}
 
-	std::vector<std::string> join_material(argc-1);
-	for(int i=1;i<argc;i++){
-		join_material[i-1] = argv[i];
-	}
-
 	std::cout << "=== TEST FOR JOIN ALL ARGV === " << std::endl;
-	std::cout << "skl::join(argv,\"+\") = \"" << skl::join(join_material, "+") << "\"" << std::endl;
+	std::cout << "skl::join(argv + 1, argv + argc, \"+\") = \"" << skl::join(argv + 1,argv+argc, "+") << "\"" << std::endl;
 
 	return 0;
 }

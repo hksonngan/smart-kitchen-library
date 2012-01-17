@@ -21,11 +21,28 @@ opt_on_cam_prop(HUE);
 opt_on_cam_prop(GAIN);
 opt_on_cam_prop(EXPOSURE);
 opt_on_cam_prop(CONVERT_RGB);
-//	opt_on_cam_prop(WHITE_BALANCE); // reserved parameter by OpenCV
+std::vector<double> WHITE_BALANCE(2,0.0);
+opt_on_container(std::vector, double, WHITE_BALANCE, "","<BLUE:RED>", "set camera parameter WHITE_BALANCE",":",2);
 opt_on_cam_prop(RECTIFICATION);
+opt_on_cam_prop(MONOCROME);
+opt_on_cam_prop(SHARPNESS);
+opt_on_cam_prop(AUTO_EXPOSURE);
+opt_on_cam_prop(GAMMA);
+opt_on_cam_prop(TEMPERATURE);
+opt_on_cam_prop(TRIGGER);
+opt_on_cam_prop(TRIGGER_DELAY);
+
+// Options for FlyCapture2
+opt_on_cam_prop(IRIS);
+opt_on_cam_prop(FOCUS);
+opt_on_cam_prop(ZOOM);
+opt_on_cam_prop(PAN);
+opt_on_cam_prop(TILT);
+opt_on_cam_prop(SHUTTER);
+
 
 #define opt_set_cap_prop(prop_name,params) \
-if(prop_name!=0.0){ assert(params.set(CV_CAP_PROP_##prop_name,prop_name));}
+if(prop_name!=0.0){ assert(params.set(skl::prop_name,prop_name));}
 
 #define opt_parse_cap_prop(params) \
 opt_set_cap_prop(POS_MSEC,params)\
@@ -45,8 +62,19 @@ opt_set_cap_prop(HUE,params)\
 opt_set_cap_prop(GAIN,params)\
 opt_set_cap_prop(EXPOSURE,params)\
 opt_set_cap_prop(CONVERT_RGB,params)\
-opt_set_cap_prop(RECTIFICATION,params)
-//	opt_set_cap_prop(WHITE_BALANCE,params)\ // reserved parameter by OpenCV
+if(WHITE_BALANCE.size()==2 && WHITE_BALANCE[0]!=0.0 && WHITE_BALANCE[1]!=0.0){\
+	assert(params.set(skl::WHITE_BALANCE_BLUE_U,WHITE_BALANCE[0]));\
+	assert(params.set(skl::WHITE_BALANCE_RED_V,WHITE_BALANCE[1]));\
+}\
+opt_set_cap_prop(RECTIFICATION,params)\
+opt_set_cap_prop(MONOCROME,params);\
+opt_set_cap_prop(SHARPNESS,params);\
+opt_set_cap_prop(AUTO_EXPOSURE,params);\
+opt_set_cap_prop(GAMMA,params);\
+opt_set_cap_prop(TEMPERATURE,params);\
+opt_set_cap_prop(TRIGGER,params);\
+opt_set_cap_prop(TRIGGER_DELAY,params);\
+
 
 
 #endif

@@ -2,7 +2,7 @@
  * @file VideoCapture.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/12
- * @date Last Change:2012/Jan/13.
+ * @date Last Change:2012/Jan/17.
  */
 #ifndef __SKL_VIDEO_CAPTURE_H__
 #define __SKL_VIDEO_CAPTURE_H__
@@ -13,50 +13,192 @@
 
 
 namespace skl{
-	class VideoCapture;
 
+	typedef enum{
+		// modes of the controlling registers (can be: auto, manual, auto single push, absolute Latter allowed with any other mode)
+		// every feature can have only one mode turned on at a time
+		DC1394_OFF         = -4,  //turn the feature off (not controlled manually nor automatically)
+		DC1394_MODE_MANUAL = -3, //set automatically when a value of the feature is set by the user
+		DC1394_MODE_AUTO = -2,
+		DC1394_MODE_ONE_PUSH_AUTO = -1
+	} camera_mode_t;
+
+	typedef enum{
+		POS_MSEC       =0,
+		POS_FRAMES     =1,
+		POS_AVI_RATIO  =2,
+		FRAME_WIDTH    =3,
+		FRAME_HEIGHT   =4,
+		FPS            =5,
+		FOURCC         =6,
+		FRAME_COUNT    =7,
+		FORMAT         =8,
+		MODE           =9,
+		BRIGHTNESS    =10,
+		CONTRAST      =11,
+		SATURATION    =12,
+		HUE           =13,
+		GAIN          =14,
+		EXPOSURE      =15,
+		CONVERT_RGB   =16,
+		WHITE_BALANCE_BLUE_U =17,
+		RECTIFICATION =18,
+		MONOCROME     =19,
+		SHARPNESS     =20,
+		AUTO_EXPOSURE =21, // exposure control done by camera,
+		// user can adjust refernce level
+		// using this feature
+		GAMMA         =22,
+		TEMPERATURE   =23,
+		TRIGGER       =24,
+		TRIGGER_DELAY =25,
+		WHITE_BALANCE_RED_V =26,
+		MAX_DC1394    =27,
+
+		// properties add by skl, which target FlyCapture2 Library
+		IRIS = 50,
+		FOCUS = 51,
+		ZOOM = 52,
+		PAN = 53,
+		TILT = 54,
+		SHUTTER = 55,
+
+
+		AUTOGRAB      =1024, // property for highgui class CvCapture_Android only
+		SUPPORTED_PREVIEW_SIZES_STRING=1025, // readonly, tricky property, returns cpnst char* indeed
+		PREVIEW_FORMAT=1026, // readonly, tricky property, returns cpnst char* indeed
+
+		// Properties of cameras available through OpenNI interfaces
+		OPENNI_OUTPUT_MODE      = 100,
+		OPENNI_FRAME_MAX_DEPTH  = 101, // in mm
+		OPENNI_BASELINE         = 102, // in mm
+		OPENNI_FOCAL_LENGTH     = 103, // in pixels
+		OPENNI_REGISTRATION_ON  = 104, // flag
+		OPENNI_REGISTRATION     = CV_CAP_PROP_OPENNI_REGISTRATION_ON, // flag that synchronizes the remapping depth map to image map
+		// by changing depth generator's view point (if the flag is "on") or
+		// sets this view point to its normal one (if the flag is "off").
+
+		// Properties of cameras available through GStreamer interface
+		PVAPI_MULTICASTIP   = 300, // ip for anable multicast master mode. 0 for disable multicast
+
+		// Properties of cameras available through XIMEA SDK interface
+		XI_DOWNSAMPLING  = 400,      // Change image resolution by binning or skipping.  
+		XI_DATA_FORMAT   = 401,       // Output data format.
+		XI_OFFSET_X      = 402,      // Horizontal offset from the origin to the area of interest (in pixels).
+		XI_OFFSET_Y      = 403,      // Vertical offset from the origin to the area of interest (in pixels).
+		XI_TRG_SOURCE    = 404,      // Defines source of trigger.
+		XI_TRG_SOFTWARE  = 405,      // Generates an internal trigger. PRM_TRG_SOURCE must be set to TRG_SOFTWARE.
+		XI_GPI_SELECTOR  = 406,      // Selects general purpose input 
+		XI_GPI_MODE      = 407,      // Set general purpose input mode
+		XI_GPI_LEVEL     = 408,      // Get general purpose level
+		XI_GPO_SELECTOR  = 409,      // Selects general purpose output 
+		XI_GPO_MODE      = 410,      // Set general purpose output mode
+		XI_LED_SELECTOR  = 411,      // Selects camera signalling LED 
+		XI_LED_MODE      = 412,      // Define camera signalling LED functionality
+		XI_MANUAL_WB     = 413,      // Calculates White Balance(must be called during acquisition)
+		XI_AUTO_WB       = 414,      // Automatic white balance
+		XI_AEAG          = 415,      // Automatic exposure/gain
+		XI_EXP_PRIORITY  = 416,      // Exposure priority (0.5 - exposure 50%, gain 50%).
+		XI_AE_MAX_LIMIT  = 417,      // Maximum limit of exposure in AEAG procedure
+		XI_AG_MAX_LIMIT  = 418,      // Maximum limit of gain in AEAG procedure
+		XI_AEAG_LEVEL    = 419,       // Average intensity of output signal AEAG should achieve(in %)
+		XI_TIMEOUT       = 420,       // Image capture timeout in milliseconds
+
+		// Properties of cameras available through AVFOUNDATION interface
+		IOS_DEVICE_FOCUS = 9001,
+		IOS_DEVICE_EXPOSURE = 9002,
+		IOS_DEVICE_FLASH = 9003,
+		IOS_DEVICE_WHITEBALANCE = 9004,
+		IOS_DEVICE_TORCH = 9005
+	} capture_property_t;
+
+	class VideoCapture;
+	class VideoParamAdder;
 	/*!
 	 * @class VideoCaptureがサポートしているパラメタを格納するクラス
 	 * */
-	typedef std::map<int,double>::const_iterator VideoParamIter;
+	typedef std::map<capture_property_t,double>::const_iterator VideoParamIter;
 	class VideoParams: public Printable<VideoParams>{
-			friend class VideoCapture;
+		friend class VideoCaptureCameraInterface;
+		friend class VideoParamAdder;
 		public:
-			VideoParams();
-			virtual ~VideoParams();
-			VideoParams(const std::string& filename);
-			VideoParams(const VideoParams& other);
+		VideoParams();
+		virtual ~VideoParams();
+		VideoParams(const std::string& filename);
+		VideoParams(const VideoParams& other);
 
-			std::string print()const;
-			bool scan(const std::string& buf);
+		std::string print()const;
+		bool scan(const std::string& buf);
 
-			bool load(const std::string& filename);
-			void save(const std::string& filename)const;
+		bool load(const std::string& filename);
+		void save(const std::string& filename)const;
 
-			bool set(const std::string& prop_name,double val);
-			bool set(int prop_id,double val);
-			VideoParamIter begin()const;
-			VideoParamIter end()const;
+		bool set(const std::string& prop_name, double val);
+		bool set(capture_property_t prop_id,double val);
+
+		double get(const std::string& prop_name)const;
+		double get(capture_property_t prop_id)const;
+
+		VideoParamIter begin()const;
+		VideoParamIter end()const;
 		protected:
-			std::map<std::string,int> property_name_id_map;
-			std::map<int,double> property_id_value_map;
+		static std::map<std::string,capture_property_t> property_name_id_map;
+		std::map<capture_property_t,double> property_id_value_map;
+	};
+
+	/*!
+	 * @class　VideoCaptureとCameraの間のパラメタのやりとりをするためのクラス
+	 * */
+	class VideoCaptureCameraInterface{
+		public:
+			VideoCaptureCameraInterface(VideoCapture* video_capture, int cam_id=0);
+			~VideoCaptureCameraInterface();
+			const VideoParams& get();
+			double get(const std::string& prop_name);
+			virtual double get(capture_property_t prop_id);
+
+			bool set(const VideoParams& params);
+			bool set(const std::string& prop_name,double val);
+			virtual bool set(capture_property_t prop_id,double val);
+
+			bool set(const std::string& prop_name,camera_mode_t mode);
+			virtual bool set(capture_property_t prop_id,camera_mode_t mode);
+
+			virtual VideoCaptureCameraInterface& operator>> (cv::Mat& image);
+
+		protected:
+			VideoParams params;
+			VideoCapture* video_capture;
+			int cam_id;
+			const std::map<std::string,capture_property_t>& getPropertyNameIDMap(){return params.property_name_id_map;}
 	};
 
 	/*!
 	 * @class パラメタの読み込み機能などを強化したVideoCapture
 	 */
 	class VideoCapture: public cv::VideoCapture{
-
 		public:
+			friend class VideoCaptureCameraInterface;
 			VideoCapture();
 			virtual ~VideoCapture();
-			virtual bool set(const VideoParams& params);
-			virtual bool set(int prop_id,double val);
-			virtual VideoParams get();
-		protected:
-			VideoParams params;
-		private:
 
+			bool set(const VideoParams& params);
+			bool set(const std::string& prop_name, double val);
+			bool set(capture_property_t prop_id,double val);
+
+			bool set(const std::string& prop_name,camera_mode_t mode);
+			virtual bool set(capture_property_t prop_id,camera_mode_t mode);
+
+
+			const VideoParams& get();
+			double get(const std::string& prop_name);
+			double get(capture_property_t prop_id);
+
+			VideoCaptureCameraInterface& operator[](int device);
+			size_t size()const{return cam_interface.size();}
+		protected:
+			std::vector<VideoCaptureCameraInterface*> cam_interface;
+		private:
 	};
 
 } // skl

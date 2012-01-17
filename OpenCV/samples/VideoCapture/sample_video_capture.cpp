@@ -1,5 +1,5 @@
-#include "skl.h"
 #define USE_VIDEO_CAPTURE_OPT_PARSER
+#include "skl.h"
 #include "sklcv.h"
 
 opt_on(std::string, camera_setting, "", "-C","<FILE>","load camera conf parameters.");
@@ -37,13 +37,12 @@ int main(int argc,char* argv[]){
 	// CAUTION: set params after open the camera.
 	cam.set(params);
 
-
 	std::cout << "Camera Parameter Settings" << std::endl;
 	std::cout << cam.get();
 
-
 	if(!cam.isOpened()){
 		std::cerr << "ERROR: failed to open video." << std::endl;
+		std::cerr << "       Maybe, camera is not connected to the PC??" << std::endl;
 		return EXIT_FAILURE;
 	}
 

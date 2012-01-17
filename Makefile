@@ -1,12 +1,10 @@
-default:
-	$(MAKE) all
+default: core opencv
 
-debug:
-	$(MAKE) debug_all
+debug: cored opencvd
 
-all: core opencv
+all: core opencv flycapture
 
-debug_all: core opencv
+debug_all: cored opencvd flycaptured
 
 core:
 	cd Core;$(MAKE)
@@ -16,6 +14,12 @@ opencv:
 	cd OpenCV;$(MAKE)
 opencvd:
 	cd OpenCV;$(MAKE) debug
+flycapture:
+	cd FlyCapture;$(MAKE)
+flycaptured:
+	cd FlyCapture;$(MAKE) debug
+
 clean:
 	cd Core;$(MAKE) clean
 	cd OpenCV;$(MAKE) clean
+	cd FlyCapture;$(MAKE) clean

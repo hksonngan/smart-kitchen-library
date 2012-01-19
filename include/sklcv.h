@@ -1,3 +1,4 @@
+#include "../OpenCV/include/cvtypes.h"
 #include "../OpenCV/include/sklcvutils.h"
 #include "../OpenCV/include/BackgroundSubtractAlgorithm.h"
 #include "../OpenCV/include/HumanDetectorWorkspaceEnd.h"
@@ -11,5 +12,6 @@
 #include "../OpenCV/include/StaticRegionDetector.h"
 #include "../OpenCV/include/TexCut.h"
 #include "../OpenCV/include/TouchedRegionDetector.h"
-#include "../OpenCV/include/VideoCapture.h"
+
+#include "../OpenCV/include/sklVideoCapture.h"
 #include "../OpenCV/include/VideoCaptureOptParser.h"

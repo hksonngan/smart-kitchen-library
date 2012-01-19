@@ -1,12 +1,11 @@
 #define USE_VIDEO_CAPTURE_OPT_PARSER
 #include "skl.h"
 #include "sklcv.h"
-#include "VideoCaptureFlyCap2.h"
+#include "sklflycap.h"
 #include <sstream>
 
 opt_on(std::string, camera_setting, "", "-C","<FILE>","load camera conf parameters.");
 opt_on(std::string, input_file,"","-i","<FILE>","load video file");
-opt_on(int,dev,0,"-d","<DEVICE_ID>","direct device id.");
 
 int main(int argc,char* argv[]){
 	skl::OptParser options;
@@ -19,7 +18,7 @@ int main(int argc,char* argv[]){
 	}
 
 	skl::FlyCapture cam;
-	skl::VideoParams params;
+	skl::VideoCaptureParams params;
 
 	if(!camera_setting.empty()){
 		params.load(camera_setting);
@@ -30,7 +29,7 @@ int main(int argc,char* argv[]){
 
 
 	if(input_file.empty()){
-		cam.open(dev);
+		cam.open();
 	}
 	else{
 		cam.open(input_file);
@@ -39,8 +38,8 @@ int main(int argc,char* argv[]){
 	// CAUTION: set params after open the camera.
 	for(size_t i=0;i<cam.size();i++){
 		cam.set(params);
-		std::cout << "Camera Parameter Settings for cam " << i << std::endl;
-		std::cout << cam.get();
+		std::cout << "=== Parameter Settings of Camera ===" << i << std::endl;
+		std::cout << cam[i].get();
 	}
 
 	if(!cam.isOpened()){
@@ -55,22 +54,17 @@ int main(int argc,char* argv[]){
 		cv::namedWindow(ss.str(),0);
 		ss.str("");
 	}
-	std::vector<cv::Mat> images(cam.size());
-	while('q'!=cv::waitKey(10)){
-		if(cam.size()==1){
-			cam >> images[0];
-			cv::imshow("image0",images[0]);
-		}
-		else{
-			assert(cam.grab());
-			for(size_t i=0;i<cam.size();i++){
-				cam[i] >> images[i];
-				if(images[i].empty()) break;
+	std::vector<cv::Mat> images;
 
-				ss << "image" << i;
-				cv::imshow(ss.str(),images[i]);
-				ss.str("");
-			}
+
+	while('q'!=cv::waitKey(10)){
+		cam >> images;
+		if(!cam.grab()) break;
+
+		for(size_t i=0;i<cam.size();i++){
+			ss << "image" << i;
+			cv::imshow(ss.str(),images[i]);
+			ss.str("");
 		}
 	}
 	cv::destroyAllWindows();

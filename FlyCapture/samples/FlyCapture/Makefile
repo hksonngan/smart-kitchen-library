@@ -19,8 +19,8 @@ CFLAGS_D = -Wall
 # skl用の設定
 PATH_TO_SKL_ROOT = ../../../../
 BINDIR = ${PATH_TO_SKL_ROOT}/bin/
-ADDITIONAL_SKL_MODULE = FlyCapture OpenCV Core
-ADDITIONAL_SKL_MODULEs = flycapture opencv core
+ADDITIONAL_SKL_MODULE = OpenCV Core
+ADDITIONAL_SKL_MODULEs = opencv core
 SKL_LIBDIR = ${PATH_TO_SKL_ROOT}/lib
 SKL_INCDIR += ${ADDITIONAL_SKL_MODULE:%=${PATH_TO_SKL_ROOT}modules/%/include/}
 INC += ${SKL_INCDIR:%=-I %}
@@ -28,8 +28,8 @@ LIBS += -L${SKL_LIBDIR} ${ADDITIONAL_SKL_MODULEs:%=-lskltest_%}
 LIBS_DEBUG += -L${SKL_LIBDIR} ${ADDITIONAL_SKL_MODULEs:%=-lskltest_%_d}
 
 # public modules
-ADDITIONAL_PUBLIC_SKL_MODULE = OpenCV Core
-ADDITIONAL_PUBLIC_SKL_MODULEs = opencv core
+ADDITIONAL_PUBLIC_SKL_MODULE = FlyCapture OpenCV Core
+ADDITIONAL_PUBLIC_SKL_MODULEs = flycapture opencv core
 PATH_TO_PUBLIC_SKL = ${PATH_TO_SKL_ROOT}/public_modules
 INC += -I ${PATH_TO_PUBLIC_SKL}/include
 PUBLIC_LIBDIR = ${PATH_TO_PUBLIC_SKL}/lib

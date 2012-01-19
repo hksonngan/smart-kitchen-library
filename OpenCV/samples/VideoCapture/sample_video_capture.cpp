@@ -17,7 +17,7 @@ int main(int argc,char* argv[]){
 	}
 
 	skl::VideoCapture cam;
-	skl::VideoParams params;
+	skl::VideoCaptureParams params;
 
 	if(!camera_setting.empty()){
 		params.load(camera_setting);

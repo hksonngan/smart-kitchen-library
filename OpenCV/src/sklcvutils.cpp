@@ -315,7 +315,7 @@ namespace skl{
 		const unsigned char* src = bayer.ptr<unsigned char>(0);
 		unsigned char* dest = bgr.ptr<unsigned char>(0);
 		unsigned char *outR=NULL, *outG=NULL, *outB=NULL;
-		register int i,j;
+		register int i,j,idx;
 		int dh, dv;
 		int tmp;
 
@@ -345,87 +345,97 @@ namespace skl{
 				// copy original RGB data to output images
 				for (i=0;i<sy;i+=2) {
 					for (j=0;j<sx;j+=2) {
-						outG[(i*sx+j)*3]=src[i*sx+j];
-						outG[((i+1)*sx+(j+1))*3]=src[(i+1)*sx+(j+1)];
-						outR[(i*sx+j+1)*3]=src[i*sx+j+1];
-						outB[((i+1)*sx+j)*3]=src[(i+1)*sx+j];
+						idx = i*sx+j;
+						outG[idx*3]=src[idx];
+						outR[(idx+1)*3]=src[idx+1];
+						idx += sx;
+						outB[idx*3]=src[idx];
+						outG[(idx+1)*3]=src[idx+1];
 					}
 				}
 				// process GREEN channel
 				for (i=3;i<sy-2;i+=2) {
 					for (j=2;j<sx-3;j+=2) {
-						dh=abs((outB[(i*sx+j-2)*3]+outB[(i*sx+j+2)*3])/2-outB[(i*sx+j)*3]);
-						dv=abs((outB[((i-2)*sx+j)*3]+outB[((i+2)*sx+j)*3])/2-outB[(i*sx+j)*3]);
+						idx = i*sx+j;
+						dh=abs((outB[(idx-2)*3]+outB[(idx+2)*3])/2-outB[idx*3]);
+						dv=abs((outB[(idx-2*sx)*3]+outB[(idx+2*sx)*3])/2-outB[(idx)*3]);
 						if (dh<dv)
-							tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3])/2;
+							tmp=(outG[(idx-1)*3]+outG[(idx+1)*3])/2;
 						else {
 							if (dh>dv)
-								tmp=(outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/2;
+								tmp=(outG[(idx-sx)*3]+outG[(idx+sx)*3])/2;
 							else
-								tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3]+outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/4;
+								tmp=(outG[(idx-1)*3]+outG[(idx+1)*3]+outG[(idx-sx)*3]+outG[(idx+sx)*3])/4;
 						}
-						CLIP(tmp,outG[(i*sx+j)*3]);
+						CLIP(tmp,outG[idx*3]);
 					}
 				}
 
 				for (i=2;i<sy-3;i+=2) {
 					for (j=3;j<sx-2;j+=2) {
-						dh=abs((outR[(i*sx+j-2)*3]+outR[(i*sx+j+2)*3])/2-outR[(i*sx+j)*3]);
-						dv=abs((outR[((i-2)*sx+j)*3]+outR[((i+2)*sx+j)*3])/2-outR[(i*sx+j)*3]);
+						idx = i*sx+j;
+						dh=abs((outR[(idx-2)*3]+outR[(idx+2)*3])/2-outR[idx*3]);
+						dv=abs((outR[(idx-2*sx)*3]+outR[(idx+2*sx)*3])/2-outR[idx*3]);
 						if (dh<dv)
-							tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3])/2;
+							tmp=(outG[(idx-1)*3]+outG[(idx+1)*3])/2;
 						else {
 							if (dh>dv)
-								tmp=(outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/2;
+								tmp=(outG[(idx-sx)*3]+outG[(idx+sx)*3])/2;
 							else
-								tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3]+outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/4;
+								tmp=(outG[(idx-1)*3]+outG[(idx+1)*3]+outG[(idx-sx)*3]+outG[(idx+sx)*3])/4;
 						} 
-						CLIP(tmp,outG[(i*sx+j)*3]);
+						CLIP(tmp,outG[idx*3]);
 					}
 				}
 				// process RED channel
 				for (i=0;i<sy-1;i+=2) {
 					for (j=2;j<sx-1;j+=2) {
-						tmp=outG[(i*sx+j)*3]+(outR[(i*sx+j-1)*3]-outG[(i*sx+j-1)*3]+
-								outR[(i*sx+j+1)*3]-outG[(i*sx+j+1)*3])/2;
-						CLIP(tmp,outR[(i*sx+j)*3]);
+						idx = i*sx+j;
+						tmp=outG[idx*3]+(outR[(idx-1)*3]-outG[(idx-1)*3]+
+								outR[(idx+1)*3]-outG[(idx+1)*3])/2;
+						CLIP(tmp,outR[idx*3]);
 					}
 				}
 				for (i=1;i<sy-2;i+=2) {
 					for (j=1;j<sx;j+=2) {
-						tmp=outG[(i*sx+j)*3]+(outR[((i-1)*sx+j)*3]-outG[((i-1)*sx+j)*3]+
-								outR[((i+1)*sx+j)*3]-outG[((i+1)*sx+j)*3])/2;
-						CLIP(tmp,outR[(i*sx+j)*3]);
+						idx = i*sx+j;
+						tmp=outG[idx*3]+(outR[(idx-sx)*3]-outG[(idx-sx)*3]+
+								outR[(idx+sx)*3]-outG[(idx+sx)*3])/2;
+						CLIP(tmp,outR[idx*3]);
 					}
 					for (j=2;j<sx-1;j+=2) {
-						tmp=outG[(i*sx+j)*3]+(outR[((i-1)*sx+j-1)*3]-outG[((i-1)*sx+j-1)*3]+
-								outR[((i-1)*sx+j+1)*3]-outG[((i-1)*sx+j+1)*3]+
-								outR[((i+1)*sx+j-1)*3]-outG[((i+1)*sx+j-1)*3]+
-								outR[((i+1)*sx+j+1)*3]-outG[((i+1)*sx+j+1)*3])/4;
-						CLIP(tmp,outR[(i*sx+j)*3]);
+						idx = i*sx+j;
+						tmp=outG[idx*3]+(outR[(idx-sx-1)*3]-outG[(idx-sx-1)*3]+
+								outR[(idx-sx+1)*3]-outG[(idx-sx+1)*3]+
+								outR[(idx+sx-1)*3]-outG[(idx+sx-1)*3]+
+								outR[(idx+sx+1)*3]-outG[(idx+sx+1)*3])/4;
+						CLIP(tmp,outR[idx*3]);
 					}
 				}
 
 				// process BLUE channel
 				for (i=1;i<sy;i+=2) {
 					for (j=1;j<sx-2;j+=2) {
-						tmp=outG[(i*sx+j)*3]+(outB[(i*sx+j-1)*3]-outG[(i*sx+j-1)*3]+
-								outB[(i*sx+j+1)*3]-outG[(i*sx+j+1)*3])/2;
-						CLIP(tmp,outB[(i*sx+j)*3]);
+						idx = i*sx+j;
+						tmp=outG[idx*3]+(outB[(idx-1)*3]-outG[(idx-1)*3]+
+								outB[(idx+1)*3]-outG[(idx+1)*3])/2;
+						CLIP(tmp,outB[idx*3]);
 					}
 				}
 				for (i=2;i<sy-1;i+=2) {
 					for (j=0;j<sx-1;j+=2) {
-						tmp=outG[(i*sx+j)*3]+(outB[((i-1)*sx+j)*3]-outG[((i-1)*sx+j)*3]+
-								outB[((i+1)*sx+j)*3]-outG[((i+1)*sx+j)*3])/2;
-						CLIP(tmp,outB[(i*sx+j)*3]);
+						idx = i*sx+j;
+						tmp=outG[idx*3]+(outB[(idx-sx)*3]-outG[(idx-sx)*3]+
+								outB[(idx+sx)*3]-outG[(idx+sx)*3])/2;
+						CLIP(tmp,outB[idx*3]);
 					}
 					for (j=1;j<sx-2;j+=2) {
-						tmp=outG[(i*sx+j)*3]+(outB[((i-1)*sx+j-1)*3]-outG[((i-1)*sx+j-1)*3]+
-								outB[((i-1)*sx+j+1)*3]-outG[((i-1)*sx+j+1)*3]+
-								outB[((i+1)*sx+j-1)*3]-outG[((i+1)*sx+j-1)*3]+
-								outB[((i+1)*sx+j+1)*3]-outG[((i+1)*sx+j+1)*3])/4;
-						CLIP(tmp,outB[(i*sx+j)*3]);
+						idx = i*sx+j;
+						tmp=outG[idx*3]+(outB[(idx-sx-1)*3]-outG[(idx-sx-1)*3]+
+								outB[(idx-sx+1)*3]-outG[(idx-sx+1)*3]+
+								outB[(idx+sx-1)*3]-outG[(idx+sx-1)*3]+
+								outB[(idx+sx+1)*3]-outG[(idx+sx+1)*3])/4;
+						CLIP(tmp,outB[idx*3]);
 					}
 				}
 				break;
@@ -435,46 +445,52 @@ namespace skl{
 				// copy original RGB data to output images
 				for (i=0;i<sy;i+=2) {
 					for (j=0;j<sx;j+=2) {
-						outB[(i*sx+j)*3]=src[i*sx+j];
-						outR[((i+1)*sx+(j+1))*3]=src[(i+1)*sx+(j+1)];
-						outG[(i*sx+j+1)*3]=src[i*sx+j+1];
-						outG[((i+1)*sx+j)*3]=src[(i+1)*sx+j];
+						idx = i*sx+j;
+						outB[idx*3]=src[idx];
+						outG[(idx+1)*3]=src[idx+1];
+
+						idx += sx;
+						outG[idx*3]=src[idx];
+						outR[(idx+1)*3]=src[idx+1];
 					}
 				}
 				// process GREEN channel
 				for (i=2;i<sy-2;i+=2) {
 					for (j=2;j<sx-3;j+=2) {
-						dh=abs((outB[(i*sx+j-2)*3]+outB[(i*sx+j+2)*3])/2-outB[(i*sx+j)*3]);
-						dv=abs((outB[((i-2)*sx+j)*3]+outB[((i+2)*sx+j)*3])/2-outB[(i*sx+j)*3]);
+						idx = i*sx+j;
+						dh=abs((outB[(idx-2)*3]+outB[(idx+2)*3])/2-outB[idx*3]);
+						dv=abs((outB[(idx-2*sx)*3]+outB[(idx+2*sx)*3])/2-outB[idx*3]);
 						if (dh<dv)
-							tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3])/2;
+							tmp=(outG[(idx-1)*3]+outG[(idx+1)*3])/2;
 						else {
 							if (dh>dv)
-								tmp=(outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/2;
+								tmp=(outG[(idx-sx)*3]+outG[(idx+sx)*3])/2;
 							else
-								tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3]+outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/4;
+								tmp=(outG[(idx-1)*3]+outG[(idx+1)*3]+outG[(idx-sx)*3]+outG[(idx+sx)*3])/4;
 						}
-						CLIP(tmp,outG[(i*sx+j)*3]);
+						CLIP(tmp,outG[(idx)*3]);
 					}
 				}
 				for (i=3;i<sy-3;i+=2) {
 					for (j=3;j<sx-2;j+=2) {
-						dh=abs((outR[(i*sx+j-2)*3]+outR[(i*sx+j+2)*3])/2-outR[(i*sx+j)*3]);
-						dv=abs((outR[((i-2)*sx+j)*3]+outR[((i+2)*sx+j)*3])/2-outR[(i*sx+j)*3]);
+						idx = i*sx+j;
+						dh=abs((outR[(idx-2)*3]+outR[(idx+2)*3])/2-outR[(idx)*3]);
+						dv=abs((outR[(idx-2*sx)*3]+outR[(idx+2*sx)*3])/2-outR[(idx)*3]);
 						if (dh<dv)
-							tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3])/2;
+							tmp=(outG[(idx-1)*3]+outG[(idx+1)*3])/2;
 						else {
 							if (dh>dv)
-								tmp=(outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/2;
+								tmp=(outG[(idx-sx)*3]+outG[(idx+sx)*3])/2;
 							else
-								tmp=(outG[(i*sx+j-1)*3]+outG[(i*sx+j+1)*3]+outG[((i-1)*sx+j)*3]+outG[((i+1)*sx+j)*3])/4;
+								tmp=(outG[(idx-1)*3]+outG[(idx+1)*3]+outG[(idx-sx)*3]+outG[(idx+sx)*3])/4;
 						}
-						CLIP(tmp,outG[(i*sx+j)*3]);
+						CLIP(tmp,outG[(idx)*3]);
 					}
 				}
 				// process RED channel
 				for (i=1;i<sy-1;i+=2) { // G-points (1/2)
 					for (j=2;j<sx-1;j+=2) {
+						idx = i * sx + j;
 						tmp=outG[(i*sx+j)*3]+(outR[(i*sx+j-1)*3]-outG[(i*sx+j-1)*3]+
 								outR[(i*sx+j+1)*3]-outG[(i*sx+j+1)*3])/2;
 						CLIP(tmp,outR[(i*sx+j)*3]);
@@ -501,6 +517,22 @@ namespace skl{
 						tmp=outG[(i*sx+j)*3]+(outB[(i*sx+j-1)*3]-outG[(i*sx+j-1)*3]+
 								outB[(i*sx+j+1)*3]-outG[(i*sx+j+1)*3])/2;
 						CLIP(tmp,outB[(i*sx+j)*3]);
+					}
+				}
+				for (i=1;i<sy-1;i+=2) {
+					for (j=0;j<sx-1;j+=2) {
+						idx = i*sx+j;
+						tmp=outG[idx*3]+(outB[(idx-sx)*3]-outG[(idx-sx)*3]+
+								outB[(idx+sx)*3]-outG[(idx+sx)*3])/2;
+						CLIP(tmp,outB[idx*3]);
+					}
+					for (j=1;j<sx-2;j+=2) {
+						idx = i*sx+j;
+						tmp=outG[idx*3]+(outB[(idx-sx-1)*3]-outG[(idx-sx-1)*3]+
+								outB[(idx-sx+1)*3]-outG[(idx-sx+1)*3]+
+								outB[(idx+sx-1)*3]-outG[(idx+sx-1)*3]+
+								outB[(idx+sx+1)*3]-outG[(idx+sx+1)*3])/4;
+						CLIP(tmp,outB[idx*3]);
 					}
 				}
 				for (i=1;i<sy-1;i+=2) {

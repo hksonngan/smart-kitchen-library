@@ -1,19 +1,7 @@
-﻿/*!
- * @file VideoCapture.h
- * @author a_hasimoto
- * @date Date Created: 2012/Jan/12
- * @date Last Change:2012/Jan/17.
- */
-#ifndef __SKL_VIDEO_CAPTURE_H__
-#define __SKL_VIDEO_CAPTURE_H__
-
-#include "skl.h"
-#include <cv.h>
+#ifndef __SKL_CV_TYPES_H__
+#define __SKL_CV_TYPES_H__
 #include <highgui.h>
-
-
 namespace skl{
-
 	typedef enum{
 		// modes of the controlling registers (can be: auto, manual, auto single push, absolute Latter allowed with any other mode)
 		// every feature can have only one mode turned on at a time
@@ -111,97 +99,5 @@ namespace skl{
 		IOS_DEVICE_WHITEBALANCE = 9004,
 		IOS_DEVICE_TORCH = 9005
 	} capture_property_t;
-
-	class VideoCapture;
-	class VideoParamAdder;
-	/*!
-	 * @class VideoCaptureがサポートしているパラメタを格納するクラス
-	 * */
-	typedef std::map<capture_property_t,double>::const_iterator VideoParamIter;
-	class VideoParams: public Printable<VideoParams>{
-		friend class VideoCaptureCameraInterface;
-		friend class VideoParamAdder;
-		public:
-		VideoParams();
-		virtual ~VideoParams();
-		VideoParams(const std::string& filename);
-		VideoParams(const VideoParams& other);
-
-		std::string print()const;
-		bool scan(const std::string& buf);
-
-		bool load(const std::string& filename);
-		void save(const std::string& filename)const;
-
-		bool set(const std::string& prop_name, double val);
-		bool set(capture_property_t prop_id,double val);
-
-		double get(const std::string& prop_name)const;
-		double get(capture_property_t prop_id)const;
-
-		VideoParamIter begin()const;
-		VideoParamIter end()const;
-		protected:
-		static std::map<std::string,capture_property_t> property_name_id_map;
-		std::map<capture_property_t,double> property_id_value_map;
-	};
-
-	/*!
-	 * @class　VideoCaptureとCameraの間のパラメタのやりとりをするためのクラス
-	 * */
-	class VideoCaptureCameraInterface{
-		public:
-			VideoCaptureCameraInterface(VideoCapture* video_capture, int cam_id=0);
-			~VideoCaptureCameraInterface();
-			const VideoParams& get();
-			double get(const std::string& prop_name);
-			virtual double get(capture_property_t prop_id);
-
-			bool set(const VideoParams& params);
-			bool set(const std::string& prop_name,double val);
-			virtual bool set(capture_property_t prop_id,double val);
-
-			bool set(const std::string& prop_name,camera_mode_t mode);
-			virtual bool set(capture_property_t prop_id,camera_mode_t mode);
-
-			virtual VideoCaptureCameraInterface& operator>> (cv::Mat& image);
-
-		protected:
-			VideoParams params;
-			VideoCapture* video_capture;
-			int cam_id;
-			const std::map<std::string,capture_property_t>& getPropertyNameIDMap(){return params.property_name_id_map;}
-	};
-
-	/*!
-	 * @class パラメタの読み込み機能などを強化したVideoCapture
-	 */
-	class VideoCapture: public cv::VideoCapture{
-		public:
-			friend class VideoCaptureCameraInterface;
-			VideoCapture();
-			virtual ~VideoCapture();
-
-			bool set(const VideoParams& params);
-			bool set(const std::string& prop_name, double val);
-			bool set(capture_property_t prop_id,double val);
-
-			bool set(const std::string& prop_name,camera_mode_t mode);
-			virtual bool set(capture_property_t prop_id,camera_mode_t mode);
-
-
-			const VideoParams& get();
-			double get(const std::string& prop_name);
-			double get(capture_property_t prop_id);
-
-			VideoCaptureCameraInterface& operator[](int device);
-			size_t size()const{return cam_interface.size();}
-		protected:
-			std::vector<VideoCaptureCameraInterface*> cam_interface;
-		private:
-	};
-
-} // skl
-
-#endif // __SKL_VIDEO_CAPTURE_H__
-
+}
+#endif // __SKL_CV_TYPES_H__

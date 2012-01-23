@@ -2,7 +2,7 @@
  * @file VideoCaptureFlyCapture.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change: 2012/Jan/19.
+ * @date Last Change: 2012/Jan/20.
  */
 #include "VideoCaptureFlyCapture.h"
 
@@ -67,6 +67,10 @@ bool VideoCaptureFlyCapture::open(int device){
 }
 
 void VideoCaptureFlyCapture::release(){
+	int i=0;
+	// カメラ内部のバッファに溜まっている画像を全て吐き出さないと終了できないので、吐き出す
+	while(grab() && i < 128){i++;}
+	std::cerr << "Stop Capture" << std::endl;
 	is_opened = false;
 	is_started = false;
 	camera.StopCapture();

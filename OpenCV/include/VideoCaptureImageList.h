@@ -2,7 +2,7 @@
  * @file VideoCaptureImageList.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change:2012/Jan/18.
+ * @date Last Change:2012/Jan/19.
  */
 #ifndef __SKL_VIDEO_CAPTURE_IMAGE_LIST_H__
 #define __SKL_VIDEO_CAPTURE_IMAGE_LIST_H__
@@ -38,6 +38,7 @@ namespace skl{
 			std::vector<std::string> img_list;
 			int bayer_change;
 			int imread_option;
+			int checked_frame_pos;
 		private:
 			// 画像列が記されたファイルが専門で、
 			// カメラなどのデバイスは読み込まない

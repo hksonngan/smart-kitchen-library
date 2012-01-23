@@ -6,6 +6,10 @@
 in = in > 255 ? 255 : in;\
 out=in;
 
+#ifdef DEBUG
+#define DEBUG_SKLUTILS
+#endif
+
 cv::Rect operator&(const cv::Rect& left, const cv::Rect& right){
 	cv::Rect rect(left.x,left.y,left.x+left.width,left.y+left.height);
 	rect.x = rect.x > right.x ? rect.x : right.x;
@@ -563,24 +567,27 @@ namespace skl{
 	{
 		int i,j;
 
-		// black edges:
+		// repeat the edge at cv::Rect(2,2,sx-4,sy-4);
 		i=3*sx*w-1;
 		j=3*sx*(sy-1)-1;
-		while (i>=0) {
-			dest[i--]=0;
-			dest[j--]=0;
-		}
-
-		i=sx*(sy-1)*3-1+w*3;
-		while (i>sx) {
-			j=6*w;
-			while (j>0) {
-				dest[i--]=0;
-				j--;
+		int idx;
+		int offset = 3*sx*w;
+		int inv = sx*sy*w-1;
+		for(j=0,idx=0;j<3;j++){
+			for(i=0;i<sx*w;i++,idx++){
+				dest[idx] = dest[offset + i];
+				dest[inv - idx] = dest[inv - ( offset + i )];
 			}
-			i-=(sx-2*w)*3;
 		}
 
+		inv = sx * w - 1;
+		for(j=0;j<sy;j++){
+			offset = j * sx * w;
+			for(i=0;i<3 * w;i++){
+				dest[offset + i] = dest[offset + 3 * w + i%w];
+				dest[offset + inv - i] = dest[offset + inv - (3 * w + i%w)];
+			}
+		}
 	}
 
 
@@ -606,6 +613,13 @@ namespace skl{
 		cv::Mat _edge2 = cv::Mat(src2.size(),CV_8UC1);
 		cv::Canny(gray1,_edge1, canny_thresh1, canny_thresh2, aperture_size);
 		cv::Canny(gray2,_edge2, canny_thresh1, canny_thresh2, aperture_size);
+#ifdef DEBUG_SKLUTILS
+		cv::namedWindow("edge1",0);
+		cv::namedWindow("edge2",0);
+		cv::imshow("edge1",_edge1);
+		cv::imshow("edge2",_edge2);
+#endif
+
 		cv::Size kernel_size(dilate_size,dilate_size);
 		cv::Mat dick_edge1 = cv::Mat(src1.size(),CV_8UC1);
 		cv::Mat dick_edge2 = cv::Mat(src2.size(),CV_8UC1);

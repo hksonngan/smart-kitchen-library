@@ -2,7 +2,7 @@
  * @file VideoCapture.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/12
- * @date Last Change:2012/Jan/18.
+ * @date Last Change:2012/Jan/19.
  */
 #ifndef __SKL_VIDEO_CAPTURE_H__
 #define __SKL_VIDEO_CAPTURE_H__
@@ -22,6 +22,7 @@ namespace skl{
 		public:
 			using _VideoCaptureInterface::set;
 			using _VideoCaptureInterface::get;
+			using VideoCaptureInterface<VideoCapture>::operator>>;
 			VideoCapture();
 			virtual ~VideoCapture();
 

@@ -118,7 +118,7 @@ namespace skl{
 
 	cv::Mat blur_mask(const cv::Mat& mask, size_t blur_width);
 
-	void edge_difference(const cv::Mat& src1, const cv::Mat& src2, cv::Mat& edge1, cv::Mat& edge2, double canny_thresh1=16, double canny_thresh2=32, int aperture_size=3, int dilate_size=4);
+	void edge_difference(const cv::Mat& src1, const cv::Mat& src2, cv::Mat& edge1, cv::Mat& edge2, double canny_thresh1=32, double canny_thresh2=64, int aperture_size=3, int dilate_size=4);
 
 
 	template <class LabelType> void resize_label(const cv::Mat& label_small,size_t scale, cv::Mat& label){

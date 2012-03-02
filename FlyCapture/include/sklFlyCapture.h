@@ -2,7 +2,7 @@
  * @file FlyCapture.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/12
- * @date Last Change:2012/Jan/19.
+ * @date Last Change:2012/Feb/10.
  */
 #ifndef __SKL_FLY_CAPTURE_H__
 #define __SKL_FLY_CAPTURE_H__
@@ -36,6 +36,13 @@ namespace skl{
 			virtual bool grab();
 			virtual void release();
 
+			// 同期撮影を専門とするため、
+			// device番号の指定なしで、全てのカメラが得られる
+			// 従ってdeviceを指定するカメラのopenは不可としたい。
+			// しかしcv::VideoCaptureがFireWireカメラを撮影できないので
+			// 常に全てのカメラをハンドルする
+			virtual bool open(int device){assert(device==0);return open();}
+
 		protected:
 			bool is_started;
 
@@ -45,10 +52,6 @@ namespace skl{
 			static FlyCapture2::BusManager* busMgr;
 
 		private:
-			// 同期撮影を専門とするため、
-			// device番号の指定なしで、全てのカメラが得られる
-			// 従ってdeviceを指定するカメラのopenは不可とする
-			virtual bool open(int device){return false;}
 			virtual bool push_back(int device){return false;}
 			std::vector<VideoCaptureFlyCapture*> fcam_interface;
 	};

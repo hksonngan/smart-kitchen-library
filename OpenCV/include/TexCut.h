@@ -10,7 +10,7 @@
 #endif
 
 #define TEXCUT_BLOCK_SIZE 4
-#define QUANTIZATION_LEVEL SHRT_MAX//16384.0f
+#define QUANTIZATION_LEVEL SHRT_MAX//32767.0f
 #define QUANTIZATION_LEVEL_HARF QUANTIZATION_LEVEL/2
 #define GRADIENT_HETEROGENUITY 1000
 
@@ -19,23 +19,24 @@
 namespace skl{
 	class TexCut: public BackgroundSubtractAlgorithm{
 		public:
+			using BackgroundSubtractAlgorithm::compute;
 			typedef Graph<int,int,int> TexCutGraph;
 
-			TexCut();
-			TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha=1.5, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
+			TexCut(float alpha=1.5, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
+			TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha=1.0, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
 			~TexCut();
 			virtual void setBackground(const cv::Mat& bg);
 			void setParams(float alpha=1.5, float smoothing_term_weight=1.5, float thresh_tex_diff = 0.4, unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
 			void learnImageNoiseModel(const cv::Mat& bg2);
 
 			void updateBackgroundModel(const cv::Mat& img);
-			cv::Mat background()const{return _background;};
+			cv::Mat background()const{return _background;}
 			void setNoiseModel(
 					const std::vector<float>& noise_std_dev,
 					const std::vector<float>& gh_expectation,
 					const std::vector<float>& gh_std_dev);
 		protected:
-			virtual double compute(const cv::Mat& src,const cv::Mat& mask, cv::Mat& dest);
+			virtual void compute(const cv::Mat& src,const cv::Mat& mask, cv::Mat& dest);
 			void calcEdgeCapacity(
 					const std::vector<cv::Mat>& src,
 					const std::vector<cv::Mat>& sobel_x,
@@ -91,7 +92,7 @@ namespace skl{
 					):img1(img1),img2(img2),noise_std_dev(noise_std_dev),gh_expectation(gh_expectation),gh_std_dev(gh_std_dev){}
 
 			void operator()(const cv::BlockedRange& range)const{
-				for(int c=range.begin();c!=range.end();c++){
+				for(int c = range.begin(); c < range.end(); c++){
 					float nsd, ghe, ghsd;
 					noiseEstimate(img1->at(c),img2->at(c),&nsd);
 					ghNoiseEstimate(nsd,&ghe,&ghsd);
@@ -113,6 +114,7 @@ namespace skl{
 					float noise_std_dev,
 					float* gh_expectation,
 					float* gh_std_dev)const{
+				assert(noise_std_dev > 0);
 				size_t iteration_time = GRADIENT_HETEROGENUITY;
 				float moment1(0),moment2(0);
 				int elem_num = TEXCUT_BLOCK_SIZE * TEXCUT_BLOCK_SIZE;
@@ -145,7 +147,7 @@ namespace skl{
 				for(int y = 0; y < img1.rows; y++){
 					temp1 = 0;
 					temp2 = 0;
-					for(int x = 0; x < img2.cols; x++){
+					for(int x = 0; x < img1.cols; x++){
 						int diff = 
 							static_cast<int>(img1.at<unsigned char>(y,x))
 							- img2.at<unsigned char>(y,x);
@@ -166,10 +168,11 @@ namespace skl{
 					const cv::Mat& data_term,
 					const cv::Mat& gradient_heterogenuity,
 					cv::Mat& smoothing_term_x,
-					cv::Mat& smoothing_term_y
+					cv::Mat& smoothing_term_y,
+					float smoothing_term_weight
 					):
 				data_term(data_term), gradient_heterogenuity(gradient_heterogenuity),
-				smoothing_term_x(smoothing_term_x),smoothing_term_y(smoothing_term_y){}
+				smoothing_term_x(smoothing_term_x),smoothing_term_y(smoothing_term_y),smoothing_term_weight(smoothing_term_weight){}
 			void operator()(const cv::BlockedRange& range)const{
 				for(int i = range.begin();i != range.end(); i++){
 					int graph_width = data_term.cols;
@@ -189,9 +192,9 @@ namespace skl{
 						dt_x = dt_x > temp ? dt_x : temp;
 						float temp2 = gradient_heterogenuity.at<float>(gy,gx+1);
 						gh_x = gh_x > temp2 ? exp(-gh_x) : exp(-temp2);
-						dt_x = static_cast<int>(gh_x * QUANTIZATION_LEVEL);
+						dt_x += static_cast<int>(gh_x * QUANTIZATION_LEVEL);
 						int s_x = smoothing_term_x.at<int>(gy,gx) + dt_x;
-						smoothing_term_x.at<int>(gy,gx) = s_x > 0 ? s_x : 0;
+						smoothing_term_x.at<int>(gy,gx) = s_x > 0 ? smoothing_term_weight * s_x : 0;
 
 					}
 					if(gy < graph_height-1){
@@ -199,9 +202,9 @@ namespace skl{
 						dt_y = dt_y > temp ? dt_y : temp;
 						float temp2 = gradient_heterogenuity.at<float>(gy+1,gx);
 						gh_y = gh_y > temp2 ? exp(-gh_y) : exp(-temp2);
-						dt_y = static_cast<int>(gh_y * QUANTIZATION_LEVEL);
+						dt_y += static_cast<int>(gh_y * QUANTIZATION_LEVEL);
 						int s_y = smoothing_term_y.at<int>(gy,gx) + dt_y;
-						smoothing_term_y.at<int>(gy,gx) = s_y > 0 ? s_y : 0;
+						smoothing_term_y.at<int>(gy,gx) = s_y > 0 ? smoothing_term_weight* s_y : 0;
 					}
 				}
 			}
@@ -216,6 +219,7 @@ namespace skl{
 			const cv::Mat& gradient_heterogenuity;
 			cv::Mat& smoothing_term_x;
 			cv::Mat& smoothing_term_y;
+			float smoothing_term_weight;
 		private:
 	};
 	class ParallelCalcEdgeCapacity{

@@ -157,7 +157,15 @@ namespace skl{
 	void cvtBayer2BGR_NN(const cv::Mat& bayer, cv::Mat& bgr, int code);
 	void cvtBayer2BGR_EDGESENSE(const cv::Mat& bayer, cv::Mat& bgr, int code);
 
-	void cvtBayer2BGR(const cv::Mat& bayer, cv::Mat& bgr, int code, int algo_type){
+	void cvtBayer2BGR(const cv::Mat& _bayer, cv::Mat& bgr, int code, int algo_type){
+		cv::Mat bayer;
+		if(!_bayer.isContinuous()){
+			bayer = cv::Mat(_bayer.size(),_bayer.type());
+			_bayer.copyTo(bayer);
+		}
+		else{
+			bayer = _bayer;
+		}
 		assert(bayer.isContinuous());
 		bgr = cv::Mat::zeros(bayer.rows,bayer.cols,CV_8UC3);
 		if(algo_type == BAYER_SIMPLE){
@@ -630,6 +638,18 @@ namespace skl{
 
 		edge1 = _edge1 - dick_edge2;
 		edge2 = _edge2 - dick_edge1;
+///
+/*		cv::imwrite("src.png",src1);
+		cv::imwrite("fg_edge.png",edge1);
+		cv::imwrite("src_fg_edge.png",_edge1);
+		cv::imwrite("bg_edge_dick.png",dick_edge2);
+
+		cv::imwrite("bg.png",src2);
+		cv::imwrite("bg_edge.png",edge2);
+		cv::imwrite("src_bg_edge.png",_edge2);
+		cv::imwrite("fg_edge_dick.png",dick_edge1);
+*/
+///
 	}
 
 }// namespace skl

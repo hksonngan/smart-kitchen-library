@@ -1,9 +1,10 @@
 #ifndef __FILTER_MAT2MAT_H__
 #define __FILTER_MAT2MAT_H__
 #include <cv.h>
+#include "skl.h"
 
 namespace skl{
-	template<class T=void> class FilterMat2Mat{
+	template<class T=void> class FilterMat2Mat: public _Filter<T,cv::Mat,cv::Mat>{
 		public:
 			FilterMat2Mat();
 			virtual ~FilterMat2Mat();

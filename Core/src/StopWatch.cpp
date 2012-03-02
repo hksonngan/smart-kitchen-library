@@ -2,7 +2,7 @@
  * @file StopWatch.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/06
- * @date Last Change: 2012/Jan/06.
+ * @date Last Change: 2012/Feb/04.
  */
 #include "StopWatch.h"
 
@@ -58,4 +58,12 @@ TimeInterval StopWatch::lap(){
 
 size_t StopWatch::record_num()const{
 	return lap_times.size()-1;
+}
+
+TimeInterval StopWatch::elapsedTime()const{
+	TimeInterval sum=0;
+	for(size_t i=1;i<lap_times.size();i++){
+		sum+=lap_times[i];
+	}
+	return sum;
 }

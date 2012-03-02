@@ -1,14 +1,22 @@
 ﻿#include "TexCut.h"
 #include <iostream>
-
+#include <algorithm>
 
 
 using namespace skl;
-TexCut::TexCut():
+TexCut::TexCut(float alpha, float smoothing_term_weight,float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh):
 	noise_std_dev(3,3.5),
 	gh_expectation(3,2.3),
 	gh_std_dev(3,1.12),
 	g(NULL){
+	setParams(alpha, smoothing_term_weight,thresh_tex_diff,over_exposure_thresh,under_exposure_thresh);
+#ifdef DEBUG_TEXCUT
+	cv::namedWindow("data_term",0);
+	cv::namedWindow("tex_int",0);
+	cv::namedWindow("gradient_heterogenuity",0);
+	cv::namedWindow("smoothing_term_x",0);
+	cv::namedWindow("smoothing_term_y",0);
+#endif
 }
 
 TexCut::TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha, float smoothing_term_weight,float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh):g(NULL){
@@ -43,7 +51,7 @@ void TexCut::setParams(float alpha, float smoothing_term_weight, float thresh_te
 	this->under_exposure_thresh = under_exposure_thresh;
 }
 
-double TexCut::compute(const cv::Mat& _src,const cv::Mat& mask,cv::Mat& dest){
+void TexCut::compute(const cv::Mat& _src,const cv::Mat& mask,cv::Mat& dest){
 	// compute edge capacity and construct graph model
 	// mask is not used.
 	std::vector<cv::Mat> src;
@@ -77,10 +85,10 @@ double TexCut::compute(const cv::Mat& _src,const cv::Mat& mask,cv::Mat& dest){
 			smoothing_term_x,
 			smoothing_term_y);
 
-	int flow = calcGraphCut(data_term,smoothing_term_x,smoothing_term_y);
+	/*int flow = */calcGraphCut(data_term,smoothing_term_x,smoothing_term_y);
 
 	setResult(_src,dest);
-	return static_cast<double>(flow);
+	return;// static_cast<double>(flow);
 }
 
 void TexCut::setBackground(const cv::Mat& bg){
@@ -273,11 +281,17 @@ void TexCut::calcEdgeCapacity(
 					data_term,
 					gradient_heterogenuity,
 					smoothing_term_x,
-					smoothing_term_y
+					smoothing_term_y,
+					smoothing_term_weight
 				)
 			);
 
 #ifdef DEBUG_TEXCUT
+	cv::namedWindow("data_term",0);
+	cv::namedWindow("tex_int",0);
+	cv::namedWindow("gradient_heterogenuity",0);
+	cv::namedWindow("smoothing_term_x",0);
+	cv::namedWindow("smoothing_term_y",0);
 	cv::imshow("data_term",data_term);
 	cv::imshow("smoothing_term_x",smoothing_term_x);
 	cv::imshow("smoothing_term_y",smoothing_term_y);
@@ -439,7 +453,7 @@ void ParallelCalcEdgeCapacity::operator()(const cv::BlockedRange& range)const{
 		if(gx < graph_width-1){
 			float s_t = s_x[0];
 			for(int c = 1; c<channels;c++){
-				s_t = s_t > s_x[c] ? s_t : s_x[c];
+				s_t = s_t < s_x[c] ? s_t : s_x[c];
 			}
 			s_t *= QUANTIZATION_LEVEL;
 			s_t = s_t < QUANTIZATION_LEVEL ? s_t : QUANTIZATION_LEVEL;
@@ -449,7 +463,7 @@ void ParallelCalcEdgeCapacity::operator()(const cv::BlockedRange& range)const{
 		if(gy < graph_height-1){
 			float s_t = s_y[0];
 			for(int c = 1; c<channels;c++){
-				s_t = s_t > s_y[c] ? s_t : s_y[c];
+				s_t = s_t < s_y[c] ? s_t : s_y[c];
 			}
 			s_t *= QUANTIZATION_LEVEL;
 			s_t = s_t < QUANTIZATION_LEVEL ? s_t : QUANTIZATION_LEVEL;
@@ -513,6 +527,7 @@ void ParallelCalcEdgeCapacity::calcDataTerm(
 			bg_sort_tar_y[i] = bsy;
 		}
 	}
+
 	// calc texture intenxity
 	*tex_int = auto_cor_src > auto_cor_bg ? auto_cor_src : auto_cor_bg;
 	*tex_int = sqrt(*tex_int/square_size);
@@ -569,11 +584,13 @@ float ParallelCalcEdgeCapacity::calcGradHetero(std::vector<float>& power)const{
 			return FLT_MAX;
 		}
 	}
+/*
 	if(isnan(power[0]/factor)){
 		for(size_t i=0;i<power.size();i++){
 			std::cerr << power[i] << std::endl;
 		}
 	}
+*/
 	return power[0]/factor;
 }
 void ParallelCalcEdgeCapacity::calcSmoothingTerm(
@@ -584,9 +601,9 @@ void ParallelCalcEdgeCapacity::calcSmoothingTerm(
 	for(int i=0;i<TEXCUT_BLOCK_SIZE;i++){
 		float s1,s2,b1,b2;
 		s1 = src_left.at<unsigned char>(i,TEXCUT_BLOCK_SIZE-1);
-		b1 = bg_left.at<unsigned char>(i,TEXCUT_BLOCK_SIZE-1);
+		b1 = std::max<unsigned char>(1,bg_left.at<unsigned char>(i,TEXCUT_BLOCK_SIZE-1));
 		s2 = src_right.at<unsigned char>(i,TEXCUT_BLOCK_SIZE-1);
-		b2 = bg_right.at<unsigned char>(i,TEXCUT_BLOCK_SIZE-1);
+		b2 = std::max<unsigned char>(1,bg_right.at<unsigned char>(i,TEXCUT_BLOCK_SIZE-1));
 		diff_l2r += s1 - (b1 * (s2/b2));
 
 		s1 = src_right.at<unsigned char>(i,0);
@@ -595,6 +612,8 @@ void ParallelCalcEdgeCapacity::calcSmoothingTerm(
 		b2 = bg_left.at<unsigned char>(i,0);
 		diff_r2l += s1 - (b1 * (s2/b2));
 	}
+	diff_l2r = std::abs(diff_l2r);
+	diff_r2l = std::abs(diff_r2l);
 
 	float diff = diff_l2r > diff_r2l ? diff_l2r : diff_r2l;
 //	std::cerr << diff << " > " << (2*nsd * sqrt(2.0/TEXCUT_BLOCK_SIZE)) << std::endl;

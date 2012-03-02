@@ -1,14 +1,20 @@
 #define USE_VIDEO_CAPTURE_OPT_PARSER
-#include "skl.h"
 #include "sklcv.h"
 
 opt_on(std::string, camera_setting, "", "-C","<FILE>","load camera conf parameters.");
 opt_on(std::string, input_file,"","-i","<FILE>","load video file");
-
-opt_on(std::string, output_file,"","-o","<FILE>","save video");
-
 opt_on(int,dev,0,"-d","<DEVICE_ID>","direct device id.");
-opt_on_bool(trackbar,"","create track bar with the window.");
+
+// params for background cut
+opt_on(float,thresh_bg,2,"","<FLOAT>","parameter thresh_bg");
+opt_on(float,thresh_fg,5,"","<FLOAT>","parameter thresh_fg");
+opt_on(float,sigma_KL,0.1,"","<FLOAT>","parameter sigma_KL");
+opt_on(float,paramK,5,"-K","<FLOAT>","parameter K");
+opt_on(float,sigma_z,10,"","<FLOAT>","parameter sigma_z");
+opt_on(float,learning_rate,0.2,"","<FLOAT>","parameter learning_rate");
+opt_on(int,bg_cluster_num,15,"","<INT>","parameter bg_cluster_num");
+opt_on(int,fg_cluster_num,5,"","<INT>","parameter fg_cluster_num");
+
 
 int main(int argc,char* argv[]){
 	skl::OptParser options;
@@ -50,38 +56,24 @@ int main(int argc,char* argv[]){
 		return EXIT_FAILURE;
 	}
 
+	cv::namedWindow("result",0);
+	cv::namedWindow("background",0);
 	cv::namedWindow("image",0);
-	int pos_frames;
-	if(trackbar && !input_file.empty()){
-		cv::createTrackbar("pos","image",&pos_frames, cam.get(skl::FRAME_COUNT)-1);
-	}
-	cv::Mat image;
+	cv::Mat image,result;
 
-	cv::VideoWriter writer;
-	if(!output_file.empty()){
-		cam >> image;
-		if(!writer.open(
-					output_file,
-					CV_FOURCC('D','V','I','X'),
-					cam.get(skl::FPS),
-					image.size(),
-					(cam.get(skl::MONOCROME)<=0))){
-			std::cerr << "WARNING: failed to open " << output_file << ".";
-		}
-		writer << image;
-	}
+	skl::BackgroundCut bgs_algo(thresh_bg,thresh_fg,sigma_KL,paramK,sigma_z,learning_rate,bg_cluster_num,fg_cluster_num);
+	cam >> image;
+	bgs_algo.background(image);
+
 
 	while('q'!=cv::waitKey(10)){
-		if(trackbar && !input_file.empty()){
-			int frame_id = cv::getTrackbarPos("pos","image");
-			cam.set(skl::POS_FRAMES,frame_id);
-		}
 		cam >> image;
 		if(image.empty()) break;
-		if(writer.isOpened()){
-			writer << image;
-		}
 		cv::imshow("image",image);
+		bgs_algo.compute(image,result);
+		cv::imshow("result",result);
+		cv::imshow("background",bgs_algo.background());
+//		bgs_algo.update(image);
 	}
 	cv::destroyWindow("image");
 

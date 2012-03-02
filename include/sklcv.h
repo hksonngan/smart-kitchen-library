@@ -11,6 +11,7 @@
 //#include "../OpenCV/include/RegressionStump_parallel.h"
 #include "../OpenCV/include/StaticRegionDetector.h"
 #include "../OpenCV/include/TexCut.h"
+#include "../OpenCV/include/BackgroundCut.h"
 #include "../OpenCV/include/TouchedRegionDetector.h"
 
 #include "../OpenCV/include/sklVideoCapture.h"

@@ -7,6 +7,9 @@
 opt_on(std::string, camera_setting, "", "-C","<FILE>","load camera conf parameters.");
 opt_on(std::string, input_file,"","-i","<FILE>","load video file");
 
+opt_on(std::string, output_dir,"","-o","<DIR>","direct directory for saving images");
+opt_on_bool(time_stamp,"-t","save images with time stamp filename.");
+
 int main(int argc,char* argv[]){
 	skl::OptParser options;
 	std::vector<std::string> args;
@@ -57,14 +60,25 @@ int main(int argc,char* argv[]){
 	std::vector<cv::Mat> images;
 
 
+	int frame_num = 0;
 	while('q'!=cv::waitKey(10)){
 		cam >> images;
-		if(!cam.grab()) break;
+		if(!cam.isOpened()) break;
 
 		for(size_t i=0;i<cam.size();i++){
 			ss << "image" << i;
 			cv::imshow(ss.str(),images[i]);
+			if(!output_dir.empty()){
+				if(time_stamp){
+					ss << "_" << skl::Time::now() << ".bmp";
+				}
+				else{
+					ss << "_" << std::setw(6) << std::setfill('0') << frame_num << ".bmp";
+				}
+				cv::imwrite(output_dir + "/" + ss.str(),images[i]);
+			}
 			ss.str("");
+			frame_num++;
 		}
 	}
 	cv::destroyAllWindows();

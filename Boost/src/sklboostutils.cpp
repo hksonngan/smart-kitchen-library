@@ -18,12 +18,13 @@ bool csv_parse(const std::string& filename, std::vector<std::vector<std::string>
 #endif
 		return false;
 	}
-	csv_parse(fin,csv_data);
+	bool result = csv_parse(fin,csv_data);
 	fin.close();
-	return true;
+	return result;
 }
 
-void csv_parse(std::istream& in, std::vector<std::vector<std::string> >* csv_data){
+bool csv_parse(std::istream& in, std::vector<std::vector<std::string> >* csv_data){
+	if(!in) return false;
 	csv_data->clear();
 	std::string buf;
 	typedef boost::escaped_list_separator<char> esc_sep;
@@ -38,4 +39,5 @@ void csv_parse(std::istream& in, std::vector<std::vector<std::string> >* csv_dat
 		}
 		csv_data->push_back(temp);
 	}
+	return true;
 }

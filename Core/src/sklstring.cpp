@@ -14,8 +14,7 @@ namespace skl{
 				break;
 			}
 		}
-
-		assert(begin < str.size());
+		if(begin == str.size()) return "";
 
 		for(;end>=0;end--){
 			if(isgraph(str[end])>0){

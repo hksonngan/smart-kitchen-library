@@ -599,7 +599,7 @@ namespace skl{
 	}
 
 
-	void edge_difference(const cv::Mat& src1, const cv::Mat& src2, cv::Mat& edge1, cv::Mat& edge2, double canny_thresh1, double canny_thresh2, int aperture_size, int dilate_size){
+	void edge_difference(const cv::Mat& src1, const cv::Mat& src2, cv::Mat& edge_diff_x,cv::Mat& edge_diff_y){
 		assert(src1.size()==src2.size());
 		cv::Mat gray1,gray2;
 		if(src1.channels()==1){
@@ -617,27 +617,28 @@ namespace skl{
 			cv::cvtColor(src2,gray2,CV_BGR2GRAY);
 		}
 
-		cv::Mat _edge1 = cv::Mat(src1.size(),CV_8UC1);
-		cv::Mat _edge2 = cv::Mat(src2.size(),CV_8UC1);
-		cv::Canny(gray1,_edge1, canny_thresh1, canny_thresh2, aperture_size);
-		cv::Canny(gray2,_edge2, canny_thresh1, canny_thresh2, aperture_size);
+		cv::Mat _edge1_x = cv::Mat(src1.size(),CV_16SC1);
+		cv::Mat _edge1_y = cv::Mat(src1.size(),CV_16SC1);
+		cv::Mat _edge2_x = cv::Mat(src2.size(),CV_16SC1);
+		cv::Mat _edge2_y = cv::Mat(src2.size(),CV_16SC1);
+		cv::Sobel(gray1,_edge1_x, CV_16SC1,1,0);
+		cv::Sobel(gray1,_edge1_y, CV_16SC1,0,1);
+		cv::Sobel(gray2,_edge2_x, CV_16SC1,1,0);
+		cv::Sobel(gray2,_edge2_y, CV_16SC1,0,1);
+
 #ifdef DEBUG_SKLUTILS
-		cv::namedWindow("edge1",0);
-		cv::namedWindow("edge2",0);
-		cv::imshow("edge1",_edge1);
-		cv::imshow("edge2",_edge2);
+		cv::namedWindow("edge1_x",0);
+		cv::namedWindow("edge2_x",0);
+		cv::imshow("edge1_x",_edge1_x);
+		cv::imshow("edge2_x",_edge2_x);
+		cv::namedWindow("edge1_y",0);
+		cv::namedWindow("edge2_y",0);
+		cv::imshow("edge1_y",_edge1_y);
+		cv::imshow("edge2_y",_edge2_y);
 #endif
 
-		cv::Size kernel_size(dilate_size,dilate_size);
-		cv::Mat dick_edge1 = cv::Mat(src1.size(),CV_8UC1);
-		cv::Mat dick_edge2 = cv::Mat(src2.size(),CV_8UC1);
-		cv::blur(_edge1,dick_edge1,kernel_size);
-		cv::threshold(dick_edge1,dick_edge1,0,255,CV_THRESH_BINARY);
-		cv::blur(_edge2,dick_edge2,kernel_size);
-		cv::threshold(dick_edge2,dick_edge2,0,255,CV_THRESH_BINARY);
-
-		edge1 = _edge1 - dick_edge2;
-		edge2 = _edge2 - dick_edge1;
+		edge_diff_x = cv::abs(_edge1_x) - cv::abs(_edge2_x);
+		edge_diff_y = cv::abs(_edge1_y) - cv::abs(_edge2_y);
 ///
 /*		cv::imwrite("src.png",src1);
 		cv::imwrite("fg_edge.png",edge1);

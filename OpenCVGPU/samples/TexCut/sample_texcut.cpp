@@ -9,7 +9,7 @@
 
 opt_on(std::string, camera_setting, "", "-C","<FILE>","load camera conf parameters.");
 opt_on(std::string, input_file,"","-i","<FILE>","load video file");
-
+opt_on(std::string, output_dir,"","-o","<DIR>","save image files");
 opt_on(float,alpha,1.5,"-a","<FLOAT>","set TexCut parameter alpha");
 opt_on(float,smoothing_term_weight,1.0,"-s","<FLOAT>","set TexCut parameter smoothing_term_weight");
 opt_on(float,thresh_tex_diff,0.4,"-t","<FLOAT>","set TexCut parameter thresh_tex_diff");
@@ -115,6 +115,12 @@ int main(int argc,char* argv[]){
 		swatch.start();
 		bgs_algo.compute(gpu_mat,result);
 		std::cerr << "GPU time: " << swatch.lap() << std::endl;
+		if(!output_dir.empty()){
+			ss << std::setw(6) << std::setfill('0') << frame;
+			cv::imwrite(output_dir + "/raw_" + ss.str() + ".bmp",mat);
+			cv::imwrite(output_dir + "/fg_mask_" + ss.str() + ".bmp",result);
+			ss.str("");
+		}
 
 		cv::imshow("result",result);
 	}

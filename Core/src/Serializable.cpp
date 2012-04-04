@@ -1,7 +1,7 @@
 ﻿/*!
  * @file Serializable.cpp
  * @author Atsushi HASHIMOTO
- * @date Last Change:2012/Jan/06.
+ * @date Last Change:2012/Apr/01.
  */
 #include "Serializable.h"
 #include <iostream>
@@ -30,6 +30,7 @@ Serializable::~Serializable(){
 	if(buf!=NULL){
 		// 何らかのバッファが存在するので、それらを開放する
 		free(buf);
+		buf = NULL;
 	}
 }
 

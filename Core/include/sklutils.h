@@ -11,5 +11,6 @@ namespace skl{
 #else
 #define printLocation() 
 #endif
+	void sleep(unsigned long msec);
 }
 #endif // __SKL_UTILS__

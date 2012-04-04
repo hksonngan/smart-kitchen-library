@@ -1,4 +1,14 @@
 ﻿#include "sklutils.h"
+/**** 環境依存 ****/
+/**** WIN32 ****/
+#ifdef _WIN32
+#define NOMINMAX
+#include <windows.h>
+/**** Linux ****/
+#elif __linux__
+#include <time.h>
+#endif
+/**** ifdef linux ****/
 
 namespace skl{
 	/*
@@ -21,5 +31,18 @@ namespace skl{
 		return sqrt(pow(gauss_rand()*sigma,2)+pow(gauss_rand()*sigma,2));
 	}
 
+	void sleep(unsigned long msec){
+		/**** WIN32 ****/
+#ifdef WIN32
+		// WIN側の動作確認はしてません。動作が確認できたらここを外してください。
+		Sleep(msec);
 
+		/**** Linux ****/
+#elif __linux__
+		struct timespec tc;
+		tc.tv_sec = msec/1000;
+		tc.tv_nsec = (msec%1000)*1000;// nano sec
+		nanosleep(&tc,NULL);
+#endif	/**** ifdef linux ****/
+	}
 }

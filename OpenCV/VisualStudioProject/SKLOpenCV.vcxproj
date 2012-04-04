@@ -1,51 +1,51 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
+<Project DefaultTargets='Build' ToolsVersion='4.0' xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
+  <ItemGroup Label='ProjectConfigurations'>
+    <ProjectConfiguration Include='Debug|Win32'>
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
+    <ProjectConfiguration Include='Release|Win32'>
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <PropertyGroup Label="Globals">
+  <PropertyGroup Label='Globals'>
     <ProjectGuid>{BD8BBD2D-9866-4D00-B86F-17F6FBC7E853}</ProjectGuid>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <Keyword>ManagedCProj</Keyword>
     <RootNamespace>SKLOpenCV</RootNamespace>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <Import Project='$(VCTargetsPath)\Microsoft.Cpp.Default.props'/>
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CLRSupport>true</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CLRSupport>true</CLRSupport>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
+  <Import Project='$(VCTargetsPath)\Microsoft.Cpp.props'/>
+  <ImportGroup Label='ExtensionSettings'>
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
+    <Import Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)'/>
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
+    <Import Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)'/>
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Label='UserMacros'/>
+  <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
@@ -58,7 +58,7 @@
       </AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <ItemDefinitionGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -71,31 +71,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
+    <Reference Include='System'/>
+    <Reference Include='System.Data'/>
+    <Reference Include='System.Xml'/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\BackgroundCut.h" />
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="Stdafx.h" />
-  </ItemGroup>
+    <ClInclude Include='..\include\BackgroundCut.h'/>
+    <ClInclude Include='resource.h'/>
+    <ClInclude Include='Stdafx.h'/>
+  <ClInclude Include='..\include\Labeling.h'/><ClInclude Include='..\include\RegionLabelingSimple.h'/><ClInclude Include='..\include\RegressionStump.h'/><ClInclude Include='..\include\RegressionStump_parallel.h'/><ClInclude Include='..\include\MotionHistory.h'/><ClInclude Include='..\include\HumanDetectorWorkspaceEnd.h'/><ClInclude Include='..\include\StaticRegionDetector.h'/><ClInclude Include='..\include\JointBoost.h'/><ClInclude Include='..\include\FilterMat2Mat.h'/><ClInclude Include='..\include\TexCut.h'/><ClInclude Include='..\include\BackgroundSubtractAlgorithm.h'/><ClInclude Include='..\include\cvtypes.h'/><ClInclude Include='..\include\VideoCaptureImageList.h'/><ClInclude Include='..\include\sklcvutils.h'/><ClInclude Include='..\include\VideoCaptureInterface.h'/><ClInclude Include='..\include\VideoCaptureDefault.h'/><ClInclude Include='..\include\sklVideoCapture.h'/><ClInclude Include='..\include\VideoCaptureOptParser.h'/><ClInclude Include='..\include\TouchedRegionDetector.h'/><ClInclude Include='..\include\VideoCaptureParams.h'/></ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\BackgroundCut.cpp" />
-    <ClCompile Include="AssemblyInfo.cpp" />
-    <ClCompile Include="Stdafx.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+    <ClCompile Include='..\src\BackgroundCut.cpp'/>
+    <ClCompile Include='AssemblyInfo.cpp'/>
+    <ClCompile Include='Stdafx.cpp'>
+      <PrecompiledHeader Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>Create</PrecompiledHeader>
+      <PrecompiledHeader Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>Create</PrecompiledHeader>
     </ClCompile>
+  <ClCompile Include='..\src\RegionLabelingSimple.cpp'/><ClCompile Include='..\src\StaticRegionDetector.cpp'/><ClCompile Include='..\src\MotionHistory.cpp'/><ClCompile Include='..\src\VideoCaptureImageList.cpp'/><ClCompile Include='..\src\VideoCaptureDefault.cpp'/><ClCompile Include='..\src\sklcvutils.cpp'/><ClCompile Include='..\src\sklVideoCapture.cpp'/><ClCompile Include='..\src\TexCut.cpp'/><ClCompile Include='..\src\VideoCaptureParams.cpp'/><ClCompile Include='..\src\VideoCaptureInterface.cpp'/><ClCompile Include='..\src\TouchedRegionDetector.cpp'/><ClCompile Include='..\src\HumanDetectorWorkspaceEnd.cpp'/></ItemGroup>
+  <ItemGroup>
+    <None Include='app.ico'/>
+    <None Include='ReadMe.txt'/>
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.ico" />
-    <None Include="ReadMe.txt" />
+    <ResourceCompile Include='app.rc'/>
   </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="app.rc" />
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
+  <Import Project='$(VCTargetsPath)\Microsoft.Cpp.targets'/>
+  <ImportGroup Label='ExtensionTargets'>
   </ImportGroup>
 </Project>

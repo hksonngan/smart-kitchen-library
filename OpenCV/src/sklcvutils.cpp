@@ -6,10 +6,6 @@
 in = in > 255 ? 255 : in;\
 out=in;
 
-#ifdef DEBUG
-#define DEBUG_SKLUTILS
-#endif
-
 cv::Rect operator&(const cv::Rect& left, const cv::Rect& right){
 	cv::Rect rect(left.x,left.y,left.x+left.width,left.y+left.height);
 	rect.x = rect.x > right.x ? rect.x : right.x;
@@ -575,27 +571,24 @@ namespace skl{
 	{
 		int i,j;
 
-		// repeat the edge at cv::Rect(2,2,sx-4,sy-4);
+		// black edges:
 		i=3*sx*w-1;
 		j=3*sx*(sy-1)-1;
-		int idx;
-		int offset = 3*sx*w;
-		int inv = sx*sy*w-1;
-		for(j=0,idx=0;j<3;j++){
-			for(i=0;i<sx*w;i++,idx++){
-				dest[idx] = dest[offset + i];
-				dest[inv - idx] = dest[inv - ( offset + i )];
-			}
+		while (i>=0) {
+			dest[i--]=0;
+			dest[j--]=0;
 		}
 
-		inv = sx * w - 1;
-		for(j=0;j<sy;j++){
-			offset = j * sx * w;
-			for(i=0;i<3 * w;i++){
-				dest[offset + i] = dest[offset + 3 * w + i%w];
-				dest[offset + inv - i] = dest[offset + inv - (3 * w + i%w)];
+		i=sx*(sy-1)*3-1+w*3;
+		while (i>sx) {
+			j=6*w;
+			while (j>0) {
+				dest[i--]=0;
+				j--;
 			}
+			i-=(sx-2*w)*3;
 		}
+
 	}
 
 

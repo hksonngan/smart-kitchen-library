@@ -1,10 +1,6 @@
-default: core opencv
+default: core opencv flycapture
 
-debug: cored opencvd
-
-all: core opencv flycapture
-
-debug_all: cored opencvd flycaptured
+debug: cored opencvd flycaptured
 
 core:
 	cd Core;$(MAKE)

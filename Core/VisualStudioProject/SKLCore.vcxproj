@@ -1,87 +1,87 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
+<Project DefaultTargets='Build' ToolsVersion='4.0' xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
+  <ItemGroup Label='ProjectConfigurations'>
+    <ProjectConfiguration Include='Debug|Win32'>
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
+    <ProjectConfiguration Include='Debug|x64'>
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
+    <ProjectConfiguration Include='Release|Win32'>
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
+    <ProjectConfiguration Include='Release|x64'>
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <PropertyGroup Label="Globals">
+  <PropertyGroup Label='Globals'>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{01F247BF-A79D-4150-8756-1D74EBB378CC}</ProjectGuid>
     <RootNamespace>SKLCore</RootNamespace>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+  <Import Project='$(VCTargetsPath)\Microsoft.Cpp.Default.props'/>
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
+  <Import Project='$(VCTargetsPath)\Microsoft.Cpp.props'/>
+  <ImportGroup Label='ExtensionSettings'>
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
+    <Import Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)'/>
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>
+    <Import Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)'/>
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
+    <Import Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)'/>
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>
+    <Import Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)'/>
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label='UserMacros'/>
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">../../../lib/$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">../../../lib/$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Configuration)\</IntDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../../../lib/$(Configuration)\</OutDir>
-    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">../../../lib/$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Configuration)\</IntDir>
-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" />
-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|x64'">AllRules.ruleset</CodeAnalysisRuleSet>
-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
-    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|x64'" />
+    <OutDir Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>../../../lib/$(Configuration)\</OutDir>
+    <OutDir Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>../../../lib/$(Configuration)\</OutDir>
+    <IntDir Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>$(Configuration)\</IntDir>
+    <IntDir Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>$(Configuration)\</IntDir>
+    <OutDir Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>../../../lib/$(Configuration)\</OutDir>
+    <OutDir Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>../../../lib/$(Configuration)\</OutDir>
+    <IntDir Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>$(Configuration)\</IntDir>
+    <IntDir Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>$(Configuration)\</IntDir>
+    <CodeAnalysisRuleSet Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'/>
+    <CodeAnalysisRules Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'/>
+    <CodeAnalysisRuleAssemblies Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'/>
+    <CodeAnalysisRuleAssemblies Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'/>
+    <CodeAnalysisRuleSet Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'/>
+    <CodeAnalysisRules Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'/>
+    <CodeAnalysisRuleAssemblies Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'/>
+    <CodeAnalysisRuleAssemblies Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'/>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
     <ClCompile>
       <AdditionalIncludeDirectories>../include;../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
@@ -95,7 +95,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>
     <ClCompile>
       <AdditionalIncludeDirectories>../include;../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Disabled</Optimization>
@@ -108,7 +108,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <ItemDefinitionGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <AdditionalIncludeDirectories>../include;../../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -122,7 +122,7 @@
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>
     <ClCompile>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <AdditionalIncludeDirectories>../include;../../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -137,40 +137,37 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="..\src\Makefile" />
-    <None Include="..\include\graph_instances.inc" />
-    <None Include="ReadMe.txt" />
-    <ClCompile Include="..\src\graph.cpp" />
-    <ClCompile Include="..\src\OptParser.cpp" />
-    <ClCompile Include="..\src\sklstring.cpp" />
-    <ClCompile Include="..\src\sklutils.cpp" />
-    <ClCompile Include="..\src\maxflow.cpp" />
-    <ClCompile Include="..\src\TimeFormatException.cpp" />
-    <ClCompile Include="..\src\TimeFormatterDefault.cpp" />
-    <ClCompile Include="..\src\TimeFormatter.cpp" />
-    <ClCompile Include="..\src\TimeInterval.cpp" />
-    <ClCompile Include="..\src\sklTime.cpp" />
-    <ClCompile Include="..\src\StopWatch.cpp" />
-    <ClCompile Include="..\src\Serializable.cpp" />
-    <ClInclude Include="..\include\block.h" />
-    <ClInclude Include="..\include\Comparable.h" />
-    <ClInclude Include="..\include\graph.h" />
-    <ClInclude Include="..\include\graph_instances.h" />
-    <ClInclude Include="..\include\OptParser.h" />
-    <ClInclude Include="..\include\Printable.h" />
-    <ClInclude Include="..\include\sklstring.h" />
-    <ClInclude Include="..\include\sklutils.h" />
-    <ClInclude Include="..\include\StringSplitter.h" />
-    <ClInclude Include="..\include\TimeFormatException.h" />
-    <ClInclude Include="..\include\TimeFormatterDefault.h" />
-    <ClInclude Include="..\include\TimeFormatter.h" />
-    <ClInclude Include="..\include\Serializable.h" />
-    <ClInclude Include="..\include\TimeInterval.h" />
-    <ClInclude Include="..\include\sklTime.h" />
-    <ClInclude Include="..\include\StopWatch.h" />
-    <ClInclude Include="..\include\Filter.h" />
-  </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
+    <None Include='..\src\Makefile'/>
+    <None Include='..\include\graph_instances.inc'/>
+    <None Include='ReadMe.txt'/>
+    <ClCompile Include='..\src\graph.cpp'/>
+    <ClCompile Include='..\src\OptParser.cpp'/>
+    <ClCompile Include='..\src\sklstring.cpp'/>
+    <ClCompile Include='..\src\sklutils.cpp'/>
+    <ClCompile Include='..\src\maxflow.cpp'/>
+    <ClCompile Include='..\src\TimeFormatException.cpp'/>
+    <ClCompile Include='..\src\TimeFormatterDefault.cpp'/>
+    <ClCompile Include='..\src\TimeFormatter.cpp'/>
+    <ClCompile Include='..\src\TimeInterval.cpp'/>
+    <ClCompile Include='..\src\sklTime.cpp'/>
+    <ClCompile Include='..\src\StopWatch.cpp'/>
+    <ClCompile Include='..\src\Serializable.cpp'/>
+    <ClInclude Include='..\include\block.h'/>
+    <ClInclude Include='..\include\Comparable.h'/>
+    <ClInclude Include='..\include\graph.h'/>
+    <ClInclude Include='..\include\OptParser.h'/>
+    <ClInclude Include='..\include\Printable.h'/>
+    <ClInclude Include='..\include\sklstring.h'/>
+    <ClInclude Include='..\include\sklutils.h'/>
+    <ClInclude Include='..\include\TimeFormatException.h'/>
+    <ClInclude Include='..\include\TimeFormatterDefault.h'/>
+    <ClInclude Include='..\include\TimeFormatter.h'/>
+    <ClInclude Include='..\include\Serializable.h'/>
+    <ClInclude Include='..\include\sklTime.h'/>
+    <ClInclude Include='..\include\StopWatch.h'/>
+    <ClInclude Include='..\include\Filter.h'/>
+  <ClInclude Include='..\include\graph_instances.inc'/><ClInclude Include='..\include\TimeInterval.h'/></ItemGroup>
+  <Import Project='$(VCTargetsPath)\Microsoft.Cpp.targets'/>
+  <ImportGroup Label='ExtensionTargets'>
   </ImportGroup>
 </Project>

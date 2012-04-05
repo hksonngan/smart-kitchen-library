@@ -97,6 +97,15 @@ doc.each_element("/Project/ItemGroup"){|node|
 			attr = {"Include" => file}
 			node.add_element("ClCompile",attr)
 		end
+		# exist_file_listに残っているものがあれば、それは消去されたクラスなのでProjectから削除
+		for delete_file in exist_file_list do
+			STDERR.puts delete_file
+			tar = node.elements["./ClCompile[@Include='#{delete_file}']"]
+			STDERR.puts tar
+			if tar != nil then
+				node.delete(tar)
+			end
+		end
 	elsif node.elements["./ClInclude"]!=nil then
 		# ヘッダファイルを格納するItemGroup
 		exist_file_list = []
@@ -113,6 +122,12 @@ doc.each_element("/Project/ItemGroup"){|node|
 			end
 			attr = {"Include" => file}
 			node.add_element("ClInclude",attr)
+		end
+		for delete_file in exist_file_list do
+			tar = node.elements["./ClInclude[@Include='#{delete_file}']"]
+			if tar != nil then
+				node.delete(tar)
+			end
 		end
 	end
 }

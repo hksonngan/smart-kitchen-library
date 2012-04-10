@@ -13,6 +13,14 @@
 #include "../../include/shared.h"
 #include "shared_funcs.cu"
 
+namespace cv{
+	namespace gpu{
+#ifndef cv::gpu::PtrStepb
+	typedef PtrStep PtrStepb;
+#endif
+	}
+}
+
 // functions using kernel functions
 namespace skl{
 	namespace gpu{

@@ -9,6 +9,9 @@
 #include <cassert>
 #include "shared.h"
 
+#ifdef _WIN32
+#define log2f(x) (logf(x)*1.4426950408889634f)
+#endif
 using namespace skl;
 using namespace skl::gpu;
 
@@ -20,8 +23,8 @@ dim3 skl::gpu::maxBlockSize(int* shared_mem_size, float byte_per_thread,float by
 	if(near_square){
 		float max_block_area_log2 = log2f(deviceProp.maxThreadsPerBlock);
 		assert(ceil(max_block_area_log2)==floor(max_block_area_log2));
-		block[0] = std::pow(2,static_cast<int>(max_block_area_log2+1)/2);
-		block[1] = std::pow(2,static_cast<int>(max_block_area_log2)/2);
+		block[0] = std::pow(2.f,static_cast<int>(max_block_area_log2+1)/2);
+		block[1] = std::pow(2.f,static_cast<int>(max_block_area_log2)/2);
 	}
 	else{
 		block[0] = deviceProp.maxThreadsPerBlock;

@@ -92,7 +92,7 @@ namespace skl{
 
 ///////////////////////////////////////////////////////////
 // TimeFormatter
-			void parseString(const std::string& str) throw (TimeFormatException);
+			void parseString(const std::string& strxx) throw (TimeFormatException);
 			std::string toString()const;
 			void parseString(const std::string& str,TimeFormatter* timeformatter) throw (TimeFormatException);	// 指定したTimeFormatter型で自分のオブジェクトに変換する
 			std::string toString(TimeFormatter* timeformatter)const;	// 指定したTimeFormatter型で自分のオブジェクトをStringに変換する

@@ -320,8 +320,13 @@ bool gpu::TexCut::compute(const cv::gpu::GpuMat& _src, cv::gpu::GpuMat& dest,cv:
 	// start calculations which do not use sobel edges
 	cv::gpu::Stream stream_exposure,stream_data_terms,stream_smoothing_terms;
 	for(size_t c = 0; c < channels; c++){
+#ifdef __linux__ 
 		cv::gpu::Sobel(src[c], sobel_x[c], CV_32S, 1, 0, buf_sobel_x, 3,1.0, cv::BORDER_DEFAULT,-1,stream_data_terms);
 		cv::gpu::Sobel(src[c], sobel_y[c], CV_32S, 0, 1, buf_sobel_y, 3, 1.0, cv::BORDER_DEFAULT,-1,stream_data_terms);
+#else
+		cv::gpu::Sobel(src[c], sobel_x[c], CV_32S, 1, 0, 3,1.0,cv::BORDER_DEFAULT,-1,stream_data_terms);
+		cv::gpu::Sobel(src[c], sobel_y[c], CV_32S, 0, 1, 3,1.0,cv::BORDER_DEFAULT,-1,stream_data_terms);
+#endif
 	}
 	stream_exposure.enqueueMemSet(fg_is_over_exposure,cv::Scalar(255));
 	stream_exposure.enqueueMemSet(fg_is_under_exposure,cv::Scalar(255));

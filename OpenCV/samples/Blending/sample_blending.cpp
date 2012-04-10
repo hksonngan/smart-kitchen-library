@@ -26,9 +26,9 @@ int main(int argc, char* argv[]){
 		readAsColor = 0;
 	}
 
-	cv::Mat src1 = cv::imread(argv[1],readAsColor);
-	cv::Mat src2 = cv::imread(argv[2],readAsColor);
-	cv::Mat mask = cv::imread(argv[3],0);
+	cv::Mat src1 = cv::imread(args[1],readAsColor);
+	cv::Mat src2 = cv::imread(args[2],readAsColor);
+	cv::Mat mask = cv::imread(args[3],0);
 
 	if(float_mask){
 		std::cerr << "flag 'float mask' on!" << std::endl;

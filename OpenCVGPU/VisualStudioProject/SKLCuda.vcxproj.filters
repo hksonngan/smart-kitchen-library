@@ -18,25 +18,11 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\sklFlyCapture.cpp">
+    <CudaCompile Include="..\src\cuda\shared_funcs.cu">
       <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sklFlyCapture2_utils.cpp">
+    </CudaCompile>
+    <CudaCompile Include="..\src\cuda\TexCut.cu">
       <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\VideoCaptureFlyCapture.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\include\sklFlyCapture.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sklFlyCapture2_utils.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\VideoCaptureFlyCapture.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
+    </CudaCompile>
   </ItemGroup>
 </Project>

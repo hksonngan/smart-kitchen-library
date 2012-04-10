@@ -158,7 +158,8 @@ generate_atomic_parser(TYPE,VAR,SHORT_FORM, EXPRESSION, EXPLANATION);\
 #define opt_on_container(CONTAINER_TYPE, ELEM_TYPE, VAR, SHORT_FORM, EXPRESSION, EXPLANATION, DELIMINATOR, LENGTH)\
 generate_atomic_parser_container(CONTAINER_TYPE, ELEM_TYPE,VAR,SHORT_FORM, EXPRESSION, EXPLANATION, DELIMINATOR, LENGTH);\
 
-#ifdef __linux__
+//#ifdef __linux__
+
 #define opt_parse(PARSER,ARGC, ARGV, ARGS)\
 skl::OptParserAtomInterface* __opt_parser_func_list__ = skl::OptParserAtomInterface::atom_top;\
 while(__opt_parser_func_list__!=NULL){\
@@ -171,7 +172,7 @@ while(__opt_parser_func_list__!=NULL){\
 	__opt_parser_func_list__->get(& PARSER);\
 	__opt_parser_func_list__ = __opt_parser_func_list__->next;\
 }
-#elif _WIN32
+/*#elif _WIN32
 #define opt_parse(PARSER,ARGC, ARGV, ARGS)\
 std::vector<std::string> __SKL_OPT_PARSER_ARGV__(ARGC);\
 for(int i = 0; i < ARGC; i++){\
@@ -191,7 +192,7 @@ while(__opt_parser_func_list__!=NULL){\
 	__opt_parser_func_list__ = __opt_parser_func_list__->next;\
 }
 #endif
-
+*/
 
 #define generate_atomic_parser(TYPE,VAR, SHORT_FORM, EXPRESSION, EXPLANATION)\
 skl::OptParserAtom<TYPE> __opt_parser_atom_##VAR(SHORT_FORM, #VAR, EXPRESSION, EXPLANATION, &VAR)

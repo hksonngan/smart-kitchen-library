@@ -2,7 +2,7 @@
  * @file BackgroundCut.h
  * @author a_hasimoto
  * @date Date Created: 2012/Feb/13
- * @date Last Change:2012/Feb/15.
+ * @date Last Change:2012/Apr/30.
  */
 #ifndef __SKL_BACKGROUND_CUT_H__
 #define __SKL_BACKGROUND_CUT_H__

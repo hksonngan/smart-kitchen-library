@@ -2,7 +2,7 @@
  * @file TexCut.cu
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change: 2012/Feb/27.
+ * @date Last Change: 2012/Apr/30.
  */
 
 #include <cassert>
@@ -15,8 +15,10 @@
 
 namespace cv{
 	namespace gpu{
-#ifndef cv::gpu::PtrStepb
+#if CV_MAJOR_VERSION > 1
+#if CV_MINOR_VERSION < 4
 	typedef PtrStep PtrStepb;
+#endif
 #endif
 	}
 }

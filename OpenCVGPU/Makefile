@@ -1,8 +1,10 @@
+VSPROJ = VisualStudioProject/SKLOpenCVGPU.vcxproj
+
 all:
 	cd src/cuda;$(MAKE)
 	cd src;$(MAKE)
 	cp src/libskl_opencvgpu.a ../lib
-#	cd VisualStudioProject; ./generate_vcproj.rb > SKLOpenCV.vcproj
+	ruby ../support/VSProjectFileMaintainer.rb -i $(VSPROJ) -s src -h include > temp.proj;mv temp.proj $(VSPROJ)
 
 .PHONY: clean debug
 

@@ -1,4 +1,4 @@
-VSPROJ = VisualStudioProject/SKLOpenCV.vcxproj
+VSPROJ = VisualStudioProject/SKLBoost.vcxproj
 
 all:
 	cd src;$(MAKE)

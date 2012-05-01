@@ -1,80 +1,80 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug|Win32">
+<Project DefaultTargets='Build' ToolsVersion='4.0' xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
+  <ItemGroup Label='ProjectConfigurations'>
+    <ProjectConfiguration Include='Debug|Win32'>
       <Configuration>Debug</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug|x64">
+    <ProjectConfiguration Include='Debug|x64'>
       <Configuration>Debug</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|Win32">
+    <ProjectConfiguration Include='Release|Win32'>
       <Configuration>Release</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
-    <ProjectConfiguration Include="Release|x64">
+    <ProjectConfiguration Include='Release|x64'>
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <PropertyGroup Label="Globals">
+  <PropertyGroup Label='Globals'>
     <ProjectGuid>{7B924656-BC04-4D71-A7AC-56C7EF87B8B4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SKLBoost</RootNamespace>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+  <Import Project='$(VCTargetsPath)\Microsoft.Cpp.Default.props'/>
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings">
+  <Import Project='$(VCTargetsPath)\Microsoft.Cpp.props'/>
+  <ImportGroup Label='ExtensionSettings'>
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
+    <Import Label='LocalAppDataPlatform' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>
+    <Import Label='LocalAppDataPlatform' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
   </ImportGroup>
-  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
+    <Import Label='LocalAppDataPlatform' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>
+    <Import Label='LocalAppDataPlatform' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
   </ImportGroup>
-  <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <PropertyGroup Label='UserMacros'/>
+  <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
     <OutDir>..\..\lib\$(Configuration)\</OutDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>
     <OutDir>..\..\lib\$(Configuration)\</OutDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
     <OutDir>..\..\lib\$(Configuration)\</OutDir>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>
     <OutDir>..\..\lib\$(Configuration)\</OutDir>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+  <ItemDefinitionGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -88,7 +88,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -102,7 +102,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+  <ItemDefinitionGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
@@ -120,7 +120,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
@@ -139,15 +139,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <None Include="ReadMe.txt" />
+    <None Include='ReadMe.txt'/>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\sklboostutils.cpp" />
+    <ClCompile Include='..\src\sklboostutils.cpp'/>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\sklboostutils.h" />
+    <ClInclude Include='..\include\sklboostutils.h'/>
   </ItemGroup>
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
+  <Import Project='$(VCTargetsPath)\Microsoft.Cpp.targets'/>
+  <ImportGroup Label='ExtensionTargets'>
   </ImportGroup>
 </Project>

@@ -78,7 +78,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
     <ClCompile>
-      <AdditionalIncludeDirectories>../include;../../include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\include;</AdditionalIncludeDirectories>
       <PrecompiledHeader>
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
@@ -113,7 +113,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>../include;../../include;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\include;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

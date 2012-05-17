@@ -2,7 +2,7 @@
  * @file TexCut.cu
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change: 2012/Apr/30.
+ * @date Last Change: 2012/May/11.
  */
 
 #include <cassert>
@@ -37,8 +37,8 @@ namespace skl{
 
 #define inSquareSeqIdx _SeqIdx( (threadIdx.x%TEXCUT_BLOCK_SIZE), (threadIdx.y%TEXCUT_BLOCK_SIZE), TEXCUT_BLOCK_SIZE)
 
-		__constant__ float alpha;
-		__constant__ float smoothing_term_weight;
+		__device__ __constant__ float alpha;
+		__device__ __constant__ float smoothing_term_weight;
 		extern __shared__ unsigned char smem[];
 		
 		inline __device__ float normalize(float val, float std_dev, float mean){
@@ -306,8 +306,15 @@ namespace skl{
 			int sharedMemSize;
 			dim3 block = maxBlockSize(&sharedMemSize,2 * sizeof(int)* TEXCUT_BLOCK_SIZE,2 * sizeof(int)* TEXCUT_BLOCK_SIZE,0,0,true,dev);
 			// sterm is transposed
-			assert(sterm.rows%32==0);
-			assert(sterm.cols%32==0);
+			while(sterm.rows%block.x!=0){
+				block.x/=2;
+			}
+			assert(block.x>0);
+			while(sterm.cols%block.y!=0){
+				block.y/=2;
+			}
+			assert(block.y>0);
+			std::cerr << "block_size: " << block.x << ", " << block.y << std::endl;
 			dim3 grid(divUp(sterm.rows,block.x),divUp(sterm.cols,block.y) );
 //			std::cerr << "calcSmoothingTermX: " << sharedMemSize << std::endl;
 //			std::cerr << block.x << ", " << block.y << ", " << block.z << std::endl;
@@ -379,8 +386,16 @@ namespace skl{
 			int sharedMemSize;
 			dim3 block = maxBlockSize(&sharedMemSize,2 * sizeof(int)* TEXCUT_BLOCK_SIZE,0,2 * sizeof(int)* TEXCUT_BLOCK_SIZE,0,true,dev);
 			// sterm is transposed
-			assert(sterm.rows%32==0);
-			assert(sterm.cols%32==0);
+			while(sterm.rows%block.y!=0){
+				block.y/=2;
+			}
+			assert(block.y>0);
+			while(sterm.cols%block.x!=0){
+				block.x/=2;
+			}
+			assert(block.x>0);
+			std::cerr << "block_size: " << block.x << ", " << block.y << std::endl;
+
 			dim3 grid(divUp(sterm.cols,block.x),divUp(sterm.rows,block.y) );
 
 			calcSmoothingTermY_kernel<<<grid,block,sharedMemSize,stream>>>(

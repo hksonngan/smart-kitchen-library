@@ -33,7 +33,7 @@ empty:=
 space:= $(empty) $(empty)
 OPENCVVER	= $(subst $(piriod),$(space),$(shell pkg-config --modversion opencv))
 INC += `pkg-config --cflags opencv`
-LIBS_OPT += `pkg-config --libs opencv`
+LIBS_OPT += `pkg-config --libs opencv` -ltbb
 
 CFLAGS += -DCV_MAJOR_VERSION=$(word 1,$(OPENCVVER))
 CFLAGS += -DCV_MINOR_VERSION=$(word 2,$(OPENCVVER))
@@ -41,9 +41,9 @@ CFLAGS += -DHAVE_TBB
 CFLAGS_D += -DCV_MAJOR_VERSION=$(word 1,$(OPENCVVER))
 CFLAGS_D += -DCV_MINOR_VERSION=$(word 2,$(OPENCVVER))
 
-#options for OpenCV gpu module
-LIBS += -lopencv_gpu
-LIBS_DEBUG += -lopencv_gpu
+#options for cuda
+LIBS_OPT += -L/usr/local/cuda/lib64 -lcudart
+
 
 # FlyCaptureの読み込み
 INC += -I/usr/include/flycapture/

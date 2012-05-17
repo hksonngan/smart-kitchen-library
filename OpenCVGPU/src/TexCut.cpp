@@ -2,7 +2,7 @@
  * @file TexCut.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change: 2012/Feb/27.
+ * @date Last Change: 2012/May/11.
  */
 #include "TexCut.h"
 #include "skl.h"

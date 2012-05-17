@@ -1,6 +1,6 @@
 # @file Makefile for sample_video_capture
 # @author a_hasimoto
-OBJNAME = sample_video_capture_gpu
+OBJNAME = sample_texcut
 
 OPT = 
 
@@ -19,8 +19,8 @@ CFLAGS_D = -Wall
 # skl用の設定
 PATH_TO_SKL_ROOT = ../../../
 BINDIR = ${PATH_TO_SKL_ROOT}/bin/
-ADDITIONAL_SKL_MODULE = OpenCVGPU FlyCapture OpenCV Core
-ADDITIONAL_SKL_MODULEs = opencvgpu flycapture opencv core
+ADDITIONAL_SKL_MODULE = FlyCapture OpenCV Core
+ADDITIONAL_SKL_MODULEs = flycapture opencv core
 SKL_LIBDIR = ${PATH_TO_SKL_ROOT}/lib
 INC += -I${PATH_TO_SKL_ROOT}include
 LIBS += -L${SKL_LIBDIR} ${ADDITIONAL_SKL_MODULEs:%=-lskl_%}
@@ -41,9 +41,13 @@ CFLAGS += -DHAVE_TBB
 CFLAGS_D += -DCV_MAJOR_VERSION=$(word 1,$(OPENCVVER))
 CFLAGS_D += -DCV_MINOR_VERSION=$(word 2,$(OPENCVVER))
 
-#options for OpenCV gpu module
-#LIBS += -lopencv_gpu
-#LIBS_DEBUG += -lopencv_gpu
+
+
+# FlyCaptureの読み込み
+INC += -I/usr/include/flycapture/
+LIBS += -lflycapture
+LIBS_DEBUG += -lflycapture
+
 
 
 .SUFFIXES:.cpp

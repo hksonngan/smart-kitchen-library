@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion='4.0' DefaultTargets='Build' xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
+<Project DefaultTargets='Build' ToolsVersion='4.0' xmlns='http://schemas.microsoft.com/developer/msbuild/2003'>
   <ItemGroup Label='ProjectConfigurations'>
     <ProjectConfiguration Include='Debug|Win32'>
       <Configuration>Debug</Configuration>
@@ -24,23 +24,23 @@
     <RootNamespace>SKLOpenCVGPU</RootNamespace>
   </PropertyGroup>
   <Import Project='$(VCTargetsPath)\Microsoft.Cpp.Default.props'/>
-  <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;' Label='Configuration'>
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;' Label='Configuration'>
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;' Label='Configuration'>
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;' Label='Configuration'>
+  <PropertyGroup Label='Configuration' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -50,17 +50,17 @@
   <ImportGroup Label='ExtensionSettings'>
     <Import Project='$(VCTargetsPath)\BuildCustomizations\CUDA 4.1.props'/>
   </ImportGroup>
-  <ImportGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;' Label='PropertySheets'>
-    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
+    <Import Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Label='LocalAppDataPlatform' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)'/>
   </ImportGroup>
-  <ImportGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;' Label='PropertySheets'>
-    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;'>
+    <Import Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Label='LocalAppDataPlatform' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)'/>
   </ImportGroup>
-  <ImportGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;' Label='PropertySheets'>
-    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;'>
+    <Import Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Label='LocalAppDataPlatform' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)'/>
   </ImportGroup>
-  <ImportGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;' Label='PropertySheets'>
-    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
+  <ImportGroup Label='PropertySheets' Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;'>
+    <Import Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Label='LocalAppDataPlatform' Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)'/>
   </ImportGroup>
   <PropertyGroup Label='UserMacros'/>
   <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>

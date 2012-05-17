@@ -42,7 +42,7 @@ empty:=
 space:= $(empty) $(empty)
 OPENCVVER	= $(subst $(piriod),$(space),$(shell pkg-config --modversion opencv))
 INC += `pkg-config --cflags opencv`
-LIBS_OPT += `pkg-config --libs opencv`
+LIBS_OPT += `pkg-config --libs opencv` -ltbb
 
 CFLAGS += -DCV_MAJOR_VERSION=$(word 1,$(OPENCVVER))
 CFLAGS += -DCV_MINOR_VERSION=$(word 2,$(OPENCVVER))

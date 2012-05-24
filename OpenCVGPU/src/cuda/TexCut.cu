@@ -2,7 +2,7 @@
  * @file TexCut.cu
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change: 2012/May/11.
+ * @date Last Change: 2012/May/24.
  */
 
 #include <cassert>
@@ -477,7 +477,7 @@ namespace skl{
 
 
 			float tex_int = normalize(
-					sqrt(max(fg_ti,bg_ti))/TEXCUT_BLOCK_SIZE,SQRT3 * noise_std_dev,0.f);
+					sqrt(max(fg_ti,bg_ti))/TEXCUT_BLOCK_SIZE,2 * SQRT3 * noise_std_dev,0.f);
 
 			float gh = max(fg_gradient_heterogenuity.ptr(gidx.y)[gidx.x],bg_gradient_heterogenuity.ptr(gidx.y)[gidx.x]);
 			tex_int = exp((gh * tex_int)-1.f);

@@ -84,7 +84,14 @@ void TexCut::compute(const cv::Mat& _src,const cv::Mat& mask,cv::Mat& dest){
 			data_term,
 			smoothing_term_x,
 			smoothing_term_y);
-
+/*	cv::Mat temp;
+	data_term.convertTo(temp,CV_8UC1,255.0/QUANTIZATION_LEVEL);
+	cv::imwrite("data_term_with_gh.png",temp);
+	smoothing_term_x.convertTo(temp,CV_8UC1,128.0/QUANTIZATION_LEVEL);
+	cv::imwrite("smoothing_term_x_with_gh.png",temp);
+	smoothing_term_y.convertTo(temp,CV_8UC1,128.0/QUANTIZATION_LEVEL);
+	cv::imwrite("smoothing_term_y_with_gh.png",temp);
+*/	
 	/*int flow = */calcGraphCut(data_term,smoothing_term_x,smoothing_term_y);
 
 	setResult(_src,dest);
@@ -298,9 +305,11 @@ void TexCut::calcEdgeCapacity(
 	cv::imshow("tex_int",tex_int);
 	cv::imshow("gradient_heterogenuity",gradient_heterogenuity);
 //	cv::waitKey(-1);
+/*	cv::Mat temp;
+	tex_int.convertTo(temp,CV_8UC1,255);
+	cv::imwrite("tex_int_with_gh.png",temp);
+*/
 #endif
-
-
 }
 
 int TexCut::calcGraphCut(const cv::Mat& data_term,const cv::Mat& smoothing_term_x, const cv::Mat& smoothing_term_y){
@@ -532,7 +541,7 @@ void ParallelCalcEdgeCapacity::calcDataTerm(
 	*tex_int = auto_cor_src > auto_cor_bg ? auto_cor_src : auto_cor_bg;
 	*tex_int = sqrt(*tex_int/square_size);
 	*tex_int = static_cast<float>(
-		normalize(*tex_int,sqrt(3.0f) * nsd));
+		normalize(*tex_int,2*sqrt(3.0f) * nsd));
 
 	// calc gradient heterogenuity
 	float grad_hetero = calcGradHetero(sort_tar_x);
@@ -555,6 +564,7 @@ void ParallelCalcEdgeCapacity::calcDataTerm(
 	float normalized_correlation_dist = 1.0f - (2.0f * cross_cor)/auto_cor;
 	assert(0 <= normalized_correlation_dist && normalized_correlation_dist <= 1.0);
 	*tex_int = exp((grad_hetero * *tex_int) - 1.0f);
+//	*tex_int = exp(*tex_int -1.0f);
 //	*tex_int = grad_hetero * *tex_int;
 	*tex_diff = (thresh_tex_diff + *tex_int * ( normalized_correlation_dist - thresh_tex_diff )) / (2 * thresh_tex_diff);
 /*

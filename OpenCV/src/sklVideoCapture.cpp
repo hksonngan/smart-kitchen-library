@@ -2,7 +2,7 @@
  * @file VideoCapture.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/12
- * @date Last Change: 2012/Jan/18.
+ * @date Last Change: 2012/May/25.
  */
 #include "sklVideoCapture.h"
 #include "VideoCaptureDefault.h"
@@ -97,6 +97,13 @@ bool VideoCapture::push_back(const std::string& filename){
 
 	return true;
 }
+bool VideoCapture::push_back(const std::string& filename, cv::Ptr<_VideoCaptureInterface> cam){
+	if(!cam->open(filename)){
+		return false;
+	}
+	cam_interface.push_back(cam);
+	return true;
+}
 
 bool VideoCapture::push_back(int device){
 	cv::Ptr<_VideoCaptureInterface> video_capture = new VideoCaptureDefault();
@@ -106,6 +113,14 @@ bool VideoCapture::push_back(int device){
 	cam_interface.push_back(video_capture);
 	return true;
 }
+bool VideoCapture::push_back(int device, cv::Ptr<_VideoCaptureInterface> cam){
+	if(!cam->open(device)){
+		return false;
+	}
+	cam_interface.push_back(cam);
+	return true;
+}
+
 
 class VideoCapture_parallel_retrieve{
 	public:

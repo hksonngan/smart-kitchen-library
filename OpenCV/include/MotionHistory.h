@@ -14,7 +14,7 @@
 namespace skl{
 
 /*!
- * @class MotionHistoryImageを作る
+ * @brief MotionHistoryImageを作る
  */
  class MotionHistory: public FilterMat2Mat<void>{
 

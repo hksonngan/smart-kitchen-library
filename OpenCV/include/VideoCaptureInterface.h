@@ -17,7 +17,7 @@
 namespace skl{
 
 	/*!
-	 * @class SKLにおけるVideoCapture用のインターフェイス
+	 * @brief SKLにおけるVideoCapture用のインターフェイス
 	 * @comment 実際にVideoCaptureを作るときには,この後で宣言されているoperator<<を持ったテンプレートつきインターフェイスVideoCapture<T>を継承すること
 	 * */
 	class _VideoCaptureInterface{
@@ -54,7 +54,7 @@ namespace skl{
 	};
 
 	/*!
-	 * @class SKLにおけるVideoCapture用のインターフェイス(operator>>つき)
+	 * @brief SKLにおけるVideoCapture用のインターフェイス(operator>>つき)
 	 */
 	template<class T> class VideoCaptureInterface: public _VideoCaptureInterface{
 		public:

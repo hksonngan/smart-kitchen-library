@@ -16,7 +16,7 @@
 namespace skl{
 
 	/*!
-	 * @class 画像列が記述されたファイルリストからファイルを読み込む
+	 * @brief 画像列が記述されたファイルリストからファイルを読み込む
 	 */
 	class VideoCaptureImageList: public VideoCaptureInterface<VideoCaptureImageList>{
 

@@ -27,7 +27,7 @@ class Labeling {
 		// raster segment /////////////////////////////////////////////////////////
 
 		/*!
-		 * @class RasterSegment
+		 * @brief RasterSegment
 		 * @brief ラベリングを行うクラス。
 		 */
 		class RasterSegment {

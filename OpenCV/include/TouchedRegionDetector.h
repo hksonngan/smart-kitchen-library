@@ -14,7 +14,7 @@
 namespace skl{
 
 /*!
- * @class 与えられたマスクから最近触られた物体のみを得る(入力はshort型のlabel画像
+ * @brief 与えられたマスクから最近触られた物体のみを得る(入力はshort型のlabel画像
  */
  class TouchedRegionDetector: public FilterMat2Mat<size_t>{
 

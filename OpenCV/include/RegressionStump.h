@@ -12,14 +12,14 @@
 namespace skl{
 
 	/*!
-	 * @class 繰り返し同じ学習セットを適用する際に二回目以降のソーティング作業を省略するためのクラス
+	 * @brief 繰り返し同じ学習セットを適用する際に二回目以降のソーティング作業を省略するためのクラス
 	 */
 	class RegressionStumpTrainDataIndex{
 		
 	}
 
 /*!
- * @class JointBoosting等で用いられる決定木のノードの帰り値を回帰としたモデル
+ * @brief JointBoosting等で用いられる決定木のノードの帰り値を回帰としたモデル
  */
 class RegressionStump:public CvStatModel{
 	public:

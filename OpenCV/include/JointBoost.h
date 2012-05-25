@@ -14,7 +14,7 @@
 
 namespace skl{
 	/*!
-	 * @class JointBoostによる識別器
+	 * @brief JointBoostによる識別器
 	 */
 	class JointBoost:public CvStatModel
 	{

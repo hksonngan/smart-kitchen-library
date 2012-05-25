@@ -2,7 +2,7 @@
  * @file VideoCapture.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/12
- * @date Last Change:2012/Jan/19.
+ * @date Last Change:2012/May/25.
  */
 #ifndef __SKL_VIDEO_CAPTURE_H__
 #define __SKL_VIDEO_CAPTURE_H__
@@ -16,7 +16,7 @@
 namespace skl{
 
 	/*!
-	 * @class パラメタの読み込み機能などを強化したVideoCapture
+	 * @brief パラメタの読み込み機能などを強化したVideoCapture
 	 */
 	class VideoCapture: public VideoCaptureInterface<VideoCapture>{
 		public:
@@ -30,11 +30,21 @@ namespace skl{
 				release();
 				return push_back(filename);
 			}
+			bool open(const std::string& filename, cv::Ptr<_VideoCaptureInterface> cam){
+				release();
+				return push_back(filename,cam);
+			}
 			bool open(int device){
 				release();
 				return push_back(device);
 			}
+			bool open(int device, cv::Ptr<_VideoCaptureInterface> cam){
+				release();
+				return push_back(device,cam);
+			}
+
 			template<class Iter> bool open(Iter first,Iter last);
+			template<class Iter,class camIter> bool open(Iter first,Iter last);
 
 			bool isOpened()const;
 			void release();
@@ -49,6 +59,8 @@ namespace skl{
 
 			virtual bool push_back(const std::string& filename);
 			virtual bool push_back(int device);
+			virtual bool push_back(const std::string& filename, cv::Ptr<_VideoCaptureInterface> cam);
+			virtual bool push_back(int device, cv::Ptr<_VideoCaptureInterface> cam);
 
 			VideoCapture& operator>>(std::vector<cv::Mat>& mat_vec);
 

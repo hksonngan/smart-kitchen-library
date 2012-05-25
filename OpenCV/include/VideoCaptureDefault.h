@@ -17,7 +17,7 @@
 namespace skl{
 
 	/*!
-	 * @class OpenCVのcv::VideoCaptureを利用するVideoCapture
+	 * @brief OpenCVのcv::VideoCaptureを利用するVideoCapture
 	 */
 	class VideoCaptureDefault: public VideoCaptureInterface<VideoCaptureDefault>, public cv::VideoCapture{
 

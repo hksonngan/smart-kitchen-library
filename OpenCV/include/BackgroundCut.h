@@ -19,7 +19,7 @@
 namespace skl{
 
 	/*!
-	 * @class Background Subtraction by Background Cut
+	 * @brief Background Subtraction by Background Cut
 	 * @reffer Jian Sun, Weiwei Zhang, Xiaoou Tang, and Heung-Yeung Shum "Background Cut," ECCV 2006
 	 */
 	class BackgroundCut : public BackgroundSubtractAlgorithm{

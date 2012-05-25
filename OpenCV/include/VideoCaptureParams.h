@@ -21,7 +21,7 @@ namespace skl{
 	typedef std::map<capture_property_t,double>::const_iterator VideoCaptureParamIter;
 
 	/*!
-	 * @class VideoCaptureクラスの取るパラメタをあらわす値オブジェクト
+	 * @brief VideoCaptureクラスの取るパラメタをあらわす値オブジェクト
 	 */
 	class VideoCaptureParams: public Printable<VideoCaptureParams>{
 		friend class VideoParamAdder;

@@ -24,7 +24,7 @@
 
 namespace skl{
 	/** 
-	 * @class TimeFormatterDefault
+	 * @brief TimeFormatterDefault
 	 * @brief YYYY.MM.DD_hh.mm.ss.fff 形式を扱う
 	 */
 	class TimeFormatterDefault : public TimeFormatter{

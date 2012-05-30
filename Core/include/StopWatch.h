@@ -2,7 +2,7 @@
  * @file StopWatch.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/06
- * @date Last Change:2012/Feb/04.
+ * @date Last Change:2012/May/22.
  */
 #ifndef __SKL_STOP_WATCH_H__
 #define __SKL_STOP_WATCH_H__
@@ -15,7 +15,7 @@
 namespace skl{
 
 	/*!
-	 * @class 実行時間を計測するクラス(DEBUG or STOP_WATCHが定義されている時のみ動作)
+	 * @brief 実行時間を計測するクラス(DEBUG or STOP_WATCHが定義されている時のみ動作)
 	 */
 	class StopWatch{
 

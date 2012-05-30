@@ -16,3 +16,6 @@
 
 #include "../OpenCV/include/sklVideoCapture.h"
 #include "../OpenCV/include/VideoCaptureOptParser.h"
+#include "../OpenCV/include/VideoCaptureImageList.h"
+#include "../OpenCV/include/SampleSetReader.h"
+#include "../OpenCV/include/SampleSetWriter.h"

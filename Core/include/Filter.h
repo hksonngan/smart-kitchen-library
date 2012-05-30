@@ -2,7 +2,7 @@
  * @file Filter.h
  * @author a_hasimoto
  * @date Date Created: 2012/Feb/10
- * @date Last Change:2012/Feb/10.
+ * @date Last Change:2012/May/22.
  */
 #ifndef __SKL_FILTER_H__
 #define __SKL_FILTER_H__
@@ -11,7 +11,7 @@
 namespace skl{
 
 /*!
- * @class compute関数を持っているクラスであることを保証するインターフェイス
+ * @brief compute関数を持っているクラスであることを保証するインターフェイス
  */
 template<class RET,class SRC, class DIST> class _Filter{
 

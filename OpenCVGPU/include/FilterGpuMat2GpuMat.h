@@ -15,7 +15,7 @@ namespace skl{
 	namespace gpu{
 
 		/*!
-		 * @class cv::gpu::GpuMatを引数としてとるFilter
+		 * @brief cv::gpu::GpuMatを引数としてとるFilter
 		 */
 		template<class RET=bool> class FilterGpuMat2GpuMat: public _Filter<RET,cv::gpu::GpuMat,cv::gpu::GpuMat>{
 			public:

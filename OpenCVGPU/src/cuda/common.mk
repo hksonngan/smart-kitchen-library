@@ -56,9 +56,9 @@ SHAREDDIR  := ../
 
 # Compilers
 NVCC       := $(CUDA_INSTALL_PATH)/bin/nvcc 
-CXX        := g++-4.6 -fPIC
-CC         := gcc-4.6 -fPIC
-LINK       := g++-4.6 -fPIC
+CXX        := g++ -fPIC
+CC         := gcc -fPIC
+LINK       := g++ -fPIC
 
 # Includes
 INCLUDES  += -I. -I$(CUDA_INSTALL_PATH)/include -I$(COMMONDIR)/inc -I$(SHAREDDIR)/inc
@@ -90,7 +90,7 @@ CWARN_FLAGS := $(CXXWARN_FLAGS) \
 CUBIN_ARCH_FLAG :=
 CXX_ARCH_FLAGS  :=
 #NVCCFLAGS       := --compiler-bindir /usr/bin/gcc-4.6
-NVCCFLAGS       += --compiler-bindir /usr/bin/gcc-4.6
+NVCCFLAGS       += --compiler-bindir /usr/bin/gcc
 LIB_ARCH        := $(OSARCH)
 
 # Determining the necessary Cross-Compilation Flags

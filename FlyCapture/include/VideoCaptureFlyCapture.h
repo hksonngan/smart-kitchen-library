@@ -21,7 +21,7 @@
 namespace skl{
 	class FlyCapture;
 	/*!
-	 * @class FlyCapture2を使って撮影を行うVideoCaptureClass
+	 * @brief FlyCapture2を使って撮影を行うVideoCaptureClass
 	 */
 	class VideoCaptureFlyCapture: public VideoCaptureInterface<VideoCaptureFlyCapture>{
 		friend class FlyCapture;

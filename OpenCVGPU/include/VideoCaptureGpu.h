@@ -16,7 +16,7 @@ namespace skl{
 
 	namespace gpu{
 		/*!
-		 * @class cv::gpu::GpuMatを返すキャプチャ。処理中に次のフレームを非同期でdeviceに送る分、連続フレームに対する処理が高速化される。
+		 * @brief cv::gpu::GpuMatを返すキャプチャ。処理中に次のフレームを非同期でdeviceに送る分、連続フレームに対する処理が高速化される。
 		 */
 		class VideoCaptureGpu: public VideoCaptureInterface<VideoCaptureGpu>{
 			public:

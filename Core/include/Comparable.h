@@ -10,7 +10,7 @@
 namespace skl{
 
 	/*!
-	 * @class 比較可能なオブジェクトであることを示す(operator<を定義するだけで他の比較演算子が出来る) 
+	 * @brief 比較可能なオブジェクトであることを示す(operator<を定義するだけで他の比較演算子が出来る) 
 	 */
 	template<class T> class Comparable{
 

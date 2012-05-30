@@ -12,7 +12,7 @@
 
 namespace skl{
 /*!
- * @class 時間間隔を表すクラス(最小単位:msec)
+ * @brief 時間間隔を表すクラス(最小単位:msec)
  */
 class TimeInterval:public Printable<TimeInterval>{
 	public:

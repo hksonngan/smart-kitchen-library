@@ -15,7 +15,7 @@
 
 namespace skl{
 	/*!
-	 * @class TimeFormatException
+	 * @brief TimeFormatException
 	 * @brief 時間←→の変換ができないときの例外クラス
 	 * */
 	class TimeFormatException :public std::exception{

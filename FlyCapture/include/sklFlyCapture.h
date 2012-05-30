@@ -24,7 +24,7 @@
 namespace skl{
 
 	/*!
-	 * @class FlyCaptureライブラリを用いて、複数カメラを同期撮影するVideoCapture
+	 * @brief FlyCaptureライブラリを用いて、複数カメラを同期撮影するVideoCapture
 	 */
 	class FlyCapture: public skl::VideoCapture{
 		public:

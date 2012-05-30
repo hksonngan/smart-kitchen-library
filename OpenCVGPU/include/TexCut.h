@@ -21,7 +21,7 @@
 namespace skl{
 	namespace gpu{
 		/*!
-		 * @class GPU上でTexCutによる背景差分を行うプログラム
+		 * @brief GPU上でTexCutによる背景差分を行うプログラム
 		 */
 		class TexCut: public BackgroundSubtractAlgorithm{
 			public:

@@ -18,7 +18,7 @@
 namespace skl{
 
 /*!
- * @class Parse Option from CommandLine
+ * @brief Parse Option from CommandLine
  */
 class OptParser{
 
@@ -56,7 +56,7 @@ class OptParser{
 };
 
 /*
- * @class parser for indivisual valiables (interface)
+ * @brief parser for indivisual valiables (interface)
  * */
 class OptParserAtomInterface{
 	public:

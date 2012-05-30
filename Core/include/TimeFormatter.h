@@ -17,7 +17,7 @@ namespace skl{
 	 */
 
 	/*!
-	 * @class TimeFormatter
+	 * @brief TimeFormatter
 	 * @brief 時間と文字列の相互変換を行う基底クラス(仮想)
 	 * */
 	class TimeFormatter{

@@ -14,7 +14,7 @@
 namespace skl{
 
 /*!
- * @class 文字列として書き出しが可能であることを保証するインターフェイス
+ * @brief 文字列として書き出しが可能であることを保証するインターフェイス
  */
 template<class T> class Printable:public Serializable,public Comparable<T>{
 

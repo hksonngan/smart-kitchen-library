@@ -11,7 +11,7 @@
 #include <list>
 namespace skl{
 /*!
- * @class BlackBoardを介してデータをやりとりするクラスのインターフェイス
+ * @brief BlackBoardを介してデータをやりとりするクラスのインターフェイス
  */
 class Serializable{
 	public:

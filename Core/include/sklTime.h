@@ -40,7 +40,7 @@ typedef long suseconds_t;
 namespace skl{
 	class TimeFormatter;
 	/*!
-	 * @class Time
+	 * @brief Time
 	 * @brief 非負で1msec単位のタイムスタンプを扱えるクラス
 	 * */
 	class Time : public Serializable{

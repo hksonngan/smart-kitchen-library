@@ -50,7 +50,7 @@ template<class Type,int CV_DEPTH> bool SampleSetWriter::_writeMat(std::ostream& 
 	for(int y=0;y<src.cols;y++){
 		for(int x=0;x<src.rows;x++){
 			if(x!=0) out << ",";
-			out << src.at<Type>(x,y);
+			out << std::fixed << src.at<Type>(x,y);
 		}
 		out << std::endl;
 	}

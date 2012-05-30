@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project xmlns='http://schemas.microsoft.com/developer/msbuild/2003' DefaultTargets='Build' ToolsVersion='4.0'>
+<Project ToolsVersion='4.0' xmlns='http://schemas.microsoft.com/developer/msbuild/2003' DefaultTargets='Build'>
   <ItemGroup Label='ProjectConfigurations'>
     <ProjectConfiguration Include='Debug|Win32'>
       <Configuration>Debug</Configuration>
@@ -50,16 +50,16 @@
   <ImportGroup Label='ExtensionSettings'>
   </ImportGroup>
   <ImportGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;' Label='PropertySheets'>
-    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Label='LocalAppDataPlatform'/>
+    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
   </ImportGroup>
   <ImportGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|x64&apos;' Label='PropertySheets'>
-    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Label='LocalAppDataPlatform'/>
+    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
   </ImportGroup>
   <ImportGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|Win32&apos;' Label='PropertySheets'>
-    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Label='LocalAppDataPlatform'/>
+    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
   </ImportGroup>
   <ImportGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Release|x64&apos;' Label='PropertySheets'>
-    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props' Label='LocalAppDataPlatform'/>
+    <Import Condition='exists(&apos;$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props&apos;)' Label='LocalAppDataPlatform' Project='$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props'/>
   </ImportGroup>
   <PropertyGroup Label='UserMacros'/>
   <PropertyGroup Condition='&apos;$(Configuration)|$(Platform)&apos;==&apos;Debug|Win32&apos;'>
@@ -157,7 +157,7 @@
     <ClCompile Include='..\src\VideoCaptureInterface.cpp'/>
     <ClCompile Include='..\src\TouchedRegionDetector.cpp'/>
     <ClCompile Include='..\src\HumanDetectorWorkspaceEnd.cpp'/>
-  </ItemGroup>
+  <ClCompile Include='..\src\SampleSetWriter.cpp'/><ClCompile Include='..\src\SampleSetReader.cpp'/></ItemGroup>
   <ItemGroup>
     <ClInclude Include='..\include\BackgroundCut.h'/>
     <ClInclude Include='..\include\Labeling.h'/>
@@ -180,7 +180,7 @@
     <ClInclude Include='..\include\VideoCaptureOptParser.h'/>
     <ClInclude Include='..\include\TouchedRegionDetector.h'/>
     <ClInclude Include='..\include\VideoCaptureParams.h'/>
-  </ItemGroup>
+  <ClInclude Include='..\include\SampleSetReader.h'/><ClInclude Include='..\include\SampleSetWriter.h'/></ItemGroup>
   <Import Project='$(VCTargetsPath)\Microsoft.Cpp.targets'/>
   <ImportGroup Label='ExtensionTargets'>
   </ImportGroup>

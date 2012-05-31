@@ -2,7 +2,7 @@
  * @file VideoCaptureImageList.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change:2012/Jan/19.
+ * @date Last Change:2012/May/31.
  */
 #ifndef __SKL_VIDEO_CAPTURE_IMAGE_LIST_H__
 #define __SKL_VIDEO_CAPTURE_IMAGE_LIST_H__
@@ -29,7 +29,7 @@ namespace skl{
 			bool isOpened()const{return !img_list.empty();}
 			void release();
 			bool grab();
-			bool retrieve(cv::Mat& image, int channel);
+			bool retrieve(cv::Mat& image, int channel=0);
 
 			bool set(capture_property_t prop_id,double val);
 			double get(capture_property_t prop_id);

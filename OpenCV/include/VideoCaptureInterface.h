@@ -2,13 +2,16 @@
  * @file VideoCaptureInterface.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change:2012/Jan/18.
+ * @date Last Change:2012/May/31.
  */
 #ifndef __SKL_VIDEO_CAPTURE_INTERFACE_H__
 #define __SKL_VIDEO_CAPTURE_INTERFACE_H__
 
 // OpenCV
 #include <cv.h>
+
+// SKL
+#include "skl.h"
 
 // SKL OpenCV Module
 #include "VideoCaptureParams.h"
@@ -20,7 +23,7 @@ namespace skl{
 	 * @brief SKLにおけるVideoCapture用のインターフェイス
 	 * @comment 実際にVideoCaptureを作るときには,この後で宣言されているoperator<<を持ったテンプレートつきインターフェイスVideoCapture<T>を継承すること
 	 * */
-	class _VideoCaptureInterface{
+	class _VideoCaptureInterface:public SensorModuleBase<cv::Mat>{
 		public:
 			_VideoCaptureInterface(){};
 			~_VideoCaptureInterface(){}
@@ -30,7 +33,7 @@ namespace skl{
 			virtual void release()=0;
 			virtual bool grab()=0;
 			virtual bool retrieve(cv::Mat& image, int channel=0)=0;
-
+			inline size_t size()const{return isOpened();}
 
 			//! カメラに値やモード(camera_mode_tがset(*,camera_mode_t mode)を通してvalに与えられる(modeは-4から-1までの整数)をセットする純粋仮想関数
 			virtual bool set(capture_property_t prop_id,double val)=0;

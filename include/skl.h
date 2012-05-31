@@ -6,3 +6,4 @@
 #include "../Core/include/graph.h"
 #include "../Core/include/StopWatch.h"
 #include "../Core/include/Serializable.h"
+#include "../Core/include/SensorModuleBase.h"

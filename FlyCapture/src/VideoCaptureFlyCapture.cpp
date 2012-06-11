@@ -2,7 +2,7 @@
  * @file VideoCaptureFlyCapture.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change: 2012/Jan/20.
+ * @date Last Change: 2012/Jun/11.
  */
 #include "VideoCaptureFlyCapture.h"
 
@@ -62,6 +62,14 @@ bool VideoCaptureFlyCapture::open(int device){
 			FlyCapture2::VIDEOMODE_1024x768Y8,
 			FlyCapture2::FRAMERATE_30);
 	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
+
+	FlyCapture2::TriggerDelay trigger_delay;
+	trigger_delay.onOff = true;
+	trigger_delay.valueA = 0;
+	error = camera.SetTriggerDelay(
+			&trigger_delay);
+	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
+
 
 	return is_opened = set(CONVERT_RGB,1.0);
 }

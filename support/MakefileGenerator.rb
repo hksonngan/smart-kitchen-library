@@ -6,7 +6,6 @@ require 'optparse'
 require 'pathname'
 
 ModuleDependency = {}
-require "#{File.dirname(__FILE__)}/DependencyList_private.rb"
 require "#{File.dirname(__FILE__)}/DependencyList.rb"
 
 # MakefileGeneratorのあるディレクトリのパス
@@ -17,7 +16,7 @@ temp = File::expand_path(PathToGenerator)
 # スクリプト実行場所からsklのルートディレクトリへの相対パス
 # MakefileGenerator(このファイル)が"ルートディレクトリ/support"の下にあると仮定して一つ上がる
 AbstPathToRoot = File.dirname(temp)
-AbstPathToProjects = AbstPathToRoot + "/modules/"
+AbstPathToProjects = AbstPathToRoot
 
 temp_array = []
 Dir::foreach(AbstPathToProjects){|f|

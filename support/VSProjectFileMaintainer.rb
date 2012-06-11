@@ -3,7 +3,6 @@
 SRC_EXT = [".cpp",".c",".hpp",".cu"]
 HEADER_EXT = [".h",".hpp",".inc"]
 
-require 'rexml/document'
 require 'optparse'
 require 'kconv'
 
@@ -70,68 +69,55 @@ unless File.exist?(input_file) then
 	exit -1
 end
 
-source = File.open(input_file)
-doc = REXML::Document.new source.read
+source = File.open(input_file).read
 
-# ソースファイルとヘッダファイルのフィルタを取得
-src_filter = []
-header_filter = []
 
-doc.each_element("/Project/ItemGroup"){|node|
-	next if node.attribute("Label")!=nil
 
-	if node.elements["./ClCompile"]!=nil then
-		# ソースファイルを格納するItemGroup
-		exist_file_list = []
-		node.elements.each("./ClCompile"){|elem|
-			exist_file_list << elem.attribute('Include').to_s.strip
-		}
-		file_list = getFileList(input_file, src_file_directories, SRC_EXT)
-		for file in file_list do
-			file.strip!
-			# 既にプロジェクトに含まれているファイルは無視
-			if exist_file_list.include?(file) then
-				exist_file_list.delete(file)
-				next
-			end
-			attr = {"Include" => file}
-			node.add_element("ClCompile",attr)
-		end
-		# exist_file_listに残っているものがあれば、それは消去されたクラスなのでProjectから削除
-		for delete_file in exist_file_list do
-			STDERR.puts delete_file
-			tar = node.elements["./ClCompile[@Include='#{delete_file}']"]
-			STDERR.puts tar
-			if tar != nil then
-				node.delete(tar)
-			end
-		end
-	elsif node.elements["./ClInclude"]!=nil then
-		# ヘッダファイルを格納するItemGroup
-		exist_file_list = []
-		node.elements.each("./ClInclude"){|elem|
-			exist_file_list << elem.attribute('Include').to_s.strip
-		}
-		file_list = getFileList(input_file, header_file_directories, HEADER_EXT)
-		for file in file_list do
-			# 既にプロジェクトに含まれているファイルは無視
-			if exist_file_list.include?(file) then
-#				STDERR.puts file
-				exist_file_list.delete(file)
-				next
-			end
-			attr = {"Include" => file}
-			node.add_element("ClInclude",attr)
-		end
-		for delete_file in exist_file_list do
-			tar = node.elements["./ClInclude[@Include='#{delete_file}']"]
-			if tar != nil then
-				node.delete(tar)
-			end
+def renewList(buf, tag, project_file,directories,filter)
+	exist_files = getFileList(project_file,directories,filter)
+	registered_files = []
+	temp = buf
+	while /<#{tag} Include='(.*?)'\/>([\W\w]*)/ =~ temp do
+		registered_files << $1
+		temp = $2
+	end
+	temp = buf.clone
+	added = exist_files - registered_files
+	deleted = registered_files - exist_files
+#	puts "Deleted"
+#	puts deleted
+#	puts "Added"
+#	puts added
+	for file in deleted do
+		regex = /(\n*\s*<#{tag} Include='#{file.gsub('\\','\\\\\\\\')}'\/>)(\s*)/
+		if Regexp.compile(regex) =~ temp then
+			temp.sub!($1+$2,$2)
+		else
+			STDERR.puts "Error failed to find the entry for '#{file}.'"
+			exit 0
 		end
 	end
-}
+	for file in added do
+		temp += "\n    <#{tag} Include='#{file}'/>"
+	end
 
-doc.write STDOUT
+	return temp
+end
 
-source.close
+# ソースファイルが書かれたItemGroupを取得
+result = source.clone
+src_list = []
+#while /.*<ClCompile Include='(\.\.\\src\\.+\.cpp)'\/>(.*)<\/ItemGroup>.*/ =~ source do
+while /<ItemGroup>([\w\W]*?)<\/ItemGroup>([\w\W]*)/ =~ source do
+	buf = $1
+	source = $2
+	if /<ClCompile Include='..\\src\\.+\.(c|cpp|cu)'\/>/ =~ buf then
+		new_buf = renewList(buf,"ClCompile",input_file,src_file_directories,SRC_EXT)
+		result.sub!(buf,new_buf)
+	elsif /<ClInclude Include='..\\include\\.+\.(h|hpp)'\/>/ =~ buf then
+		new_buf = renewList(buf,"ClInclude",input_file,header_file_directories, HEADER_EXT)
+		result.sub!(buf,new_buf)
+	end
+end
+
+print result

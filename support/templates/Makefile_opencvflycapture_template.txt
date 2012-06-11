@@ -1,0 +1,5 @@
+# FlyCaptureの読み込み
+INC += -I/usr/include/flycapture/
+LIBS += -lflycapture
+LIBS_DEBUG += -lflycapture
+

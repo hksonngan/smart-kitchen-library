@@ -1,0 +1,3 @@
+#options for cuda
+LIBS_OPT += -L/usr/local/cuda/lib64 -lcudart -lcufft -lcublas -lnpp -lcuinj -lcusparse -lcurand
+

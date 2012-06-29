@@ -9,7 +9,6 @@
 #include <time.h>
 #endif
 /**** ifdef linux ****/
-
 namespace skl{
 	/*
 	 * @brief 平均0,標準偏差1のガウス分布を作成する
@@ -39,10 +38,23 @@ namespace skl{
 
 		/**** Linux ****/
 #elif __linux__
-		struct timespec tc;
+			struct timespec tc;
 		tc.tv_sec = msec/1000;
 		tc.tv_nsec = (msec%1000)*1000;// nano sec
 		nanosleep(&tc,NULL);
 #endif	/**** ifdef linux ****/
+	}
+
+	float radian(float x, float y, float offset_radian,float origin_return_value){
+		if(x==0 && y==0) return origin_return_value;
+		float rad = atan2f(y,x);
+		rad += offset_radian;
+		while(rad>2*M_PI){
+			rad -= 2*M_PI;
+		}
+		while(rad<0){
+			rad += 2*M_PI;
+		}
+		return rad;
 	}
 }

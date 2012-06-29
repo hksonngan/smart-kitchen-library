@@ -2,7 +2,7 @@
  * @file SampleSetWriter.h
  * @author a_hasimoto
  * @date Date Created: 2012/May/30
- * @date Last Change:2012/May/30.
+ * @date Last Change:2012/Jun/29.
  */
 #ifndef __SKL_SAMPLE_SET_WRITER_H__
 #define __SKL_SAMPLE_SET_WRITER_H__
@@ -22,10 +22,10 @@ class SampleSetWriter{
 	public:
 		SampleSetWriter();
 		virtual ~SampleSetWriter();
-		static bool write(const std::string& filename, const cv::Mat* samples, const cv::Mat* responces=NULL, const cv::Mat* likelihoods=NULL,const std::vector<skl::Time>* timestamps=NULL);
-		static bool write(std::ostream& out, const cv::Mat* samples, const cv::Mat* responces=NULL, const cv::Mat* likelihoods=NULL,const std::vector<skl::Time>* timestamps=NULL);
+		static bool write(const std::string& filename, const cv::Mat* samples, const cv::Mat* responces=NULL, const cv::Mat* likelihoods=NULL,const std::vector<skl::Time>* timestamps=NULL, const std::vector<cv::KeyPoint>* keypoints=NULL);
+		static bool write(std::ostream& out, const cv::Mat* samples, const cv::Mat* responces=NULL, const cv::Mat* likelihoods=NULL,const std::vector<skl::Time>* timestamps=NULL, const std::vector<cv::KeyPoint>* keypoints=NULL);
 	protected:
-		static bool _writeHeader(std::ostream& out, size_t sample_num, size_t sample_dim, bool has_responce, size_t class_num, bool has_timestamp);
+		static bool _writeHeader(std::ostream& out, size_t sample_num, size_t sample_dim, bool has_responce, size_t class_num, bool has_timestamp,bool has_keypoint);
 		template<class Type,int CV_DEPTH> static bool _writeMat(std::ostream& out,const cv::Mat& src);
 
 		inline static bool _writeSamples(std::ostream& out,const cv::Mat& src){
@@ -41,6 +41,7 @@ class SampleSetWriter{
 			return true;
 		}
 		static bool _writeTimeStamps(std::ostream& out,const std::vector<skl::Time>& timestamps);
+		static bool _writeKeyPoints(std::ostream& out,const std::vector<cv::KeyPoint>& keypoints);
 	private:
 		
 };

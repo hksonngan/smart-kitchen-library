@@ -2,7 +2,7 @@
  * @file SampleSetReader.h
  * @author yamamoto, a_hasimoto
  * @date Date Created: 2012/May/30
- * @date Last Change:2012/May/30.
+ * @date Last Change:2012/Jun/29.
  */
 #ifndef __SKL_SAMPLE_SET_READER_H__
 #define __SKL_SAMPLE_SET_READER_H__
@@ -22,13 +22,13 @@ class SampleSetReader{
 	public:
 		SampleSetReader();
 		virtual ~SampleSetReader();
-		static bool read(const std::string& filename, cv::Mat* samples=NULL, cv::Mat* responces=NULL, cv::Mat* likelihoods=NULL,std::vector<skl::Time>* timestamps=NULL);
-		static bool read(std::istream& in, cv::Mat* samples=NULL, cv::Mat* responces=NULL, cv::Mat* likelihoods=NULL,std::vector<skl::Time>* timestamps=NULL);
+		static bool read(const std::string& filename, cv::Mat* samples=NULL, cv::Mat* responces=NULL, cv::Mat* likelihoods=NULL,std::vector<skl::Time>* timestamps=NULL, std::vector<cv::KeyPoint>* keypoints=NULL);
+		static bool read(std::istream& in, cv::Mat* samples=NULL, cv::Mat* responces=NULL, cv::Mat* likelihoods=NULL,std::vector<skl::Time>* timestamps=NULL,std::vector<cv::KeyPoint>* keypoints=NULL);
 	protected:
 		static bool skip(std::istream& in,size_t num);
 		template <class Type,size_t CV_DEPTH> static bool _readMatrix(std::istream& in, size_t cols, size_t rows, cv::Mat& dist);
 
-		static bool _readHeader(std::istream& in, size_t& sample_num,size_t& sample_dim,bool& has_responce, size_t& class_num, bool& has_timestamp);
+		static bool _readHeader(std::istream& in, size_t& sample_num,size_t& sample_dim,bool& has_responce, size_t& class_num, bool& has_timestamp, bool& has_keypoint);
 
 		inline static bool _readSamples(std::istream& in, size_t sample_num, size_t sample_dim, cv::Mat& dist){
 			return _readMatrix<float,CV_32F>(in,sample_dim,sample_num,dist);
@@ -42,6 +42,7 @@ class SampleSetReader{
 			return _readMatrix<float,CV_32F>(in,class_num,sample_num,dist);
 		}
 		static bool _readTimestamps(std::istream& in, size_t sample_num, std::vector<skl::Time>& dist);
+		static bool _readKeyPoints(std::istream& in, size_t sample_num, std::vector<cv::KeyPoint>& dist);
 
 	private:
 };

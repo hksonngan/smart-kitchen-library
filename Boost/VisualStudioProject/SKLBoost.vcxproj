@@ -144,10 +144,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include='..\src\sklboostutils.cpp'/>
-  </ItemGroup>
+  
+    <ClCompile Include='..\src\BlackBoardServer.cpp'/></ItemGroup>
   <ItemGroup>
     <ClInclude Include='..\include\sklboostutils.h'/>
-  </ItemGroup>
+  
+    <ClInclude Include='..\include\BlackBoardServer.h'/></ItemGroup>
   <Import Project='$(VCTargetsPath)\Microsoft.Cpp.targets'/>
   <ImportGroup Label='ExtensionTargets'>
   </ImportGroup>

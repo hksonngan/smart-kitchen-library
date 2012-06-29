@@ -2,7 +2,7 @@
  * @file TexCut.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change:2012/Feb/27.
+ * @date Last Change:2012/Jun/25.
  */
 #ifndef __SKL_GPU_TEX_CUT_H__
 #define __SKL_GPU_TEX_CUT_H__
@@ -14,7 +14,7 @@
 #include <cv.h>
 #include <highgui.h>
 #include <opencv2/gpu/gpu.hpp>
-#include "../OpenCV/include/BackgroundSubtractAlgorithm.h"
+#include "sklcv.h"
 
 #include "FilterGpuMat2GpuMat.h"
 
@@ -95,6 +95,8 @@ namespace skl{
 				void alloc_gpu(
 						const cv::Size& img_size,
 						size_t nChannels);
+
+				skl::Graphcut gc_algo;
 			private:
 				std::vector<cv::Rect> img_rects;
 				std::vector<cv::Rect> graph_rects;

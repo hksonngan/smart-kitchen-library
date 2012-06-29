@@ -53,7 +53,38 @@ namespace skl{
 	cv::Vec3b assignColor(size_t ID);
 	cv::Mat visualizeRegionLabel(const cv::Mat& label,size_t region_num);
 
+	enum ArrowType{
+		NONE,
+		ARROW,
+		ARROW_FILL,
+		INV_ARROW,
+		INV_ARROW_FILL,
+		CIRCLE,
+		CIRCLE_FILL,
+		SQUARE,
+		SQUARE_FILL,
+		ABS_SQUARE,
+		ABS_SQUARE_FILL,
+		DIAMOND,
+		DIAMOND_FILL,
+		ABS_DIAMOND,
+		ABS_DIAMOND_FILL
+	};
 
+	void arrow(
+		cv::Mat& img,
+		cv::Point pt1,
+		cv::Point pt2,
+		const cv::Scalar& color,
+		int thickness,
+		int lineType,
+		ArrowType head_type = ARROW,
+		ArrowType tail_type = NONE,
+		int head_size = 6,
+		int tail_size = 6,
+		int head_degree = 30,
+		int tail_degree = 30,
+		int shift=0);
 
 
 	template<class T> void setWeight(const T& mask,double* w1, double* w2){
@@ -141,25 +172,25 @@ namespace skl{
 		int y_counter = 0;
 		LabelType elem;
 		for(int ly = 0; ly < label.rows; ly++){
-//			assert(0<=ly);
-//			assert(ly<label.rows);
+			//			assert(0<=ly);
+			//			assert(ly<label.rows);
 			plabel = label.ptr<LabelType>(ly);
 
 			for(int lx = 0; lx < label.cols; lx+=scale,x++){
 				if(lx % label_size.width == 0){
 					if(y_counter%scale == 0){
 						y++;
-//						assert(0<=y);
-//						assert(y < label_small.rows);
+						//						assert(0<=y);
+						//						assert(y < label_small.rows);
 						plabel_small = label_small.ptr<const LabelType>(y);
 					}
 					y_counter++;
 					x = 0;
 				}
-//				assert(0 <= x);
-//				assert(x < label_small.cols);
-//				assert(0 <= lx);
-//				assert(lx < label.cols);
+				//				assert(0 <= x);
+				//				assert(x < label_small.cols);
+				//				assert(0 <= lx);
+				//				assert(lx < label.cols);
 				if(0==(elem = plabel_small[x])) continue;
 				for(size_t s=0;s<scale;s++){
 					plabel[lx+s] = elem;

@@ -1,8 +1,8 @@
-﻿/*!
+/*!
  * @file TexCut.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change: 2012/May/11.
+ * @date Last Change: 2012/Jun/25.
  */
 #include "TexCut.h"
 #include "skl.h"
@@ -10,7 +10,7 @@
 #include "shared.h"
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/gpu/stream_accessor.hpp>
-
+#include <fstream>
 #define GRADIENT_HETEROGENUITY_ITER_TIME 1000
 
 //#define DEBUG_GPU_TEXCUT_STOPWATCH
@@ -169,7 +169,7 @@ inline cv::Size getGraphSize(const cv::Size& img_size){
 }
 
 /*!
- * @brief デフォルトコンストラクタ
+ * @brief �ǥե���ȥ��󥹥ȥ饯��
  */
 gpu::TexCut::TexCut(float alpha, float smoothing_term_weight, float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh):
 	noise_std_dev(3,3.5),
@@ -180,7 +180,7 @@ gpu::TexCut::TexCut(float alpha, float smoothing_term_weight, float thresh_tex_d
 }
 
 /*!
- * @brief デストラクタ
+ * @brief �ǥ��ȥ饯��
  */
 gpu::TexCut::~TexCut(){
 
@@ -301,6 +301,14 @@ void gpu::TexCut::alloc_gpu(
 	}
 	
 
+}
+
+void _imwrite(const std::string& filename, const cv::Mat& mat){
+	std::ofstream fout;
+	fout.open(filename.c_str());
+	if(!fout) return;
+	fout << mat;
+	fout.close();
 }
 
 bool gpu::TexCut::compute(const cv::gpu::GpuMat& _src, cv::gpu::GpuMat& dest,cv::gpu::Stream& stream_external){
@@ -494,7 +502,21 @@ bool gpu::TexCut::compute(const cv::gpu::GpuMat& _src, cv::gpu::GpuMat& dest,cv:
 #endif
 
 	// do graphcut
+//	stream_external.waitForCompletion();
+/*	buf_graphcut = cv::Scalar(0);
+	_imwrite("/data/terminals.csv",cv::Mat(terminals));
+	_imwrite("/data/leftTransp.csv",cv::Mat(leftTransp));
+	_imwrite("/data/rightTransp.csv",cv::Mat(rightTransp));
+	_imwrite("/data/top.csv",cv::Mat(top));
+	_imwrite("/data/bottom.csv",cv::Mat(bottom));
+
 	cv::gpu::graphcut(terminals,leftTransp,rightTransp,top,bottom,dest,buf_graphcut,stream_external);
+*/
+	cv::Mat _dest;
+	gc_algo.compute(cv::Mat(terminals),
+			cv::Mat(leftTransp),cv::Mat(rightTransp),
+			cv::Mat(top),cv::Mat(bottom),_dest);
+	dest.upload(_dest);
 
 #ifdef DEBUG_GPU_TEXCUT_STOPWATCH
 	std::cerr << "graphcut               " << swatch.lap() << std::endl;

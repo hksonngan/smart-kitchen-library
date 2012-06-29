@@ -19,3 +19,5 @@
 #include "../OpenCV/include/VideoCaptureImageList.h"
 #include "../OpenCV/include/SampleSetReader.h"
 #include "../OpenCV/include/SampleSetWriter.h"
+#include "../OpenCV/include/Graphcut.h"
+#include "../OpenCV/include/Flow.h"

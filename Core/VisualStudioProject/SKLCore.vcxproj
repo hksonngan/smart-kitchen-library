@@ -171,7 +171,8 @@
     <ClInclude Include='..\include\TimeFormatter.h'/>
     <ClInclude Include='..\include\TimeFormatterDefault.h'/>
     <ClInclude Include='..\include\TimeInterval.h'/>
-  <ClInclude Include='..\include\graph_instances.inc'/></ItemGroup>
+  <ClInclude Include='..\include\graph_instances.inc'/>
+    <ClInclude Include='..\include\SensorModuleBase.h'/></ItemGroup>
   <Import Project='$(VCTargetsPath)\Microsoft.Cpp.targets'/>
   <ImportGroup Label='ExtensionTargets'>
   </ImportGroup>

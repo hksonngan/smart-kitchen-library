@@ -160,9 +160,11 @@
     <ClCompile Include='..\src\SampleSetWriter.cpp'/>
     <ClCompile Include='..\src\SampleSetReader.cpp'/>
     <ClCompile Include='..\src\Graphcut.cpp'/>
-    <ClCompile Include='..\src\MatReader.cpp'/>
     <ClCompile Include='..\src\Flow.cpp'/>
-    <ClCompile Include='..\src\sklcvutils_arrow.cpp'/></ItemGroup>
+    <ClCompile Include='..\src\sklcvutils_arrow.cpp'/>
+    <ClCompile Include='..\src\VideoCaptureOptFlowImageList.cpp'/>
+    <ClCompile Include='..\src\ImplicitShapeModel.cpp'/>
+    <ClCompile Include='..\src\sklcvutils_colorpalette.cpp'/></ItemGroup>
   <ItemGroup>
     <ClInclude Include='..\include\BackgroundCut.h'/>
     <ClInclude Include='..\include\Labeling.h'/>
@@ -188,7 +190,9 @@
   <ClInclude Include='..\include\SampleSetReader.h'/><ClInclude Include='..\include\SampleSetWriter.h'/>
     <ClInclude Include='..\include\Graphcut.h'/>
     <ClInclude Include='..\include\MatReader.h'/>
-    <ClInclude Include='..\include\Flow.h'/></ItemGroup>
+    <ClInclude Include='..\include\Flow.h'/>
+    <ClInclude Include='..\include\VideoCaptureOptFlowImageList.h'/>
+    <ClInclude Include='..\include\ImplicitShapeModel.h'/></ItemGroup>
   <Import Project='$(VCTargetsPath)\Microsoft.Cpp.targets'/>
   <ImportGroup Label='ExtensionTargets'>
   </ImportGroup>

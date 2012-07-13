@@ -2,11 +2,12 @@
  * @file VideoCapture.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/12
- * @date Last Change: 2012/May/25.
+ * @date Last Change: 2012/Jul/06.
  */
 #include "sklVideoCapture.h"
 #include "VideoCaptureDefault.h"
 #include "VideoCaptureImageList.h"
+#include "VideoCaptureOptFlowImageList.h"
 #include <sstream>
 #include <fstream>
 
@@ -86,6 +87,9 @@ bool VideoCapture::push_back(const std::string& filename){
 	cv::Ptr<_VideoCaptureInterface> capture;
 	if(extname==".lst" || extname==".lst0"){
 		capture = new VideoCaptureImageList();
+	}
+	else if(extname==".lstf" || extname==".lstflow"){
+		capture = new VideoCaptureOptFlowImageList();
 	}
 	else{
 		capture = new VideoCaptureDefault();

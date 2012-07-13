@@ -53,6 +53,16 @@ namespace skl{
 		return buf;
 	}
 
+	std::string replace(const std::string& src,const std::string& strFrom,const std::string& strTo){
+		std::string result(src);
+		size_t pos(result.find(strFrom));
+		while(pos!=std::string::npos){
+			result.replace(pos,strFrom.length(),strTo);
+			pos = result.find(strFrom);
+		}
+		return result;
+	}
+
 	bool parse_conffile(const std::string& filename, std::map<std::string,std::string>& param_map,const std::string& deliminator){
 		std::ifstream fin;
 		fin.open(filename.c_str());

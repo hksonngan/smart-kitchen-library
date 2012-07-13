@@ -1,0 +1,86 @@
+﻿/*!
+ * @file VideoCaptureOptFlowImageList.cpp
+ * @author yamamoto
+ * @date Date Created: 2012/May/25
+ * @date Last Change: 2012/Jul/07.
+ */
+#include "VideoCaptureOptFlowImageList.h"
+#include <fstream>
+#include <string>
+
+using namespace skl;
+
+
+/*!
+ * @brief デフォルトコンストラクタ
+ */
+VideoCaptureOptFlowImageList::VideoCaptureOptFlowImageList():hasFlow(false){
+
+}
+
+/*!
+ * @brief デストラクタ
+ */
+VideoCaptureOptFlowImageList::~VideoCaptureOptFlowImageList(){
+
+}
+
+bool VideoCaptureOptFlowImageList::open(const std::string& filename){
+	release();
+	std::ifstream fin;
+	fin.open(filename.c_str());
+	if(!fin){
+		std::cerr << "ERROR: failed to open file '" << filename << "'." << std::endl;
+		return false;
+	}
+	std::string str;
+	while(fin && std::getline(fin,str)){
+		img_list.push_back(str);
+	}
+	fin.close();
+	return params.set(FRAME_COUNT,img_list.size());
+}
+
+bool VideoCaptureOptFlowImageList::grab(){
+	if(index >= static_cast<int>(img_list.size())){
+		std::cerr << index << std::endl;
+		return false;
+	}
+
+	checked_frame_pos = index;
+	hasFlow = flow.read(img_list[checked_frame_pos]);
+#ifdef DEBUG
+	if(!hasFlow){
+		std::cerr << "hasFlow fail to read'" << img_list[checked_frame_pos] << "'." << std::endl;
+	}
+#endif
+/*#ifdef DEBUG
+	std::cerr << checked_frame_pos << ": " << img_list[checked_frame_pos] << ": " << hasFlow << std::endl;
+#endif
+*/
+	index++;
+	if(!hasFlow) return false;
+	return true;
+}
+
+bool VideoCaptureOptFlowImageList::retrieve(cv::Mat& image, int channel){
+	if(static_cast<size_t>(checked_frame_pos) >= img_list.size() || checked_frame_pos < 0 || !hasFlow){
+		image.release();
+		return false;
+	}
+	else{
+		if(Flow::X==channel){
+			image = flow.u.clone();
+			return true;
+		}
+		else if(Flow::Y==channel){
+			image = flow.v.clone();
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
+	return true;
+}
+

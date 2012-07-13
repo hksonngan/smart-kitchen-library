@@ -1,7 +1,7 @@
 ﻿/*!
  * @file   Time.h
  * @author Takahiro Suzuki
- * @date Last Change:2012/Jan/13.
+ * @date Last Change:2012/Jul/09.
  **/
 
 #ifndef __SKL_TIME_H__
@@ -41,7 +41,7 @@ namespace skl{
 	class TimeFormatter;
 	/*!
 	 * @brief Time
-	 * @brief 非負で1msec単位のタイムスタンプを扱えるクラス
+	 * @brief 非負で1usec単位のタイムスタンプを扱えるクラス
 	 * */
 	class Time : public Serializable{
 		public:
@@ -75,7 +75,7 @@ namespace skl{
 			Time();
 			Time(long nSec,int nMSec,int nUSec=0);
 			Time(const Time& other);	//コピーコンストラクタ
-			Time(int YYYY,int MM,int DD,int hh, int mm, int ss=0, int mmm=0);	// Set
+			Time(int YYYY,int MM,int DD,int hh, int mm, int ss=0, int mmm=0,int usec=0);	// Set
 			~Time();
 
 			Time& operator=(const Time& other);

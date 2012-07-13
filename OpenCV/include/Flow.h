@@ -2,7 +2,7 @@
  * @file Flow.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jun/29
- * @date Last Change:2012/Jun/29.
+ * @date Last Change:2012/Jul/06.
  */
 #ifndef __SKL_FLOW_H__
 #define __SKL_FLOW_H__
@@ -17,6 +17,7 @@ namespace skl{
 class Flow{
 
 	public:
+		enum Direction{X=0,Y=1};
 		Flow();
 		Flow(const cv::Mat& u,const cv::Mat& v);
 		virtual ~Flow();
@@ -28,6 +29,8 @@ class Flow{
 			distance(r);
 			return r;
 		}
+		const cv::Mat& operator[](Direction d)const;
+		cv::Mat& operator[](Direction d);
 		void angle(cv::Mat& rad, float offset_rad=0,float origin_return_value=0);
 		inline cv::Mat angle(float offset_rad=0,float origin_return_value=0){
 			cv::Mat rad;
@@ -37,7 +40,7 @@ class Flow{
 
 		cv::Mat visualize(cv::Mat& base, int interval=8,const cv::Scalar& arrow_color=CV_RGB(255,0,0));
 		bool read(const std::string& filename);
-		bool write(const std::string& filename);
+		bool write(const std::string& filename)const;
 	protected:
 		bool isValid()const;
 	private:

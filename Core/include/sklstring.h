@@ -8,11 +8,11 @@
 #include <algorithm>
 
 namespace skl{
-	const std::string true_strings[] = {"1","true","TRUE","True","on","ON","On"};
-	static const int true_string_num = 7;
+	const std::string true_strings[] = {"1","true","TRUE","True","on","ON","On","yes","YES","yes"};
+	static const int true_string_num = 10;
 
-	const std::string false_strings[] = {"0","false","FALSE","False","off","OFF","Off",""};
-	static const int false_string_num = 8;
+	const std::string false_strings[] = {"0","false","FALSE","False","off","OFF","Off","no","NO","No"};
+	static const int false_string_num = 10;
 
 	std::string strip(const std::string& str);
 	std::vector<std::string> split(const std::string& str, const std::string& deliminator, int length=-1);
@@ -29,6 +29,8 @@ namespace skl{
 	}
 
 	std::vector<std::string> split_strip(const std::string& str, const std::string& deliminator, int length=-1);
+
+	std::string replace(const std::string& src,const std::string& strFrom,const std::string& strTo);
 
 	bool parse_conffile(std::istream& in, std::map<std::string,std::string>& param_map, const std::string& deliminator=":");
 	bool parse_conffile(const std::string& filename, std::map<std::string,std::string>& param_map, const std::string& deliminator=":");

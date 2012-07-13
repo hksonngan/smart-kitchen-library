@@ -2,7 +2,7 @@
  * @file VideoCaptureImageList.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change: 2012/May/31.
+ * @date Last Change: 2012/Jul/09.
  */
 #include "VideoCaptureImageList.h"
 #include <fstream>

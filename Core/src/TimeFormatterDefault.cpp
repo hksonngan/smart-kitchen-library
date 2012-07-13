@@ -43,10 +43,10 @@ namespace skl{
 	 * @param Hour 時を入れる変数
 	 * @param Min 分を入れる変数
 	 * @param Sec 秒を入れる変数
-	 * @param USec 本来はミリ秒までだが，仕様上USecで扱う必要があるのでUSecを入れる変数
+	 * @param USec USec(micro sec.)を入れる変数
 	 */
 	void TimeFormatterDefault::parseString(const std::string    & str,int* Year,int* Mon,int* Day,int* Hour,int* Min,int* Sec,long* USec)const throw (TimeFormatException){
-		if(str.length() != 23){
+		if(str.length() < 10){
 			throw TimeFormatException(str,this->getName());
 		}
 
@@ -65,24 +65,44 @@ namespace skl{
 			throw TimeFormatException(str,this->getName());
 		}
 		*Day = atoi( str.substr(8,2).c_str());
-		// hhの判定$
+
+		// hh.mm.ss.mmm can be skiped;
+		*Hour = 0;
+		*Min = 0;
+		*Sec = 0;
+		*USec = 0;
+
+
+		// hhの判定
+		if(str.length()==10) return;
 		if(str.find(".",11) != 13){
 			throw TimeFormatException(str,this->getName());
 		}
 		*Hour = atoi( str.substr(11,2).c_str());
 		// mmの判定
+		if(str.length()==13) return;
 		if(str.find(".",14) != 16 ){
 			throw TimeFormatException(str,this->getName());
 		}
 		*Min = atoi( str.substr(14,2).c_str());
 
 		// ssの判定
+		if(str.length()==16) return;
 		if(str.find(".",17) != 19){
 			throw TimeFormatException(str,this->getName());
 		}
 		*Sec = atoi(str.substr(17,2).c_str());
 		// mmmの判定(判定省略)
-		*USec = atol(str.substr(20,3).c_str())*1000;
+		if(str.length()==20) return;
+		if(str.length() == 26){
+			*USec = atol(str.substr(20,6).c_str());
+		}
+		else if(str.length() == 23){
+			*USec = atol(str.substr(20,3).c_str())*1000;
+		}
+		else{
+			throw TimeFormatException(str,this->getName());
+		}
 	}
 
 	/** 
@@ -108,7 +128,7 @@ namespace skl{
 			<< std::setw(2) << std::setfill('0') << Hour << "."
 			<< std::setw(2) << std::setfill('0') << Min << "."
 			<< std::setw(2) << std::setfill('0') << Sec << "."
-			<< std::setw(3) << std::setfill('0') << (int)floor((double)USec/1000.0);
+			<< std::setw(6) << std::setfill('0') << USec;
 		return sstr.str();
 	}
 }

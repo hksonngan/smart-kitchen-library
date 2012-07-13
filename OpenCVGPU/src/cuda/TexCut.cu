@@ -2,7 +2,7 @@
  * @file TexCut.cu
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change: 2012/May/24.
+ * @date Last Change: 2012/Jul/10.
  */
 
 #include <cassert>
@@ -52,7 +52,9 @@ namespace skl{
 				const cv::gpu::PtrStepi sobel_y,
 				cv::gpu::PtrStepf gradient_heterogenuity,
 				float gh_expectation,
-				float gh_std_dev){
+				float gh_std_dev,
+				int cols,
+				int rows){
 			int smem_step = (TEXCUT_SQUARE_AREA+1) * SquareNum;
 
 			// declare shared_memory
@@ -98,7 +100,9 @@ namespace skl{
 				(dy[offset]==0?0.f:FLT_MAX) :
 					((float)dy[offset] / (float)dy[offset + TEXCUT_SQUARE_AREA_HARF]);
 
-			gradient_heterogenuity.ptr(graph_node_idx.y)[graph_node_idx.x] = normalize(max(ghx,ghy),gh_std_dev*2.f,gh_expectation);
+			if( gidx.x < cols && gidx.y < rows){
+				gradient_heterogenuity.ptr(graph_node_idx.y)[graph_node_idx.x] = normalize(max(ghx,ghy),gh_std_dev*2.f,gh_expectation);
+			}
 		}
 
 		void calcGradHetero_gpu(
@@ -117,7 +121,9 @@ namespace skl{
 
 			calcGradHetero_kernel<<<grid,block,sharedMemSize,stream>>>(
 					sobel_x,sobel_y,gradient_heterogenuity,
-					gh_expectation,gh_std_dev);
+					gh_expectation,gh_std_dev,
+					sobel_x.cols,
+					sobel_y.rows);
 			cudaSafeCall( cudaGetLastError() );
 		}
 /*
@@ -185,7 +191,9 @@ namespace skl{
 				const cv::gpu::PtrStepi bg_sobel_x,
 				const cv::gpu::PtrStepi bg_sobel_y,
 				cv::gpu::PtrStepf fg_tex_intencity,
-				cv::gpu::PtrStepf textural_correlation){
+				cv::gpu::PtrStepf textural_correlation,
+				int cols,
+				int rows){
 			int in_square_seq_idx = inSquareSeqIdx;
 			dim3 gidx = GlobalIdx;
 
@@ -214,7 +222,7 @@ namespace skl{
 					in_square_seq_idx);
 
 			dim3 graph_node_idx = SquareIdx;
-			if(in_square_seq_idx==0){
+			if(in_square_seq_idx==0 && gidx.x < cols && gidx.y < rows){
 				textural_correlation.ptr(graph_node_idx.y)[graph_node_idx.x] = (float)buf[offset];
 			}
 
@@ -224,7 +232,7 @@ namespace skl{
 			sumUp(buf+offset,
 					TEXCUT_SQUARE_AREA,
 					in_square_seq_idx);
-			if(in_square_seq_idx==0){
+			if(in_square_seq_idx==0 && gidx.x < cols && gidx.y < rows){
 				fg_tex_intencity.ptr(graph_node_idx.y)[graph_node_idx.x] = (float)buf[offset];
 			}
 		}
@@ -248,7 +256,9 @@ namespace skl{
 					sobel_x, sobel_y,
 					bg_sobel_x, bg_sobel_y,
 					fg_tex_intencity,
-					textural_correlation);
+					textural_correlation,
+					sobel_x.cols,
+					sobel_y.rows);
 			cudaSafeCall( cudaGetLastError() );
 		}
 
@@ -257,7 +267,9 @@ namespace skl{
 					const cv::gpu::PtrStepb bg,
 					cv::gpu::PtrStepf sterm,
 					float noise_std_dev,
-					int offset){
+					int offset,
+					int cols,
+					int rows){
 			dim3 gidx = GlobalIdx;
 
 			dim3 imgIdx(
@@ -284,8 +296,8 @@ namespace skl{
 								  / lbg[si-1];
 			}
 
-
-			sterm.ptr(gidx.x)[gidx.y] = min(sterm.ptr(gidx.x)[gidx.y],1.f - exp(
+			if(gidx.x < cols && gidx.y < rows){
+				sterm.ptr(gidx.x)[gidx.y] = min(sterm.ptr(gidx.x)[gidx.y],1.f - exp(
 						normalize(
 							abs(ldiff) / TEXCUT_BLOCK_SIZE,
 							noise_std_dev / TEXCUT_SQRT_BLOCK_SIZE,
@@ -293,6 +305,7 @@ namespace skl{
 						)
 						- 1.f
 					));
+			}
 		}
 
 
@@ -314,7 +327,7 @@ namespace skl{
 				block.y/=2;
 			}
 			assert(block.y>0);
-			std::cerr << "block_size: " << block.x << ", " << block.y << std::endl;
+//			std::cerr << "block_size: " << block.x << ", " << block.y << std::endl;
 			dim3 grid(divUp(sterm.rows,block.x),divUp(sterm.cols,block.y) );
 //			std::cerr << "calcSmoothingTermX: " << sharedMemSize << std::endl;
 //			std::cerr << block.x << ", " << block.y << ", " << block.z << std::endl;
@@ -323,12 +336,14 @@ namespace skl{
 					src,
 					bg,
 					sterm,
-					noise_std_dev,0);
+					noise_std_dev,0,
+					sterm.rows, sterm.cols);
 			calcSmoothingTermX_kernel<<<grid,block,sharedMemSize,stream>>>(
 					src,
 					bg,
 					sterm,
-					noise_std_dev,TEXCUT_BLOCK_SIZE-1);
+					noise_std_dev,TEXCUT_BLOCK_SIZE-1,
+					sterm.rows, sterm.cols);
 			cudaSafeCall( cudaGetLastError() );
 		}
 
@@ -337,7 +352,9 @@ namespace skl{
 				const cv::gpu::PtrStepb bg,
 				cv::gpu::PtrStepf sterm,
 				float noise_std_dev,
-				int offset){
+				int offset,
+				int cols,
+				int rows){
 			dim3 gidx = GlobalIdx;
 			dim3 imgIdx(
 					gidx.x * TEXCUT_BLOCK_SIZE,
@@ -366,7 +383,8 @@ namespace skl{
 
 
 			// sterm is NOT transposed
-			sterm.ptr(gidx.y)[gidx.x] = min(sterm.ptr(gidx.y)[gidx.x],1.f - exp(
+			if(gidx.x < cols && gidx.y < rows){
+				sterm.ptr(gidx.y)[gidx.x] = min(sterm.ptr(gidx.y)[gidx.x],1.f - exp(
 						normalize(
 							abs(ldiff) / TEXCUT_BLOCK_SIZE,
 							noise_std_dev / TEXCUT_SQRT_BLOCK_SIZE,
@@ -374,6 +392,7 @@ namespace skl{
 						)
 						- 1.f
 					));
+			}
 		}
 
 		void calcSmoothingTermY_gpu(
@@ -394,7 +413,7 @@ namespace skl{
 				block.x/=2;
 			}
 			assert(block.x>0);
-			std::cerr << "block_size: " << block.x << ", " << block.y << std::endl;
+//			std::cerr << "block_size: " << block.x << ", " << block.y << std::endl;
 
 			dim3 grid(divUp(sterm.cols,block.x),divUp(sterm.rows,block.y) );
 
@@ -402,19 +421,23 @@ namespace skl{
 					src,
 					bg,
 					sterm,
-					noise_std_dev,0);
+					noise_std_dev,0,
+					sterm.cols,sterm.rows);
 			calcSmoothingTermY_kernel<<<grid,block,sharedMemSize,stream>>>(
 					src,
 					bg,
 					sterm,
-					noise_std_dev,TEXCUT_BLOCK_SIZE-1);
+					noise_std_dev,TEXCUT_BLOCK_SIZE-1,
+					sterm.cols,sterm.rows);
 			cudaSafeCall( cudaGetLastError() );
 		}
 
 		__global__ void calcTexturalIntencity_kernel(
 				const cv::gpu::PtrStepi sobel_x,
 				const cv::gpu::PtrStepi sobel_y,
-				cv::gpu::PtrStepf tex_intencity){
+				cv::gpu::PtrStepf tex_intencity,
+				int cols,
+				int rows){
 			int in_square_seq_idx = inSquareSeqIdx;
 			dim3 gidx = GlobalIdx;
 
@@ -424,22 +447,21 @@ namespace skl{
 			int square_seq_idx_in_block = SquareSeqIdxInBlock;
 			// offset to direct shared memory position
 			// for the belonging square
-			int offset = TEXCUT_SQUARE_AREA * square_seq_idx_in_block;
-			int temp = sobel_x.ptr(gidx.y)[gidx.x];
+			int offset = (TEXCUT_SQUARE_AREA+1) * square_seq_idx_in_block;
+			int dx = sobel_x.ptr(gidx.y)[gidx.x];
+			int dy = sobel_y.ptr(gidx.y)[gidx.x];
+			auto_correlation[offset + in_square_seq_idx] = dx*dx + dy*dy;
 
-			auto_correlation[offset + in_square_seq_idx] = temp*temp;
-			temp = sobel_y.ptr(gidx.y)[gidx.x];
-			auto_correlation[offset + in_square_seq_idx] += temp*temp;
 			__syncthreads();
-
 			sumUp(auto_correlation + offset,
 					TEXCUT_SQUARE_AREA,
 					in_square_seq_idx);
 
 			if(in_square_seq_idx!=0) return;
-
 			dim3 graph_node_idx = SquareIdx;
-			tex_intencity.ptr(graph_node_idx.y)[graph_node_idx.x] = (float)auto_correlation[offset];
+			if(gidx.x < cols && gidx.y < rows){
+				tex_intencity.ptr(graph_node_idx.y)[graph_node_idx.x] = (float)auto_correlation[offset];
+			}
 		}
 
 		void calcTexturalIntencity_gpu(
@@ -449,12 +471,14 @@ namespace skl{
 				cudaStream_t stream,
 				int dev){
 			int sharedMemSize;
-			dim3 block = maxBlockSize(&sharedMemSize,sizeof(int),0,0,0,true,dev);
+			dim3 block = maxBlockSize(&sharedMemSize,(1.f+1.f/TEXCUT_SQUARE_AREA) * sizeof(int),0,0,0,true,dev);
 			dim3 grid(divUp(sobel_x.cols,block.x), divUp(sobel_x.rows,block.y));
 
 			calcTexturalIntencity_kernel<<<grid,block,sharedMemSize,stream>>>(
 					sobel_x, sobel_y,
-					tex_intencity);
+					tex_intencity,
+					sobel_x.cols,
+					sobel_x.rows);
 			cudaSafeCall( cudaGetLastError() );
 		}
 
@@ -469,7 +493,9 @@ namespace skl{
 				cv::gpu::PtrStepf textural_correlation,
 				float noise_std_dev,
 				float thresh_tex_diff,
-				const cv::gpu::PtrStepb is_over_under_exposure){
+				const cv::gpu::PtrStepb is_over_under_exposure,
+				int cols,
+				int rows){
 
 			dim3 gidx = GlobalIdx;
 			float fg_ti = fg_tex_intencity.ptr(gidx.y)[gidx.x];
@@ -482,7 +508,7 @@ namespace skl{
 			float gh = max(fg_gradient_heterogenuity.ptr(gidx.y)[gidx.x],bg_gradient_heterogenuity.ptr(gidx.y)[gidx.x]);
 			tex_int = exp((gh * tex_int)-1.f);
 
-
+			// ignore over/under exposure and image boundary terminals.
 			if(0 != is_over_under_exposure.ptr(gidx.y)[gidx.x]){
 				tex_int = 0.f;
 				gh = 0.f;
@@ -492,19 +518,20 @@ namespace skl{
 				return;
 			}
 
-			max_gradient_heterogenuity.ptr(gidx.y)[gidx.x] = gh;
-			max_intencity.ptr(gidx.y)[gidx.x] = tex_int;
+			if(gidx.x<cols && gidx.y < rows){
+				max_gradient_heterogenuity.ptr(gidx.y)[gidx.x] = gh;
+				max_intencity.ptr(gidx.y)[gidx.x] = tex_int;
 
-			if(fg_ti + bg_ti==0){
-				terminals.ptr(gidx.y)[gidx.x] = 0.f;
-				return;
+				if(fg_ti + bg_ti==0){
+					terminals.ptr(gidx.y)[gidx.x] = 0.f;
+					return;
+				}
+				terminals.ptr(gidx.y)[gidx.x] = 
+					2 * (int)(
+							GRAPHCUT_QUANTIZATION_LEVEL * 
+							( tex_int * 
+								 (1.f - (2.f * textural_correlation.ptr(gidx.y)[gidx.x])/(fg_ti + bg_ti)  - thresh_tex_diff) / (2.f * thresh_tex_diff) ));
 			}
-
-			terminals.ptr(gidx.y)[gidx.x] = 
-				2 * (int)(
-						GRAPHCUT_QUANTIZATION_LEVEL * 
-						( tex_int * 
-							 (1.f - (2.f * textural_correlation.ptr(gidx.y)[gidx.x])/(fg_ti + bg_ti)  - thresh_tex_diff) / (2.f * thresh_tex_diff) ));
 		}
 
 		void bindUpDataTerm_gpu(
@@ -537,7 +564,9 @@ namespace skl{
 					textural_correlation,
 					noise_std_dev,
 					thresh_tex_diff,
-					is_over_under_exposure);
+					is_over_under_exposure,
+					max_intencity.cols,
+					max_intencity.rows);
 			cudaSafeCall( cudaGetLastError() );
 		}
 
@@ -549,7 +578,9 @@ namespace skl{
 				cv::gpu::PtrStepi rightTransp,
 				cv::gpu::PtrStepi leftTransp,
 				cv::gpu::PtrStepi bottom,
-				cv::gpu::PtrStepi top){
+				cv::gpu::PtrStepi top,
+				int cols,
+				int rows){
 			dim3 gidx = GlobalIdx;
 			int array_width = blockDim.x+1;
 			int array_height = blockDim.y+1;
@@ -580,15 +611,19 @@ namespace skl{
 			float gh_penalty = exp( - max(gh[array_idx],gh[array_idx+1]));
 			// hCue (sterm_x) is transposed
 			int temp = smoothing_term_weight * max(0,(int)((max_sterm_x.ptr(gidx.x)[gidx.y] + gh_penalty) * GRAPHCUT_QUANTIZATION_LEVEL) + dt_bonus);
-			rightTransp.ptr(gidx.x)[gidx.y] = (gidx.x == mem_width-1) ? 0 :temp;
-			leftTransp.ptr((gidx.x+1)%mem_width)[gidx.y] = (gidx.x == mem_width-1) ? 0 : temp;
+			if(gidx.x < cols && gidx.y < rows){
+				rightTransp.ptr(gidx.x)[gidx.y] = (gidx.x == mem_width-1) ? 0 :temp;
+				leftTransp.ptr((gidx.x+1)%mem_width)[gidx.y] = (gidx.x == mem_width-1) ? 0 : temp;
+			}
 
 
 			dt_bonus = -min(0,min(dt[array_idx],dt[array_idx+array_width]));
 			gh_penalty = exp( - max(gh[array_idx],gh[array_idx+array_width]) );
 			temp = smoothing_term_weight * max(0,(int)((max_sterm_y.ptr(gidx.y)[gidx.x] + gh_penalty) * GRAPHCUT_QUANTIZATION_LEVEL) + dt_bonus);
-			bottom.ptr(gidx.y)[gidx.x] = gidx.y == mem_height-1 ? 0 : temp;
-			top.ptr((gidx.y+1)%mem_height)[gidx.x] = gidx.y==mem_height-1 ? 0:temp;
+			if(gidx.x < cols && gidx.y < rows){
+				bottom.ptr(gidx.y)[gidx.x] = gidx.y == mem_height-1 ? 0 : temp;
+				top.ptr((gidx.y+1)%mem_height)[gidx.x] = gidx.y==mem_height-1 ? 0:temp;
+			}
 		}
 
 		void bindUpSmoothingTerms_gpu(
@@ -616,27 +651,35 @@ namespace skl{
 					rightTransp,
 					leftTransp,
 					bottom,
-					top);
+					top,
+					terminals.cols,
+					terminals.rows);
 			cudaSafeCall( cudaGetLastError() );
 		}
 
 		__global__ void checkOverExposure_kernel(
 				const cv::gpu::PtrStepb img,
 				cv::gpu::PtrStepb is_over_exposure,
-				unsigned char over_exposure_thresh){
+				unsigned char over_exposure_thresh,
+				int cols,
+				int rows){
 			dim3 gidx = GlobalIdx;
 			dim3 graph_node_idx = SquareIdx;
-			if(img.ptr(gidx.y)[gidx.x] <= over_exposure_thresh){
+			if(gidx.x < cols && gidx.y < rows &&
+					img.ptr(gidx.y)[gidx.x] <= over_exposure_thresh){
 				is_over_exposure.ptr(graph_node_idx.y)[graph_node_idx.x] = 0;
 			}
 		}
 		__global__ void checkUnderExposure_kernel(
 				const cv::gpu::PtrStepb img,
 				cv::gpu::PtrStepb is_under_exposure,
-				unsigned char under_exposure_thresh){
+				unsigned char under_exposure_thresh,
+				int cols,
+				int rows){
 			dim3 gidx = GlobalIdx;
 			dim3 graph_node_idx = SquareIdx;
-			if(under_exposure_thresh <= img.ptr(gidx.y)[gidx.x]){
+			if(gidx.x < cols && gidx.y < rows &&
+					under_exposure_thresh <= img.ptr(gidx.y)[gidx.x]){
 				is_under_exposure.ptr(graph_node_idx.y)[graph_node_idx.x] = 0;
 			}
 		}
@@ -656,7 +699,9 @@ namespace skl{
 			checkOverExposure_kernel<<<grid,block,sharedMemSize,stream>>>(
 					img,
 					is_over_exposure,
-					over_exposure_thresh);
+					over_exposure_thresh,
+					img.cols,
+					img.rows);
 			cudaSafeCall( cudaGetLastError() );
 		}
 		void checkUnderExposure_gpu(
@@ -673,7 +718,9 @@ namespace skl{
 			checkUnderExposure_kernel<<<grid,block,sharedMemSize,stream>>>(
 					img,
 					is_under_exposure,
-					under_exposure_thresh);
+					under_exposure_thresh,
+					img.cols,
+					img.rows);
 			cudaSafeCall( cudaGetLastError() );
 		}
 

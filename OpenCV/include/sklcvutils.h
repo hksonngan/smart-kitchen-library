@@ -22,6 +22,12 @@ bool operator&&(const cv::Rect& left, const cv::Rect& right);
 cv::Rect operator|(const cv::Rect& left, const cv::Rect& right);
 
 namespace skl{
+	void fillColorPalette(
+			std::vector<cv::Scalar>& palette,
+			size_t hue_pattern_num=7,
+			bool use_gray=true,
+			int min_luminance_value=20);
+
 #define SKL_GRAY 128
 	typedef enum{
 		BAYER_SIMPLE,	//!< 単純なベイヤー変換
@@ -76,8 +82,8 @@ namespace skl{
 		cv::Point pt1,
 		cv::Point pt2,
 		const cv::Scalar& color,
-		int thickness,
-		int lineType,
+		int thickness = 1,
+		int lineType = 8,
 		ArrowType head_type = ARROW,
 		ArrowType tail_type = NONE,
 		int head_size = 6,

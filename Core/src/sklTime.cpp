@@ -1,7 +1,7 @@
 ﻿/*!
  * @file   MmTime.cpp
  * @author Takahiro Suzuki
- * @date Last Change:2012/Jan/13.
+ * @date Last Change:2012/Jul/09.
  **/
 
 /**** Header ****/
@@ -37,7 +37,7 @@ namespace skl{
 		tv_st.tv_usec = other.tv_st.tv_usec;
 	}
 
-	Time::Time(int YYYY,int MM,int DD,int hh, int mm, int ss, int mmm){
+	Time::Time(int YYYY,int MM,int DD,int hh, int mm, int ss, int mmm, int usec){
 		defaulttf = new TimeFormatterDefault();
 
 		struct tm tm_st;
@@ -50,7 +50,7 @@ namespace skl{
 
 		// tm構造体からUNIX Timeを獲得する
 		tv_st.tv_sec = mktime(&tm_st);
-		tv_st.tv_usec = mmm*1000;
+		tv_st.tv_usec = mmm*1000 + usec;
 	}
 
 	Time::~Time(){

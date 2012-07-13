@@ -2,7 +2,7 @@
  * @file Flow.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jun/29
- * @date Last Change: 2012/Jun/29.
+ * @date Last Change: 2012/Jul/06.
  */
 #include "Flow.h"
 #include "skl.h"
@@ -42,6 +42,16 @@ bool Flow::isValid()const{
 	if(u.type()!=CV_32FC1) return false;
 	if(u.type()!=v.type()) return false;
 	return true;
+}
+const cv::Mat& Flow::operator[](Flow::Direction d)const{
+	if(X==d) return u;
+	return v;
+}
+
+cv::Mat& Flow::operator[](Direction d){
+	if(X==d) return u;
+	return v;
+
 }
 
 /*!
@@ -122,7 +132,7 @@ bool Flow::read(const std::string& filename){
 	return true;
 }
 
-bool Flow::write(const std::string& filename){
+bool Flow::write(const std::string& filename)const{
 	if(!isValid()) return false;
 	std::ofstream fout;
 	fout.open(filename.c_str(),std::ios::binary);
@@ -131,7 +141,7 @@ bool Flow::write(const std::string& filename){
 	}
 
 	fout.write((char*)&u.cols,sizeof(int));
-	fout.write((char*)&v.rows,sizeof(int));
+	fout.write((char*)&u.rows,sizeof(int));
 	for(int y=0;y<u.rows;y++){
 		fout.write((char*)u.ptr<float>(y),sizeof(float)*u.cols);
 	}

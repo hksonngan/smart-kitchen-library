@@ -123,7 +123,7 @@ int main(int argc,char* argv[]){
 		}
 
 		cv::imshow("result",result*255);
-		bgs_algo.setBackground(gpu_mat);
+//		bgs_algo.setBackground(gpu_mat);
 	}
 	cv::destroyAllWindows();
 	if(do_cpu){

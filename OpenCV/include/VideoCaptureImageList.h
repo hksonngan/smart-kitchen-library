@@ -2,7 +2,7 @@
  * @file VideoCaptureImageList.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change:2012/May/31.
+ * @date Last Change:2012/Jul/06.
  */
 #ifndef __SKL_VIDEO_CAPTURE_IMAGE_LIST_H__
 #define __SKL_VIDEO_CAPTURE_IMAGE_LIST_H__
@@ -25,7 +25,7 @@ namespace skl{
 			using _VideoCaptureInterface::set;
 			VideoCaptureImageList();
 			virtual ~VideoCaptureImageList();
-			bool open(const std::string& filename);
+			virtual bool open(const std::string& filename);
 			bool isOpened()const{return !img_list.empty();}
 			void release();
 			bool grab();

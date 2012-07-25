@@ -2,7 +2,7 @@
  * @file TouchedRegionDetector.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/06
- * @date Last Change:2012/Feb/14.
+ * @date Last Change:2012/Jul/25.
  */
 #ifndef __SKL_TOUCHED_REGION_DETECTOR_H__
 #define __SKL_TOUCHED_REGION_DETECTOR_H__
@@ -23,7 +23,7 @@ namespace skl{
 		virtual ~TouchedRegionDetector();
 
 		size_t compute(const cv::Mat& object_labels,const cv::Mat& human_mask, cv::Mat& dest);
-
+		inline void clear(){motion_history_algo.clear();}
 		void length_of_memory(int _length_of_memory){motion_history_algo.history_length(_length_of_memory);}
 		int length_of_memory()const{return motion_history_algo.history_length();}
 		const cv::Mat motion_history_image()const {return motion_history_algo.motion_history_image();}

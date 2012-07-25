@@ -16,6 +16,7 @@ namespace skl{
 			~StaticRegionDetector();
 			void setParam(double thresh,size_t life_time=1);
 			size_t compute(const cv::Mat& region_labels, const cv::Mat& mask, cv::Mat& object_labels);
+			void clear();
 		protected:
 			double thresh;
 			int life_time;

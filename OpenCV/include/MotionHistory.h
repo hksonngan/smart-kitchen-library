@@ -2,7 +2,7 @@
  * @file MotionHistory.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/06
- * @date Last Change:2012/Jan/06.
+ * @date Last Change:2012/Jul/25.
  */
 #ifndef __SKL_MOTION_HISTORY_H__
 #define __SKL_MOTION_HISTORY_H__
@@ -21,6 +21,7 @@ namespace skl{
 	public:
 		MotionHistory(int history_length=8);
 		virtual ~MotionHistory();
+		void clear();
 		void compute(const cv::Mat& mask);
 		void compute(const cv::Mat& mask, cv::Mat& dest);
 

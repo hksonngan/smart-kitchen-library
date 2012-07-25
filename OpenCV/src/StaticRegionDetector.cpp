@@ -23,6 +23,12 @@ StaticRegionDetector::~StaticRegionDetector(){
 #endif
 }
 
+void StaticRegionDetector::clear(){
+	prev_labels.release();
+	prev_object_areas.clear();
+	object_life_map.clear();
+}
+
 void StaticRegionDetector::setParam(double thresh, size_t life_time){
 	this->life_time = life_time;
 	this->thresh = thresh;

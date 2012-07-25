@@ -2,7 +2,7 @@
  * @file MotionHistory.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/06
- * @date Last Change: 2012/Jan/06.
+ * @date Last Change: 2012/Jul/25.
  */
 #include "MotionHistory.h"
 
@@ -59,4 +59,9 @@ void MotionHistory::compute(const cv::Mat& mask){
 	cv::imshow("motion_history",prev);
 #endif
 
+}
+
+void MotionHistory::clear(){
+	size = cv::Size(0,0);
+	prev.release();
 }

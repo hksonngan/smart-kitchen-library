@@ -2,6 +2,8 @@
 /**** 環境依存 ****/
 /**** WIN32 ****/
 #ifdef _WIN32
+#define _USE_MATH_DEFINES
+#include <math.h>
 #define NOMINMAX
 #include <windows.h>
 /**** Linux ****/
@@ -50,10 +52,10 @@ namespace skl{
 		float rad = atan2f(y,x);
 		rad += offset_radian;
 		while(rad>2*M_PI){
-			rad -= 2*M_PI;
+			rad -= static_cast<float>(2*M_PI);
 		}
 		while(rad<0){
-			rad += 2*M_PI;
+			rad += static_cast<float>(2*M_PI);
 		}
 		return rad;
 	}

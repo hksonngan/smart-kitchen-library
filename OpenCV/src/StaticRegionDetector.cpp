@@ -131,7 +131,7 @@ std::vector<bool> StaticRegionDetector::update_object_life_map(
 			double score = calcScore(
 					current_object_areas[cid],
 					prev_object_areas[pid],
-					cross_area_mat[cid][pid]);
+					static_cast<double>(cross_area_mat[cid][pid]));
 			if(best_score < score){
 				best_score = score;
 				best_match = pid;

@@ -14,6 +14,7 @@ namespace skl{
 		public:
 			HumanDetectorWorkspaceEnd();
 			~HumanDetectorWorkspaceEnd();
+
 			void setWorkspaceEnd(const cv::Mat& workspace_end);
 			std::list<size_t> compute(const cv::Mat& src, const cv::Mat& mask, cv::Mat& human_region);
 		protected:

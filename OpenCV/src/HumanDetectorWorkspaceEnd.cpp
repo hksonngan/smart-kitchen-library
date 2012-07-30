@@ -14,7 +14,7 @@ std::list<size_t> HumanDetectorWorkspaceEnd::compute(
 		const cv::Mat& src,
 		const cv::Mat& mask,
 		cv::Mat& human){
-	assert(mask.size()==workspace_end.size());
+//	assert(mask.size()==workspace_end.size());
 	human = cv::Mat::zeros(mask.size(),CV_8UC1);
 	std::vector<bool> is_human(1,false);
 
@@ -46,4 +46,3 @@ std::list<size_t> HumanDetectorWorkspaceEnd::compute(
 
 	return human_regions;
 }
-

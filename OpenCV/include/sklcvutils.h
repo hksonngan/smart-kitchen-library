@@ -162,8 +162,8 @@ namespace skl{
 		assert(label_small.channels()==1);
 		assert(label_small.type()==label.type());
 		cv::Size label_size(label_small.size());
-		label_size.width *= scale;
-		label_size.height *= scale;
+		label_size.width *= (int)scale;
+		label_size.height *= (int)scale;
 		assert(label_size == label.size());
 
 		label = cv::Scalar(0);
@@ -182,7 +182,7 @@ namespace skl{
 			//			assert(ly<label.rows);
 			plabel = label.ptr<LabelType>(ly);
 
-			for(int lx = 0; lx < label.cols; lx+=scale,x++){
+			for(int lx = 0; lx < label.cols; lx+=(int)scale,x++){
 				if(lx % label_size.width == 0){
 					if(y_counter%scale == 0){
 						y++;

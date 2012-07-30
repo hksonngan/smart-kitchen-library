@@ -27,7 +27,7 @@ namespace skl{
 				VideoCaptureGpu(VideoCapturePtr video_capture_cpu=NULL);
 				virtual ~VideoCaptureGpu();
 
-				void setBaseCapture(VideoCapturePtr video_capture_cpu){
+				inline void setBaseCapture(VideoCapturePtr video_capture_cpu){
 					assert(!video_capture_cpu.empty());
 					this->video_capture_cpu = video_capture_cpu;
 				}
@@ -44,7 +44,7 @@ namespace skl{
 					if(video_capture_cpu.empty()) return false;
 					return video_capture_cpu->isOpened();
 				}
-				void release(){
+				inline void release(){
 					s.waitForCompletion();
 					video_capture_cpu.release();
 					isNextFrameUploaded = false;
@@ -70,7 +70,7 @@ namespace skl{
 				}
 				inline double get(capture_property_t prop_id){
 					if(prop_id==skl::POS_FRAMES){
-						int pos_frame = video_capture_cpu->get(prop_id);
+						int pos_frame = static_cast<int>(video_capture_cpu->get(prop_id));
 						if(isNextFrameUploaded){
 							return pos_frame - 1;
 						}
@@ -81,7 +81,7 @@ namespace skl{
 					return video_capture_cpu->get(prop_id);
 				}
 
-				VideoCaptureGpu& operator>>(cv::gpu::GpuMat& gpu_mat){
+				inline VideoCaptureGpu& operator>>(cv::gpu::GpuMat& gpu_mat){
 					if(!grab()){
 						gpu_mat.release();
 					}

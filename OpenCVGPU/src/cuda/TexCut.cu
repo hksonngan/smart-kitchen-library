@@ -7,6 +7,7 @@
 
 #include <cassert>
 #include <cfloat>
+#include "opencv2/core/core.hpp"
 #include "opencv2/gpu/devmem2d.hpp"
 #include "cuda_runtime.h"
 #include "npp.h"

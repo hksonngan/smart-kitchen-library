@@ -28,7 +28,7 @@ namespace skl{
 			float val = VAL_MAX - val_step * v;
 			for(size_t h=0;h<cycle;h++,p++){
 				if(h==0 && use_gray){
-					int _val = (val/VAL_MAX)*BGR_MAX;
+					int _val = static_cast<int>((val/VAL_MAX)*BGR_MAX);
 					palette[p] = cv::Scalar(_val,_val,_val);
 				}
 				float hue = hue_step * h;

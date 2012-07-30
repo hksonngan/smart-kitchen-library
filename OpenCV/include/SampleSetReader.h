@@ -8,8 +8,8 @@
 #define __SKL_SAMPLE_SET_READER_H__
 
 #include <fstream>
-#include "skl.h"
 #include "cv.h"
+#include "skl.h"
 
 namespace skl{
 
@@ -49,18 +49,18 @@ class SampleSetReader{
 
 template <class Type,size_t CV_DEPTH> bool SampleSetReader::_readMatrix(std::istream& in, size_t cols, size_t rows, cv::Mat& dist){
 	if(dist.depth()!=CV_DEPTH || dist.channels()!=1 || dist.cols!=(int)cols || dist.rows!=(int)rows){
-		dist = cv::Mat::zeros(cv::Size(cols,rows),CV_DEPTH);
+		dist = cv::Mat::zeros(cv::Size((int)cols,(int)rows),CV_DEPTH);
 	}
 	std::string str;
 	std::vector<std::string> buf;
 	for(size_t y=0;y<cols;y++){
 		if(in.eof()) return false;
 		std::getline(in,str);
-		buf = skl::split_strip(str,",",rows);
+		buf = skl::split_strip(str,",",(int)rows);
 		if(buf.size()!=rows) return false;
 		for(size_t x=0;x<rows;x++){
-			Type val = atof(buf[x].c_str());
-			dist.at<Type>(x,y) = val;
+			Type val = static_cast<Type>(atof(buf[x].c_str()));
+			dist.at<Type>((int)x,(int)y) = val;
 		}
 	}
 	return true;

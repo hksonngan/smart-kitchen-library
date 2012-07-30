@@ -18,6 +18,7 @@
 
 #include <iostream>
 #include "cuda_runtime.h"
+struct CUstream{int id;};
 #define cudaSafeCall(expr) __cudaSafeCall(expr,__FILE__,__LINE__)
 
 

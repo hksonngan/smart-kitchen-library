@@ -144,7 +144,9 @@ namespace skl{
 
 		for(int y=0;y<label.rows;y++){
 			for(int x=0;x<label.cols;x++){
-				vis.at<cv::Vec3b>(y,x) = colors[label.at<short>(y,x)-1];
+				short l = label.at<short>(y,x);
+				if(l==0) continue;
+				vis.at<cv::Vec3b>(y,x) = colors[l-1];
 			}
 		}
 		return vis;

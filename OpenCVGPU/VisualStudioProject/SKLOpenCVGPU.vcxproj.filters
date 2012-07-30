@@ -50,8 +50,5 @@
     <ClInclude Include="..\include\VideoCaptureGpu.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\TexCut_share.hpp">
-      <Filter>ソース ファイル</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

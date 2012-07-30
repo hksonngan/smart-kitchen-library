@@ -1,4 +1,4 @@
-/*!
+ï»¿/*!
  * @file TexCut.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
@@ -169,7 +169,7 @@ inline cv::Size getGraphSize(const cv::Size& img_size){
 }
 
 /*!
- * @brief ¥Ç¥Õ¥©¥ë¥È¥³¥ó¥¹¥È¥é¥¯¥¿
+ * @brief ï¿½Ç¥Õ¥ï¿½ï¿½ï¿½È¥ï¿½ï¿½ó¥¹¥È¥é¥¯ï¿½ï¿½
  */
 gpu::TexCut::TexCut(float alpha, float smoothing_term_weight, float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh):
 	noise_std_dev(3,3.5),
@@ -180,7 +180,7 @@ gpu::TexCut::TexCut(float alpha, float smoothing_term_weight, float thresh_tex_d
 }
 
 /*!
- * @brief ¥Ç¥¹¥È¥é¥¯¥¿
+ * @brief ï¿½Ç¥ï¿½ï¿½È¥é¥¯ï¿½ï¿½
  */
 gpu::TexCut::~TexCut(){
 

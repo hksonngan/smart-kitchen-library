@@ -1,7 +1,7 @@
 #define USE_VIDEO_CAPTURE_OPT_PARSER
 #include "skl.h"
 #include "sklcv.h"
-#include "sklflycap.h"
+//#include "sklflycap.h"
 #include <sstream>
 
 opt_on(std::string, camera_setting, "", "-C","<FILE>","load camera conf parameters.");
@@ -29,7 +29,8 @@ int main(int argc,char* argv[]){
 		return EXIT_FAILURE;
 	}
 
-	skl::FlyCapture cam;
+//	skl::FlyCapture cam;
+	skl::VideoCapture cam;
 	skl::VideoCaptureParams params;
 
 	if(!camera_setting.empty()){
@@ -68,20 +69,25 @@ int main(int argc,char* argv[]){
 	skl::TexCut bgs_algo;
 
 	// get first background image
-	cam >> mat;
+	cv::Mat raw;
+	cam >> raw;
+	cv::blur(raw,mat,cv::Size(3,3));
 	bgs_algo.setParams(alpha,smoothing_term_weight,thresh_tex_diff,over_exposure_thresh,under_exposure_thresh);
 	bgs_algo.setBackground(mat);
 
 	// get second background image
-	cam >> mat;
+	cam >> raw;
+	cv::blur(raw,mat,cv::Size(3,3));
 	bgs_algo.learnImageNoiseModel(mat);
+
 
 	int frame = cam.get("POS_FRAMES");
 	skl::StopWatch swatch;
 	unsigned int _step_buf=0;
 	while('q'!=cv::waitKey(10)){
 		std::cout << "frame: " << frame++ << std::endl;
-		cam >> mat;
+		cam >> raw;
+		cv::blur(raw,mat,cv::Size(3,3));
 		_step_buf++;
 		if(step>_step_buf){
 			continue;

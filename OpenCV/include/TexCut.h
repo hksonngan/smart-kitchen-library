@@ -6,7 +6,7 @@
 #include "BackgroundSubtractAlgorithm.h"
 
 #ifdef DEBUG
-//#define DEBUG_TEXCUT
+#define DEBUG_TEXCUT
 #endif
 
 #define TEXCUT_BLOCK_SIZE 4
@@ -158,6 +158,7 @@ namespace skl{
 					cv::Mat& smoothing_term_x,
 					cv::Mat& smoothing_term_y);
 			void operator()(const cv::BlockedRange& range)const;
+			static float calcGradHetero(std::vector<float>& power);
 		protected:
 			const std::vector<cv::Mat>& src;
 			const std::vector<cv::Mat>& sobel_x;
@@ -186,7 +187,6 @@ namespace skl{
 					const cv::Mat& bg_sobel_x, const cv::Mat& bg_sobel_y,
 					float nsd,float gh_mean,float gh_sd,
 					float* tex_int, float* gh, float* tex_diff)const;
-			float calcGradHetero(std::vector<float>& power)const;
 			void calcSmoothingTerm(
 					const cv::Mat& src_left, const cv::Mat& src_right,
 					const cv::Mat& bg_left, const cv::Mat& bg_right,

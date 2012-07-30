@@ -517,8 +517,9 @@ void ParallelCalcEdgeCapacity::calcDataTerm(
 	float auto_cor_src(0),auto_cor_bg(0);
 	float cross_cor(0);
 	int square_size = TEXCUT_BLOCK_SIZE * TEXCUT_BLOCK_SIZE;
-	std::vector<float> sort_tar_x(square_size,0);
-	std::vector<float> sort_tar_y(sort_tar_x),bg_sort_tar_x(sort_tar_x),bg_sort_tar_y(sort_tar_x);
+	std::vector<float> sort_tar(square_size,0),bg_sort_tar(square_size,0);
+//	std::vector<float> sort_tar_x(square_size,0),sort_tar_y(square_size,0);
+//	std::vector<float> bg_sort_tar_x(square_size,0),bg_sort_tar_y(square_size,0);
 	for(int y=0,i=0;y<TEXCUT_BLOCK_SIZE;y++){
 		for(int x=0;x<TEXCUT_BLOCK_SIZE;x++,i++){
 			float ssx,ssy,bsx,bsy;
@@ -526,14 +527,16 @@ void ParallelCalcEdgeCapacity::calcDataTerm(
 			ssy = static_cast<float>(sobel_y.at<unsigned char>(y,x));
 			bsx = static_cast<float>(bg_sobel_x.at<unsigned char>(y,x));
 			bsy = static_cast<float>(bg_sobel_y.at<unsigned char>(y,x));
-			auto_cor_src += (std::pow(ssx,2) + std::pow(ssy,2));
-			auto_cor_bg += (std::pow(bsx,2) + std::pow(bsy,2));
+			sort_tar[i] = (std::pow(ssx,2) + std::pow(ssy,2));
+			auto_cor_src += sort_tar[i];
+			bg_sort_tar[i] = (std::pow(bsx,2) + std::pow(bsy,2));
+			auto_cor_bg += bg_sort_tar[i];
 			cross_cor += (ssx * bsx + ssy * bsy);
 
-			sort_tar_x[i] = ssx;
-			sort_tar_y[i] = ssy;
-			bg_sort_tar_x[i] = bsx;
-			bg_sort_tar_y[i] = bsy;
+//			sort_tar_x[i] = ssx;
+//			sort_tar_y[i] = ssy;
+//			bg_sort_tar_x[i] = bsx;
+//			bg_sort_tar_y[i] = bsy;
 		}
 	}
 
@@ -544,13 +547,17 @@ void ParallelCalcEdgeCapacity::calcDataTerm(
 		normalize(*tex_int,2*sqrt(3.0f) * nsd));
 
 	// calc gradient heterogenuity
-	float grad_hetero = calcGradHetero(sort_tar_x);
-	float temp = calcGradHetero(sort_tar_y);
+	float grad_hetero = calcGradHetero(sort_tar);
+	float temp = calcGradHetero(bg_sort_tar);
 	grad_hetero = grad_hetero > temp ? grad_hetero : temp;
-	temp = calcGradHetero(bg_sort_tar_x);
+/*	float grad_hetero = calcGradHetero(sort_tar_x);
+	float temp = calcGradHetero(bg_sort_tar_x);
+	grad_hetero = grad_hetero > temp ? grad_hetero : temp;
+	temp = calcGradHetero(sort_tar_y);
 	grad_hetero = grad_hetero > temp ? grad_hetero : temp;
 	temp = calcGradHetero(bg_sort_tar_y);
 	grad_hetero = grad_hetero > temp ? grad_hetero : temp;
+*/
 	grad_hetero = normalize(grad_hetero, 2*gh_sd, gh_mean);
 	*gh = grad_hetero;
 
@@ -583,25 +590,23 @@ float ParallelCalcEdgeCapacity::normalize(float val,float sigma, float mean)cons
 	return val;
 }
 
-float ParallelCalcEdgeCapacity::calcGradHetero(std::vector<float>& power)const{
-	std::sort(power.begin(),power.end(),std::greater<float>());
-	float factor = power[power.size()/2];
+
+float ParallelCalcEdgeCapacity::calcGradHetero(std::vector<float>& power){
+	float max = sqrt(*std::max_element(power.begin(),power.end()));
+	float factor = sqrt(*std::min_element(power.begin(),power.end()));
+/*	std::vector<float>::iterator median = power.begin()+(power.size()/2);
+	std::nth_element(power.begin(),median,power.end(),std::greater<float>());
+	float factor = *median;
+*/
 	if(factor == 0.0f){
-		if(power[0]==0.0f){
+		if(max==0.0f){
 			return 0;
 		}
 		else{
 			return FLT_MAX;
 		}
 	}
-/*
-	if(isnan(power[0]/factor)){
-		for(size_t i=0;i<power.size();i++){
-			std::cerr << power[i] << std::endl;
-		}
-	}
-*/
-	return power[0]/factor;
+	return max/factor;
 }
 void ParallelCalcEdgeCapacity::calcSmoothingTerm(
 		const cv::Mat& src_left, const cv::Mat& src_right,
@@ -666,14 +671,13 @@ void ParallelNoiseEstimate::ghNoiseEstimate(
 					for(int e = 0; e < elem_num; e++){
 						powers[e] = static_cast<float>(rayleigh_rand(std::sqrt(6.0)*noise_std_dev));
 					}
-					std::sort(powers.begin(),powers.end(),std::greater<float>());
-					float factor = powers[powers.size()/2];
-					if(factor==0){
+					float gh = ParallelCalcEdgeCapacity::calcGradHetero(powers);
+					if(gh==0||gh==FLT_MAX){
 						i--;
 						continue;
 					}
-					moment1 += powers[0]/factor;
-					moment2 += std::pow(powers[0]/factor,2);
+					moment1 += gh;
+					moment2 += std::pow(gh,2);
 				}
 				moment1 /= iteration_time;
 				moment2 /= iteration_time;

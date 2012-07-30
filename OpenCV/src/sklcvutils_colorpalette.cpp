@@ -15,6 +15,7 @@ namespace skl{
 			size_t hue_pattern_num,
 			bool use_gray,
 			int min_luminance_value){
+		if(palette.empty()) return;
 		float sat = SAT_MAX;
 
 		size_t cycle = hue_pattern_num+use_gray;
@@ -26,7 +27,7 @@ namespace skl{
 
 		for(size_t v=0,p=0;v<val_pattern_num;v++){
 			float val = VAL_MAX - val_step * v;
-			for(size_t h=0;h<cycle;h++,p++){
+			for(size_t h=0;h<cycle && p < palette.size();h++,p++){
 				if(h==0 && use_gray){
 					int _val = static_cast<int>((val/VAL_MAX)*BGR_MAX);
 					palette[p] = cv::Scalar(_val,_val,_val);

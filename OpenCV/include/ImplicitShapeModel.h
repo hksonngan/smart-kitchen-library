@@ -2,7 +2,7 @@
  * @file ImplicitShapeModel.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jul/11
- * @date Last Change:2012/Jul/19.
+ * @date Last Change:2012/Jul/26.
  */
 #ifndef __SKL_IMPLICIT_SHAPE_MODEL_H__
 #define __SKL_IMPLICIT_SHAPE_MODEL_H__
@@ -153,7 +153,8 @@ class ImplicitShapeModel{
 		bool hasVocaburary;
 		std::vector<ISMEntries> occurrences;
 		std::vector<float> v_norm;
-		std::map<int,std::vector<size_t> > sample_num;
+		std::map<int,std::vector<size_t> > word_hit_num;
+//		std::map<int,size_t> sample_num;
 
 		bool getSimilarity(const cv::Mat& features, cv::Mat& similarity)const;
 		void getNorm(const cv::Mat& features, std::vector<float>& norm)const;

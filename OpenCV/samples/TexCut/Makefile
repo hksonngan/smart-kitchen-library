@@ -19,8 +19,10 @@ CFLAGS_D = -Wall
 # skl用の設定
 PATH_TO_SKL_ROOT = ../../../
 BINDIR = ${PATH_TO_SKL_ROOT}/bin/
-ADDITIONAL_SKL_MODULE = FlyCapture OpenCV Core
-ADDITIONAL_SKL_MODULEs = flycapture opencv core
+#ADDITIONAL_SKL_MODULE = FlyCapture OpenCV Core
+#ADDITIONAL_SKL_MODULEs = flycapture opencv core
+ADDITIONAL_SKL_MODULE = OpenCV Core
+ADDITIONAL_SKL_MODULEs = opencv core
 SKL_LIBDIR = ${PATH_TO_SKL_ROOT}/lib
 INC += -I${PATH_TO_SKL_ROOT}include
 LIBS += -L${SKL_LIBDIR} ${ADDITIONAL_SKL_MODULEs:%=-lskl_%}
@@ -44,9 +46,9 @@ CFLAGS_D += -DCV_MINOR_VERSION=$(word 2,$(OPENCVVER))
 
 
 # FlyCaptureの読み込み
-INC += -I/usr/include/flycapture/
-LIBS += -lflycapture
-LIBS_DEBUG += -lflycapture
+#INC += -I/usr/include/flycapture/
+#LIBS += -lflycapture
+#LIBS_DEBUG += -lflycapture
 
 
 

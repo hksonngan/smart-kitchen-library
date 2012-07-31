@@ -2,11 +2,10 @@
  * @file FilterGpuMat2GpuMat.h
  * @author a_hasimoto
  * @date Date Created: 2012/Feb/10
- * @date Last Change:2012/Feb/10.
+ * @date Last Change:2012/Jul/31.
  */
 #ifndef __SKL_GPU_FILTER_GPU_MAT2_GPU_MAT_H__
 #define __SKL_GPU_FILTER_GPU_MAT2_GPU_MAT_H__
-#pragma unmanaged
 #include "skl.h"
 #include <opencv2/gpu/gpu.hpp>
 
@@ -57,6 +56,5 @@ namespace skl{
 
 	} // skl
 } // gpu
-#pragma managed
 #endif // __SKL_GPU_FILTER_GPU_MAT2_GPU_MAT_H__
 

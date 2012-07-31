@@ -2,7 +2,7 @@
  * @file VideoCaptureImageList.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change: 2012/Jul/09.
+ * @date Last Change: 2012/Jul/31.
  */
 #include "VideoCaptureImageList.h"
 #include <fstream>
@@ -47,7 +47,10 @@ void VideoCaptureImageList::release(){
 }
 
 bool VideoCaptureImageList::grab(){
-	if(static_cast<size_t>(index) >= img_list.size()) return false;
+	if(static_cast<size_t>(index) >= img_list.size()){
+		release();
+		return false;
+	}
 	checked_frame_pos = index;
 	index++;
 	return true;

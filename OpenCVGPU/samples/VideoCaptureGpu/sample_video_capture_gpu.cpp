@@ -26,7 +26,7 @@ int main(int argc,char* argv[]){
 	// CAUTION: call opt_parse_cap_prop after opt_parse
 	opt_parse_cap_prop(params);
 
-
+	std::cerr << params << std::endl;
 
 	if(input_file.empty()){
 		cam.open(dev);
@@ -51,14 +51,20 @@ int main(int argc,char* argv[]){
 	cv::gpu::GpuMat image;
 	cv::gpu::GpuMat edge;
 	cv::Mat edge_cpu;
+	cv::Mat image_cpu;
 	while('q'!=cv::waitKey(10)){
 		// set関数を呼ぶと非同期アップロードが無効化する
 //		cam.set(skl::POS_FRAMES,0);
-		cam >> image;
+		if(!cam.grab()) break;
+		if(!cam.retrieve(image)) break;
 		if(image.empty()) break;
+/*
 		cv::gpu::Scharr(image,edge,CV_8U,1,0);
 		edge_cpu = cv::Mat(edge);
 		cv::imshow("edge x",edge_cpu);
+*/
+		cam.retrieve(image_cpu);
+		cv::imshow("image",image_cpu);
 	}
 	cv::destroyWindow("image");
 

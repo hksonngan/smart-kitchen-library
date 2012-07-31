@@ -2,7 +2,7 @@
  * @file VideoCaptureGpu.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Feb/10
- * @date Last Change: 2012/Feb/17.
+ * @date Last Change: 2012/Jul/31.
  */
 #include "VideoCaptureGpu.h"
 #include "sklcv.h"
@@ -13,6 +13,9 @@ using namespace skl::gpu;
  * @brief デフォルトコンストラクタ
 */
 VideoCaptureGpu::VideoCaptureGpu(cv::Ptr<_VideoCaptureInterface> video_capture_cpu):video_capture_cpu(video_capture_cpu),isNextFrameUploaded(false),_switch(false){
+	if(this->video_capture_cpu.refcount==0){
+		this->video_capture_cpu = cv::Ptr<_VideoCaptureInterface>(new skl::VideoCapture());
+	}
 }
 
 

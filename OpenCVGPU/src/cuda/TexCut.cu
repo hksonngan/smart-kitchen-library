@@ -2,12 +2,11 @@
  * @file TexCut.cu
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change: 2012/Jul/10.
+ * @date Last Change: 2012/Jul/31.
  */
 
 #include <cassert>
 #include <cfloat>
-#include "opencv2/core/core.hpp"
 #include "opencv2/gpu/devmem2d.hpp"
 #include "cuda_runtime.h"
 #include "npp.h"

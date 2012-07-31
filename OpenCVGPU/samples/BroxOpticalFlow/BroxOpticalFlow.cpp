@@ -134,6 +134,11 @@ int main(int argc,char* argv[]){
 			convFloatMat2UCharMat(flow.angle(),angle,255.0/(2*M_PI));
 			cv::imshow("distance",distance);
 			cv::imshow("angle",angle);
+			cv::imwrite("flow.png",visualize);
+			cv::imwrite("prev.png",prevcpu);
+			cv::imwrite("raw.png",imgcpu);
+			cv::imwrite("distance.png",distance);
+			cv::imwrite("angle.png",angle);
 		}
 		prev = image.clone();
 	}

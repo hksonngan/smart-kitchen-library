@@ -2,10 +2,10 @@
  * @file VideoCaptureGpu.h
  * @author a_hasimoto
  * @date Date Created: 2012/Feb/10
- * @date Last Change:2012/Feb/10.
+ * @date Last Change:2012/Jul/31.
  */
-#ifndef __SKL_GPU_VIDEO_CAPTURE_G_P_U_H__
-#define __SKL_GPU_VIDEO_CAPTURE_G_P_U_H__
+#ifndef __SKL_GPU_VIDEO_CAPTURE_GPU_H__
+#define __SKL_GPU_VIDEO_CAPTURE_GPU_H__
 
 #include <opencv2/gpu/gpu.hpp>
 #include "sklcv.h"
@@ -24,7 +24,7 @@ namespace skl{
 				using _VideoCaptureInterface::get;
 				using VideoCaptureInterface<VideoCaptureGpu>::operator>>;
 
-				VideoCaptureGpu(VideoCapturePtr video_capture_cpu = new skl::VideoCapture());
+				VideoCaptureGpu(VideoCapturePtr video_capture_cpu=VideoCapturePtr());
 				virtual ~VideoCaptureGpu();
 
 				inline void setBaseCapture(VideoCapturePtr video_capture_cpu){
@@ -46,7 +46,7 @@ namespace skl{
 				}
 				inline void release(){
 					s.waitForCompletion();
-					if(video_capture_cpu.refcount>0){
+					if(*video_capture_cpu.refcount>0){
 						video_capture_cpu.release();
 					}
 					isNextFrameUploaded = false;
@@ -54,13 +54,13 @@ namespace skl{
 
 				bool grab();
 				inline virtual bool retrieve(cv::Mat& image, int channel=0){
-					if(!isNextFrameUploaded) return false;
+					//if(!isNextFrameUploaded) return false;
 					if(channel!=0) return false;
 					image = switching_mat_cpu[_switch];
 					return true;
 				}
 				inline virtual bool retrieve(cv::gpu::GpuMat& image, int channel=0){
-					if(!isNextFrameUploaded) return false;
+					//if(!isNextFrameUploaded) return false;
 					if(channel!=0) return false;
 					image = switching_mat[_switch];
 					return true;

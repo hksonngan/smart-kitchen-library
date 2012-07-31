@@ -95,7 +95,7 @@ int main(int argc,char* argv[]){
 		else{
 			_step_buf=0;
 		}
-		if(!cam.isOpened()) break;
+		if(!cam.isOpened()||raw.cols==0||raw.rows==0) break;
 
 		cv::imshow("image",mat);
 

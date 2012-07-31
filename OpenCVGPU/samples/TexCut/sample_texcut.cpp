@@ -99,8 +99,9 @@ int main(int argc,char* argv[]){
 	skl::StopWatch swatch;
 	while('q'!=cv::waitKey(10)){
 		std::cout << "frame: " << frame++ << std::endl;
-		cam >> gpu_mat;
-		if(!cam.isOpened()) break;
+		if(!cam.grab()) break;
+		if(!cam.retrieve(gpu_mat)) break;
+		if(!cam.isOpened()||gpu_mat.cols==0||gpu_mat.rows==0) break;
 
 		cam.retrieve(mat);
 		cv::imshow("image",mat);

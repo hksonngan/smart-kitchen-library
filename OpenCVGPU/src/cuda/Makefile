@@ -8,7 +8,7 @@ ROOTBINDIR = ../
 BINDIR = ../
 ROOTOBJDIR = ./
 
-INCLUDES += `pkg-config --cflags opencv`
+INCLUDES += `pkg-config --cflags opencv` -I../../include
 
 # options for OpenCV
 piriod:= .

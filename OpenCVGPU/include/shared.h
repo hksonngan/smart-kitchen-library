@@ -2,7 +2,7 @@
  * @file shared.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change:2012/Feb/20.
+ * @date Last Change:2012/Jul/30.
  */
 #ifndef __SKL_GPU_SHARED_H__
 #define __SKL_GPU_SHARED_H__
@@ -18,7 +18,6 @@
 
 #include <iostream>
 #include "cuda_runtime.h"
-struct CUstream{int id;};
 #define cudaSafeCall(expr) __cudaSafeCall(expr,__FILE__,__LINE__)
 
 #define divUp(val,grain) ( (val)+(grain)-1 )/(grain)

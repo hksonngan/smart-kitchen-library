@@ -41,7 +41,7 @@ namespace skl{
 			// 従ってdeviceを指定するカメラのopenは不可としたい。
 			// しかしcv::VideoCaptureがFireWireカメラを撮影できないので
 			// 常に全てのカメラをハンドルする
-			virtual bool open(int device){assert(device==0);return open();}
+			virtual inline bool open(int device){assert(device==0);return open();}
 
 		protected:
 			bool is_started;
@@ -52,7 +52,7 @@ namespace skl{
 			static FlyCapture2::BusManager* busMgr;
 
 		private:
-			virtual bool push_back(int device){return false;}
+			virtual inline bool push_back(int device){return false;}
 			std::vector<VideoCaptureFlyCapture*> fcam_interface;
 	};
 

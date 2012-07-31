@@ -58,7 +58,7 @@ bool FlyCapture::open(){
 bool FlyCapture::sync_capture_start(FlyCapture2::Camera** ppCameras){
 	if(size()==0) return false;
 
-	FlyCapture2::Error error = FlyCapture2::Camera::StartSyncCapture(fcam_interface.size(), (const FlyCapture2::Camera**)ppCameras );
+	FlyCapture2::Error error = FlyCapture2::Camera::StartSyncCapture((unsigned int)fcam_interface.size(), (const FlyCapture2::Camera**)ppCameras );
 	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
 	for(size_t i=0;i<fcam_interface.size();i++){
 		fcam_interface[i]->is_started = true;

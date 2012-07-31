@@ -264,12 +264,12 @@ bool VideoCaptureFlyCapture::set_flycap(capture_property_t prop_id,double val){
 		}
 		if(pp->second == FlyCapture2::WHITE_BALANCE){
 			params.set(prop_id,val);
-			prop.valueB = params.get(skl::WHITE_BALANCE_BLUE_U);
-			prop.valueA = params.get(skl::WHITE_BALANCE_RED_V);
+			prop.valueB = (unsigned int)params.get(skl::WHITE_BALANCE_BLUE_U);
+			prop.valueA = (unsigned int)params.get(skl::WHITE_BALANCE_RED_V);
 			if(prop.valueA == 0.0 || prop.valueB == 0.0) return true;
 		}
 		else{
-			prop.valueA = val;
+			prop.valueA = (unsigned int)val;
 		}
 	}
 	error = camera.SetProperty(&prop);

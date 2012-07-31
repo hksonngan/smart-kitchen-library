@@ -24,9 +24,9 @@ namespace skl{
 
 		size_t compute(const cv::Mat& object_labels,const cv::Mat& human_mask, cv::Mat& dest);
 		inline void clear(){motion_history_algo.clear();}
-		void length_of_memory(int _length_of_memory){motion_history_algo.history_length(_length_of_memory);}
-		int length_of_memory()const{return motion_history_algo.history_length();}
-		const cv::Mat motion_history_image()const {return motion_history_algo.motion_history_image();}
+		inline void length_of_memory(int _length_of_memory){motion_history_algo.history_length(_length_of_memory);}
+		inline int length_of_memory()const{return motion_history_algo.history_length();}
+		inline const cv::Mat motion_history_image()const {return motion_history_algo.motion_history_image();}
 	protected:
 		MotionHistory motion_history_algo;
 	private:

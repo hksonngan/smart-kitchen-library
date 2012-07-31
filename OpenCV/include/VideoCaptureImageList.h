@@ -26,7 +26,7 @@ namespace skl{
 			VideoCaptureImageList();
 			virtual ~VideoCaptureImageList();
 			virtual bool open(const std::string& filename);
-			bool isOpened()const{return !img_list.empty();}
+			inline bool isOpened()const{return !img_list.empty();}
 			void release();
 			bool grab();
 			bool retrieve(cv::Mat& image, int channel=0);
@@ -42,7 +42,7 @@ namespace skl{
 		private:
 			// 画像列が記されたファイルが専門で、
 			// カメラなどのデバイスは読み込まない
-			bool open(int device){return false;}
+			inline bool open(int device){return false;}
 	};
 
 } // skl

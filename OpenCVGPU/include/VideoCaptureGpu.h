@@ -24,7 +24,7 @@ namespace skl{
 				using _VideoCaptureInterface::get;
 				using VideoCaptureInterface<VideoCaptureGpu>::operator>>;
 
-				VideoCaptureGpu(VideoCapturePtr video_capture_cpu=NULL);
+				VideoCaptureGpu(VideoCapturePtr video_capture_cpu = new skl::VideoCapture());
 				virtual ~VideoCaptureGpu();
 
 				inline void setBaseCapture(VideoCapturePtr video_capture_cpu){
@@ -46,7 +46,9 @@ namespace skl{
 				}
 				inline void release(){
 					s.waitForCompletion();
-					video_capture_cpu.release();
+					if(video_capture_cpu.refcount>0){
+						video_capture_cpu.release();
+					}
 					isNextFrameUploaded = false;
 				}
 

@@ -13,9 +13,6 @@ using namespace skl::gpu;
  * @brief デフォルトコンストラクタ
 */
 VideoCaptureGpu::VideoCaptureGpu(cv::Ptr<_VideoCaptureInterface> video_capture_cpu):video_capture_cpu(video_capture_cpu),isNextFrameUploaded(false),_switch(false){
-	if(this->video_capture_cpu==NULL){
-		this->video_capture_cpu = cv::Ptr<_VideoCaptureInterface>(new skl::VideoCapture());
-	}
 }
 
 

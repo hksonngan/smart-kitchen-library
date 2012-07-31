@@ -151,7 +151,7 @@ VideoCapture& VideoCapture::operator>>(std::vector<cv::Mat>& mat_vec){
 	}
 	else{
 		cv::parallel_for(
-				cv::BlockedRange(0,size()),
+				cv::BlockedRange(0,(int)size()),
 				VideoCapture_parallel_retrieve(cam_interface,mat_vec)
 				);
 	}

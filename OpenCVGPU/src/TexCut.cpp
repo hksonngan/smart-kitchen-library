@@ -4,6 +4,7 @@
  * @date Date Created: 2012/Jan/25
  * @date Last Change: 2012/Jun/25.
  */
+#pragma unmanaged
 #include "TexCut.h"
 #include "skl.h"
 #include "sklcvgpu_utils.h"
@@ -164,17 +165,17 @@ namespace skl{
 // local utility func
 inline cv::Size getGraphSize(const cv::Size& img_size){
 	return cv::Size(
-			skl::gpu::divUp(img_size.width,TEXCUT_BLOCK_SIZE),
-			skl::gpu::divUp(img_size.height,TEXCUT_BLOCK_SIZE));
+			divUp(img_size.width,TEXCUT_BLOCK_SIZE),
+			divUp(img_size.height,TEXCUT_BLOCK_SIZE));
 }
 
 /*!
  * @brief �ǥե���ȥ��󥹥ȥ饯��
  */
 gpu::TexCut::TexCut(float alpha, float smoothing_term_weight, float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh):
-	noise_std_dev(3,3.5),
-	gh_expectation(3,2.3),
-	gh_std_dev(3,1.12)
+	noise_std_dev(3,3.5f),
+	gh_expectation(3,2.3f),
+	gh_std_dev(3,1.12f)
 {
 	setParams(alpha,smoothing_term_weight,thresh_tex_diff,over_exposure_thresh,under_exposure_thresh);
 }
@@ -544,13 +545,13 @@ void gpu::TexCut::learnImageNoiseModel(const cv::gpu::GpuMat& bg2){
 		cv::Scalar mean,stddev;
 		skl::gpu::meanStdDev(diff,mean,stddev);
 
-		noise_std_dev[c] = stddev[0];
+		noise_std_dev[c] = (float)stddev[0];
 	}
 
 	gh_expectation.assign(channels,0);
 	gh_std_dev.assign(channels,0);
 	cv::parallel_for(
-			cv::BlockedRange(0,channels),
+			cv::BlockedRange(0,(int)channels),
 			ParallelGHNoiseEstimate(
 				noise_std_dev,
 				&gh_expectation,

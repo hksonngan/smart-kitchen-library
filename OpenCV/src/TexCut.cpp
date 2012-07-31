@@ -137,7 +137,7 @@ void TexCut::learnImageNoiseModel(const cv::Mat& bg2){
 	gh_expectation.assign(channels,0);
 	gh_std_dev.assign(channels,0);
 	cv::parallel_for(
-			cv::BlockedRange(0,channels),
+			cv::BlockedRange(0,(int)channels),
 			ParallelNoiseEstimate(
 				&bg_img,
 				&bg_img2,
@@ -319,7 +319,7 @@ int TexCut::calcGraphCut(const cv::Mat& data_term,const cv::Mat& smoothing_term_
 	size_t graph_width = nodes[0].size();
 	size_t graph_height = nodes.size();
 	size_t graph_size = graph_width * graph_height;
-	g = new TexCutGraph(graph_size,graph_size * 2 - graph_width - graph_height );
+	g = new TexCutGraph((int)graph_size,(int)graph_size * 2 - graph_width - graph_height );
 	for(size_t x=0;x<graph_width;x++){
 		nodes[0][x] = g->add_node();
 	}
@@ -341,15 +341,15 @@ int TexCut::calcGraphCut(const cv::Mat& data_term,const cv::Mat& smoothing_term_
 
 void TexCut::setCapacity(
 		TexCutGraph* g,std::vector<std::vector<TexCutGraph::node_id> >& nodes, size_t x,size_t y, const cv::Mat& data_term,const cv::Mat& smoothing_term_x, const cv::Mat& smoothing_term_y){
-	int _data_term = data_term.at<int>(y,x);
+	int _data_term = data_term.at<int>((int)y,(int)x);
 	g->add_tweights(
 			nodes[y][x],
 			QUANTIZATION_LEVEL - _data_term,
 			_data_term);
 	if(x!=nodes[0].size()-1){
-		int _smoothing_term_x = static_cast<int>(smoothing_term_weight * smoothing_term_x.at<int>(y,x));
+		int _smoothing_term_x = static_cast<int>(smoothing_term_weight * smoothing_term_x.at<int>((int)y,(int)x));
 		if(_smoothing_term_x < 0){
-			std::cerr << smoothing_term_x.at<int>(y,x) << std::endl;
+			std::cerr << smoothing_term_x.at<int>((int)y,(int)x) << std::endl;
 			std::cerr << smoothing_term_weight << std::endl;
 			std::cerr << _smoothing_term_x << std::endl;
 			std::cerr << QUANTIZATION_LEVEL << std::endl;
@@ -362,7 +362,7 @@ void TexCut::setCapacity(
 				_smoothing_term_x);
 	}
 	if(y!=nodes.size()-1){
-		int _smoothing_term_y = static_cast<int>(smoothing_term_weight * smoothing_term_y.at<int>(y,x));
+		int _smoothing_term_y = static_cast<int>(smoothing_term_weight * smoothing_term_y.at<int>((int)y,(int)x));
 		g->add_edge(
 				nodes[y][x],
 				nodes[y+1][x],//QUANTIZATION_LEVEL*2,QUANTIZATION_LEVEL*2);
@@ -398,7 +398,7 @@ void ParallelCalcEdgeCapacity::operator()(const cv::BlockedRange& range)const{
 			ignore_data_term = true;
 		}
 
-		int channels = src.size();
+		int channels = (int)src.size();
 		std::vector<float> t_i(channels, 0);
 		std::vector<float> d_t(channels, 0);
 		std::vector<float> s_x(channels, FLT_MAX);

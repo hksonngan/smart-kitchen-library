@@ -51,4 +51,12 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="..\src\cuda\shared_funcs.cu">
+      <Filter>ソース ファイル</Filter>
+    </CudaCompile>
+    <CudaCompile Include="..\src\cuda\TexCut.cu">
+      <Filter>ソース ファイル</Filter>
+    </CudaCompile>
+  </ItemGroup>
 </Project>

@@ -4,6 +4,10 @@ using namespace skl;
  * @brief 奈良先端大、井村先生のプログラム（激速）を利用したラベリング
  * 背景色は(0,0,0)でないといけない
  * */
+RegionLabelingSimple::RegionLabelingSimple(int threshold):threshold(threshold){}
+
+RegionLabelingSimple::~RegionLabelingSimple(){}
+
 size_t RegionLabelingSimple::compute(
 		const cv::Mat& img,
 		const cv::Mat& _mask,

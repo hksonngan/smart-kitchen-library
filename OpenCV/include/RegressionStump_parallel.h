@@ -1,6 +1,6 @@
 /*!
  * @file FeatureClassifierDecisionStumpForJointBoost.h
- * @author ∂∂À‹∆ÿªÀ
+ * @author a_hasimoto
  * @date Last Change:2011/Nov/27.
  */
 #ifndef __FEATURE_CLASSIFIER_DECISION_STAMP_FOR_JOINT_BOOST_FOR_HIGH_SPEED_H__

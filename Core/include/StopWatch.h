@@ -29,7 +29,7 @@ namespace skl{
 			void reset();
 
 			// additional functions to record laps
-			const std::vector<TimeInterval>& lap_time()const{return lap_times;}
+			inline const std::vector<TimeInterval>& lap_time()const{return lap_times;}
 			TimeInterval lap_time(size_t i)const;
 			TimeInterval lap();
 
@@ -38,7 +38,7 @@ namespace skl{
 			size_t record_num()const;
 
 			// alias for reset
-			void clear(){reset();}
+			inline void clear(){reset();}
 		protected:
 			Time base_time;
 			std::vector<TimeInterval> lap_times;

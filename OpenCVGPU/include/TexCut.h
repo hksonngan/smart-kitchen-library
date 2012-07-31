@@ -6,7 +6,6 @@
  */
 #ifndef __SKL_GPU_TEX_CUT_H__
 #define __SKL_GPU_TEX_CUT_H__
-
 #ifdef DEBUG
 #define DEBUG_GPU_TEXCUT
 #endif
@@ -14,8 +13,8 @@
 #include <cv.h>
 #include <highgui.h>
 #include <opencv2/gpu/gpu.hpp>
-#include "sklcv.h"
-
+//#include "sklcv.h"
+#include "../../OpenCV/include/Graphcut.h"
 #include "FilterGpuMat2GpuMat.h"
 
 namespace skl{
@@ -23,9 +22,9 @@ namespace skl{
 		/*!
 		 * @brief GPU上でTexCutによる背景差分を行うプログラム
 		 */
-		class TexCut: public BackgroundSubtractAlgorithm{
+		class TexCut: public FilterGpuMat2GpuMat<bool>{
 			public:
-				using BackgroundSubtractAlgorithm::compute;
+				using FilterGpuMat2GpuMat<bool>::compute;
 				TexCut(float alpha=1.5, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
 				~TexCut();
 				void setParams(float alpha=1.5,float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4, unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
@@ -41,16 +40,16 @@ namespace skl{
 				TexCut(const cv::gpu::GpuMat& bg1, const cv::gpu::GpuMat& bg2, float alpha=1.0, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
 				void setBackground(const cv::gpu::GpuMat& bg);
 				void learnImageNoiseModel(const cv::gpu::GpuMat& bg2);
-				void updateBackgroundModel(const cv::gpu::GpuMat& img){setBackground(img);}
+				inline void updateBackgroundModel(const cv::gpu::GpuMat& img){setBackground(img);}
 
 				/* Interfaces with cv::Mat */
 				TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha=1.0, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
 
-				void setBackground(const cv::Mat& bg){setBackground(cv::gpu::GpuMat(bg));}
-				void learnImageNoiseModel(const cv::Mat& bg2){learnImageNoiseModel(cv::gpu::GpuMat(bg2));}
+				inline void setBackground(const cv::Mat& bg){setBackground(cv::gpu::GpuMat(bg));}
+				inline void learnImageNoiseModel(const cv::Mat& bg2){learnImageNoiseModel(cv::gpu::GpuMat(bg2));}
 
-				void updateBackgroundModel(const cv::Mat& img){updateBackgroundModel(cv::gpu::GpuMat(img));}
-				cv::Mat background()const{
+				inline void updateBackgroundModel(const cv::Mat& img){updateBackgroundModel(cv::gpu::GpuMat(img));}
+				inline cv::Mat background()const{
 					std::vector<cv::Mat> temp(_background.size());
 					for(size_t c=0;c<temp.size();c++){
 						temp[c] = cv::Mat(_background[c]);
@@ -120,6 +119,5 @@ namespace skl{
 
 	} // skl
 } // gpu
-
 #endif // __SKL_GPU_TEX_CUT_H__
 

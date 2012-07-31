@@ -9,7 +9,7 @@
 namespace skl{
 	namespace gpu{
 		// specialization for void
-		template<> void FilterGpuMat2GpuMat<void>::compute(const cv::gpu::GpuMat& src,cv::gpu::GpuMat& dest){
+/*		template<> void FilterGpuMat2GpuMat<void>::compute(const cv::gpu::GpuMat& src,cv::gpu::GpuMat& dest){
 			compute(src,dest,cv::gpu::Stream::Null());
 		}
 
@@ -30,6 +30,6 @@ namespace skl{
 			compute(src_buf,dest_buf,s);
 			dest_buf.download(dest);
 		}
-
+		*/
 	}
 }

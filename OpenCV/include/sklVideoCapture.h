@@ -26,19 +26,19 @@ namespace skl{
 			VideoCapture();
 			virtual ~VideoCapture();
 
-			bool open(const std::string& filename){
+			inline bool open(const std::string& filename){
 				release();
 				return push_back(filename);
 			}
-			bool open(const std::string& filename, cv::Ptr<_VideoCaptureInterface> cam){
+			inline bool open(const std::string& filename, cv::Ptr<_VideoCaptureInterface> cam){
 				release();
 				return push_back(filename,cam);
 			}
-			bool open(int device){
+			inline bool open(int device){
 				release();
 				return push_back(device);
 			}
-			bool open(int device, cv::Ptr<_VideoCaptureInterface> cam){
+			inline bool open(int device, cv::Ptr<_VideoCaptureInterface> cam){
 				release();
 				return push_back(device,cam);
 			}
@@ -55,7 +55,7 @@ namespace skl{
 			double get(capture_property_t prop_id);
 
 			_VideoCaptureInterface& operator[](int device);
-			size_t size()const{return cam_interface.size();}
+			inline size_t size()const{return cam_interface.size();}
 
 			virtual bool push_back(const std::string& filename);
 			virtual bool push_back(int device);

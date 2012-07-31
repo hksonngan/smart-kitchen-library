@@ -84,6 +84,9 @@
     <ClCompile Include="..\src\ImplicitShapeModel_Entry.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\BackgroundSubtractAlgorithm.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\BackgroundCut.h">
@@ -95,12 +98,6 @@
     <ClInclude Include="..\include\RegionLabelingSimple.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\RegressionStump.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\RegressionStump_parallel.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\MotionHistory.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -108,9 +105,6 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="..\include\StaticRegionDetector.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\JointBoost.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="..\include\FilterMat2Mat.h">

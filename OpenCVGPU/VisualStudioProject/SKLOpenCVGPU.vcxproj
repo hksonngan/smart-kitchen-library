@@ -113,11 +113,18 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <CallingConvention>
       </CallingConvention>
+      <FunctionLevelLinking>
+      </FunctionLevelLinking>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <CudaCompile>
+      <Include>$(ProjectDir)..\include;</Include>
+      <Keep>true</Keep>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -165,6 +172,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <CudaCompile>
+      <Include>$(ProjectDir)..\include;</Include>
+    </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
@@ -182,6 +192,14 @@
     <ClInclude Include="..\include\sklcvgpu_utils.h" />
     <ClInclude Include="..\include\TexCut.h" />
     <ClInclude Include="..\include\VideoCaptureGpu.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <CudaCompile Include="..\src\cuda\shared_funcs.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
+    <CudaCompile Include="..\src\cuda\TexCut.cu">
+      <FileType>Document</FileType>
+    </CudaCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

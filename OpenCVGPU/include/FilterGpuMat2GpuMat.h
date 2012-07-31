@@ -6,10 +6,9 @@
  */
 #ifndef __SKL_GPU_FILTER_GPU_MAT2_GPU_MAT_H__
 #define __SKL_GPU_FILTER_GPU_MAT2_GPU_MAT_H__
-
+#pragma unmanaged
 #include "skl.h"
 #include <opencv2/gpu/gpu.hpp>
-
 
 namespace skl{
 	namespace gpu{
@@ -56,11 +55,8 @@ namespace skl{
 			return val;
 		}
 
-		typedef FilterGpuMat2GpuMat<bool> BackgroundSubtractAlgorithm;
-
-
 	} // skl
 } // gpu
-
+#pragma managed
 #endif // __SKL_GPU_FILTER_GPU_MAT2_GPU_MAT_H__
 

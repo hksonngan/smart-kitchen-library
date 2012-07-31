@@ -123,7 +123,7 @@ bool SampleSetReader::_readTimestamps(std::istream& in, size_t sample_num, std::
 	std::string str;
 	if(in.eof()) return false;
 	std::getline(in,str);
-	std::vector<std::string> buf = skl::split_strip(str,",",sample_num);
+	std::vector<std::string> buf = skl::split_strip(str,",",(int)sample_num);
 	if(buf.size()!=sample_num) return false;
 
 	dist.resize(sample_num);
@@ -139,7 +139,7 @@ bool SampleSetReader::_readKeyPoints(std::istream& in, size_t sample_num, std::v
 	for(int i=0;i<7;i++){
 		if(in.eof()) return false;
 		std::getline(in,str);
-		buf[i] = skl::split_strip(str,",",sample_num);
+		buf[i] = skl::split_strip(str,",",(int)sample_num);
 		if(buf[i].size()!=sample_num) return false;
 	}
 	

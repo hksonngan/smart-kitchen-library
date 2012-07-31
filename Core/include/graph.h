@@ -158,8 +158,8 @@ public:
 	arc_id get_next_arc(arc_id a);
 
 	// other functions for reading graph structure
-	int get_node_num() { return node_num; }
-	int get_arc_num() { return (int)(arc_last - arcs); }
+	inline int get_node_num() { return node_num; }
+	inline int get_arc_num() { return (int)(arc_last - arcs); }
 	void get_arc_ends(arc_id a, node_id& i, node_id& j); // returns i,j to that a = i->j
 
 	///////////////////////////////////////////////////

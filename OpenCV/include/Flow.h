@@ -29,8 +29,10 @@ class Flow{
 			distance(r);
 			return r;
 		}
+
 		const cv::Mat& operator[](Direction d)const;
 		cv::Mat& operator[](Direction d);
+
 		void angle(cv::Mat& rad, float offset_rad=0,float origin_return_value=0);
 		inline cv::Mat angle(float offset_rad=0,float origin_return_value=0){
 			cv::Mat rad;

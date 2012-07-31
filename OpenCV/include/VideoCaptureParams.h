@@ -46,7 +46,7 @@ namespace skl{
 		VideoCaptureParamIter begin()const;
 		VideoCaptureParamIter end()const;
 
-		const std::map<std::string,capture_property_t>& getPropertyNameIDMap(){return property_name_id_map;}
+		inline const std::map<std::string,capture_property_t>& getPropertyNameIDMap(){return property_name_id_map;}
 		protected:
 
 		static std::map<std::string,capture_property_t> property_name_id_map;

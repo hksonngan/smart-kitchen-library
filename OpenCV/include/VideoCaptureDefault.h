@@ -26,12 +26,12 @@ namespace skl{
 			using _VideoCaptureInterface::set;
 			VideoCaptureDefault();
 			virtual ~VideoCaptureDefault();
-			bool open(const std::string& filename){return cv::VideoCapture::open(filename);}
-			bool open(int device){return cv::VideoCapture::open(device);}
-			bool isOpened()const{return cv::VideoCapture::isOpened();}
-			void release(){cv::VideoCapture::release();}
-			bool grab(){return cv::VideoCapture::grab();}
-			bool retrieve(cv::Mat& image,int channel=0){return cv::VideoCapture::retrieve(image,channel);}
+			inline bool open(const std::string& filename){return cv::VideoCapture::open(filename);}
+			inline bool open(int device){return cv::VideoCapture::open(device);}
+			inline bool isOpened()const{return cv::VideoCapture::isOpened();}
+			inline void release(){cv::VideoCapture::release();}
+			inline bool grab(){return cv::VideoCapture::grab();}
+			inline bool retrieve(cv::Mat& image,int channel=0){return cv::VideoCapture::retrieve(image,channel);}
 
 			//! カメラに値やモード(camera_mode_tがset(*,camera_mode_t mode)を通してvalに与えられる(modeは-4から-1までの整数)をセットする純粋仮想関数
 			bool set(capture_property_t prop_id,double val);

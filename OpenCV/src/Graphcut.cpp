@@ -37,7 +37,7 @@ int Graphcut::compute(
 	if(graph!=NULL){
 		delete graph;
 	}
-	graph = new Graph<int,int,int>(graph_node_num,graph_node_num * 2 - graph_size.width - graph_size.height);
+	graph = new Graph<int,int,int>((int)graph_node_num,(int)graph_node_num * 2 - graph_size.width - graph_size.height);
 
 
 	for(int x=0;x<graph_size.width;x++){

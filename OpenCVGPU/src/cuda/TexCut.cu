@@ -11,7 +11,7 @@
 #include "opencv2/gpu/devmem2d.hpp"
 #include "cuda_runtime.h"
 #include "npp.h"
-#include "../../include/shared.h"
+#include "shared.h"
 #include "shared_funcs.cu"
 
 namespace cv{
@@ -85,7 +85,7 @@ namespace skl{
 			for(int i=0;i<TEXCUT_SQUARE_AREA;i++){
 				idx = offset + i % 2;
 				if((idx+1)%(TEXCUT_SQUARE_AREA+1)!=0 && array[idx] < array[idx+1]){
-					swap(array[idx],array[idx+1]);
+					swapi(array[idx],array[idx+1]);
 				}
 				__syncthreads();
 			}
@@ -157,7 +157,7 @@ namespace skl{
 			__syncthreads();
 
 			// reuse dx space for sumup function
-			sumUp(correlation+offset,
+			sumUpi(correlation+offset,
 					TEXCUT_SQUARE_AREA,
 					in_square_seq_idx);
 
@@ -218,7 +218,7 @@ namespace skl{
 			__syncthreads();
 
 			// reuse dx space for sumup function
-			sumUp(buf+offset,
+			sumUpi(buf+offset,
 					TEXCUT_SQUARE_AREA,
 					in_square_seq_idx);
 
@@ -230,7 +230,7 @@ namespace skl{
 			// calc intencity
 			buf[offset + in_square_seq_idx] = dx * dx + dy * dy;
 			__syncthreads();
-			sumUp(buf+offset,
+			sumUpi(buf+offset,
 					TEXCUT_SQUARE_AREA,
 					in_square_seq_idx);
 			if(in_square_seq_idx==0 && gidx.x < cols && gidx.y < rows){
@@ -454,7 +454,7 @@ namespace skl{
 			auto_correlation[offset + in_square_seq_idx] = dx*dx + dy*dy;
 
 			__syncthreads();
-			sumUp(auto_correlation + offset,
+			sumUpi(auto_correlation + offset,
 					TEXCUT_SQUARE_AREA,
 					in_square_seq_idx);
 

@@ -30,7 +30,7 @@ namespace skl{
 			virtual ~BackgroundCut();
 			void setParams(float thresh_bg, float thresh_fg, float sigma_KL,float K=5, float sigma_z=10, float learning_rate=0.2, int bg_cluster_num=15, int fg_cluster_num=5);
 			void background(const cv::Mat& background);
-			cv::Mat background()const{return _background;}
+			inline cv::Mat background()const{return _background;}
 			void updateBackgroundModel(const cv::Mat& img);
 		protected:
 			void compute(const cv::Mat& src,const cv::Mat& mask,cv::Mat& dest);

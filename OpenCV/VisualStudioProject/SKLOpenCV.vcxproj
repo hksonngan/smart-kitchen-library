@@ -34,6 +34,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -70,7 +71,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>C:\opencv\opencv\include;C:\opencv\opencv2\include\opencv;$(IncludePath)</IncludePath>
     <OutDir>$(ProjectDir)..\..\lib\$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)..\..\lib\$(Configuration)\</OutDir>
@@ -116,6 +117,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <CallingConvention>
       </CallingConvention>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -171,6 +173,7 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\BackgroundSubtractAlgorithm.cpp" />
     <ClCompile Include="..\src\ImplicitShapeModel_Entries.cpp" />
     <ClCompile Include="..\src\ImplicitShapeModel_Entry.cpp" />
     <ClCompile Include="..\src\RegionLabelingSimple.cpp" />
@@ -198,12 +201,9 @@
     <ClInclude Include="..\include\BackgroundCut.h" />
     <ClInclude Include="..\include\Labeling.h" />
     <ClInclude Include="..\include\RegionLabelingSimple.h" />
-    <ClInclude Include="..\include\RegressionStump.h" />
-    <ClInclude Include="..\include\RegressionStump_parallel.h" />
     <ClInclude Include="..\include\MotionHistory.h" />
     <ClInclude Include="..\include\HumanDetectorWorkspaceEnd.h" />
     <ClInclude Include="..\include\StaticRegionDetector.h" />
-    <ClInclude Include="..\include\JointBoost.h" />
     <ClInclude Include="..\include\FilterMat2Mat.h" />
     <ClInclude Include="..\include\TexCut.h" />
     <ClInclude Include="..\include\BackgroundSubtractAlgorithm.h" />

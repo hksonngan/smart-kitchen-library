@@ -15,8 +15,7 @@ namespace skl{
 	void FlyCapture2PrintBuildInfo();
 
 	/*!
-	 * @brief FlyCapture¤Î¥«¥á¥é¤Ë´Ø¤¹¤ë¾ğÊó¤ò½ĞÎÏ¤¹¤ë
-	 * */
+	 * @brief FlyCapture¤Î¥«¥á¥é¤Ë´Ø¤¹¤EğÊó¤ò½ĞÎÏ¤¹¤E	 * */
 	void FlyCapture2PrintCameraInfo(const FlyCapture2::CameraInfo& camInfo);
 }
 

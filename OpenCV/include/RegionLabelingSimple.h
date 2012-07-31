@@ -8,9 +8,9 @@ namespace skl{
 
 	class RegionLabelingSimple : public FilterMat2Mat<size_t>{
 		public:
-			RegionLabelingSimple(int threshold=30):threshold(threshold){}
-			~RegionLabelingSimple(){}
-			void setThreshold(int threshold){this->threshold = threshold;}
+			RegionLabelingSimple(int threshold=30);
+			~RegionLabelingSimple();
+			inline void setThreshold(int threshold){this->threshold = threshold;}
 			size_t compute(const cv::Mat& img, const cv::Mat& mask, cv::Mat& labels);
 		protected:
 			int threshold;

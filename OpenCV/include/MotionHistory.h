@@ -25,9 +25,9 @@ namespace skl{
 		void compute(const cv::Mat& mask);
 		void compute(const cv::Mat& mask, cv::Mat& dest);
 
-		const cv::Mat& motion_history_image()const{return prev;}
-		int history_length()const{return (offset+1) / step;}
-		void history_length(int __history_length){
+		inline const cv::Mat& motion_history_image()const{return prev;}
+		inline int history_length()const{return (offset+1) / step;}
+		inline void history_length(int __history_length){
 			offset = 255 - 256 % __history_length;
 			step = 256 / __history_length;
 		}

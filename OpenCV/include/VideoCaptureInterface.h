@@ -25,8 +25,8 @@ namespace skl{
 	 * */
 	class _VideoCaptureInterface:public SensorModuleBase<cv::Mat>{
 		public:
-			_VideoCaptureInterface(){};
-			~_VideoCaptureInterface(){}
+			_VideoCaptureInterface();
+			~_VideoCaptureInterface();
 			virtual bool open(const std::string& filename)=0;
 			virtual bool open(int device)=0;
 			virtual bool isOpened()const=0;
@@ -61,8 +61,8 @@ namespace skl{
 	 */
 	template<class T> class VideoCaptureInterface: public _VideoCaptureInterface{
 		public:
-			VideoCaptureInterface():_VideoCaptureInterface(){};
-			virtual ~VideoCaptureInterface(){};
+			VideoCaptureInterface();
+			virtual ~VideoCaptureInterface();
 /*
 			// pure virtual functions from _VideoCaptureInterface
 			virtual bool open(const std::string& filename)=0;
@@ -75,7 +75,7 @@ namespace skl{
 			virtual double get(capture_property_t prop_id)=0;
 */
 			// a function with Template T
-			virtual T& operator >> (cv::Mat& image){
+			virtual inline T& operator >> (cv::Mat& image){
 				if(!grab()){
 					image.release();
 				}
@@ -86,6 +86,9 @@ namespace skl{
 			}
 		protected:
 	};
+
+	template<class T> VideoCaptureInterface<T>::VideoCaptureInterface():_VideoCaptureInterface(){}
+	template<class T> VideoCaptureInterface<T>::~VideoCaptureInterface(){}
 
 } // skl
 

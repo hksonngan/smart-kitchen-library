@@ -19,9 +19,6 @@
     <None Include="..\include\graph_instances.inc">
       <Filter>ヘッダー ファイル</Filter>
     </None>
-    <None Include="..\include\OptParser.h.edited">
-      <Filter>ヘッダー ファイル</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\graph.cpp">

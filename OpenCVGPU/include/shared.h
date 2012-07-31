@@ -21,14 +21,11 @@
 struct CUstream{int id;};
 #define cudaSafeCall(expr) __cudaSafeCall(expr,__FILE__,__LINE__)
 
+#define divUp(val,grain) ( (val)+(grain)-1 )/(grain)
 
 namespace skl{
 	namespace gpu{
 		dim3 maxBlockSize(int* shared_mem_size, float byte_per_thread,float byte_per_row = 0.f,float byte_per_col = 0.f, int byte_const=0, bool near_square = true,int dev=0);
-
-		template <class T> static inline int divUp(T val,int grain){
-			return (val+grain-1)/grain;
-		}
 
 		static inline void __cudaSafeCall(cudaError_t err, const char* file, const int line){
 			if(cudaSuccess != err){

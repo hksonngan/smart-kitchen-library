@@ -5,6 +5,7 @@
 #include <highgui.h>
 #include "BackgroundSubtractAlgorithm.h"
 
+
 #ifdef DEBUG
 #define DEBUG_TEXCUT
 #endif
@@ -21,7 +22,6 @@ namespace skl{
 		public:
 			using BackgroundSubtractAlgorithm::compute;
 			typedef Graph<int,int,int> TexCutGraph;
-
 			TexCut(float alpha=1.5, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
 			TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha=1.0, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
 			~TexCut();
@@ -30,7 +30,7 @@ namespace skl{
 			void learnImageNoiseModel(const cv::Mat& bg2);
 
 			void updateBackgroundModel(const cv::Mat& img);
-			cv::Mat background()const{return _background;}
+			inline cv::Mat background()const{return _background;}
 			void setNoiseModel(
 					const std::vector<float>& noise_std_dev,
 					const std::vector<float>& gh_expectation,

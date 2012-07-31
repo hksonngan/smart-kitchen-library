@@ -97,6 +97,7 @@ namespace skl{
 		*w1 = mask;
 		*w2 = 1.0 - mask;
 	}
+
 	template<> void setWeight<unsigned char>(const unsigned char& mask, double* w1, double* w2);
 
 	template<class T> T blend(const T& pix1, const T& pix2, double w1,double w2){
@@ -211,8 +212,8 @@ namespace skl{
 
 	template <class LabelType> cv::Mat resize_label(const cv::Mat& label_small,size_t scale){
 		cv::Size label_size = label_small.size();
-		label_size.width *= scale;
-		label_size.height *= scale;
+		label_size.width *= (int)scale;
+		label_size.height *= (int)scale;
 		cv::Mat label = cv::Mat(label_size,label_small.type());
 		resize_label<LabelType>(label_small,scale,label);
 		return label;

@@ -6,9 +6,9 @@
 namespace skl{
 	class BackgroundSubtractAlgorithm:public FilterMat2Mat<void>{
 		public:
-			BackgroundSubtractAlgorithm(){};
-			virtual ~BackgroundSubtractAlgorithm(){};
-			virtual void compute(const cv::Mat& src, cv::Mat& dest){
+			BackgroundSubtractAlgorithm();
+			virtual ~BackgroundSubtractAlgorithm();
+			virtual inline void compute(const cv::Mat& src, cv::Mat& dest){
 				cv::Mat mask;// = cv::Mat(src.size(),CV_8UC1,255);
 				return compute(src, mask, dest);
 			}

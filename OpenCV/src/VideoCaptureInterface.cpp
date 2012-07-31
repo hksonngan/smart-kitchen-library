@@ -8,6 +8,10 @@
 
 using namespace skl;
 
+_VideoCaptureInterface::_VideoCaptureInterface(){}
+_VideoCaptureInterface::~_VideoCaptureInterface(){}
+
+
 bool _VideoCaptureInterface::set(const VideoCaptureParams& params){
 	bool any_success = false;
 	for(VideoCaptureParamIter iter = params.begin();
@@ -40,7 +44,6 @@ bool _VideoCaptureInterface::set(capture_property_t prop_id,camera_mode_t mode){
 }
 
 
-
 const VideoCaptureParams& _VideoCaptureInterface::get(){
 	for(std::map<std::string,capture_property_t>::const_iterator iter = params.getPropertyNameIDMap().begin();
 			iter!= params.getPropertyNameIDMap().end();iter++){
@@ -57,4 +60,6 @@ double _VideoCaptureInterface::get(const std::string& prop_name){
 	if(params.getPropertyNameIDMap().end() == pp) return 0;
 	return get(pp->second);
 }
+
+
 

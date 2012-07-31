@@ -46,7 +46,7 @@ namespace skl{
 				}
 				inline void release(){
 					s.waitForCompletion();
-					if(*video_capture_cpu.refcount>0){
+					if(!video_capture_cpu.empty()){
 						video_capture_cpu.release();
 					}
 					isNextFrameUploaded = false;

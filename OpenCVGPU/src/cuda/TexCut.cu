@@ -13,13 +13,18 @@
 #include "shared.h"
 #include "shared_funcs.cu"
 
+
+
 namespace cv{
 	namespace gpu{
 #if CV_MAJOR_VERSION > 1
 #if CV_MINOR_VERSION < 4
 	typedef PtrStep PtrStepb;
 #endif
+#elif WIN32
+	typedef PtrStep PtrStepb;
 #endif
+
 	}
 }
 

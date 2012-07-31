@@ -124,6 +124,7 @@
       <Include>$(ProjectDir)..\include;</Include>
       <Keep>true</Keep>
       <TargetMachinePlatform>64</TargetMachinePlatform>
+      <Defines>WIN32;LIB;DEBUG;</Defines>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -174,6 +175,7 @@
     </Link>
     <CudaCompile>
       <Include>$(ProjectDir)..\include;</Include>
+      <Defines>WIN32; LIB;</Defines>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -107,8 +107,8 @@ void TexCut::compute(const cv::Mat& __src,const cv::Mat& mask,cv::Mat& dest){
 	return;// static_cast<double>(flow);
 }
 
-void TexCut::setBackground(const cv::Mat& ___bg){
-	if(_doSmoothing){
+void TexCut::setBackground(const cv::Mat& ___bg,bool noSmoothing){
+	if(_doSmoothing && !noSmoothing){
 		cv::blur(___bg,_background,cv::Size(3,3));
 	}
 	else{
@@ -393,7 +393,7 @@ void TexCut::setCapacity(
 }
 
 void TexCut::updateBackgroundModel(const cv::Mat& img){
-	setBackground(img);
+	setBackground(img,true);
 }
 
 /****** Definitions for Parallel Processing ******/

@@ -199,7 +199,7 @@ void gpu::TexCut::setParams(float alpha,float smoothing_term_weight,float thresh
 	cudaSafeCall(cudaMemcpyToSymbol("skl::gpu::smoothing_term_weight",&smoothing_term_weight,sizeof(float)));
 }
 
-void gpu::TexCut::setBackground(const cv::gpu::GpuMat& bg){
+void gpu::TexCut::setBackground(const cv::gpu::GpuMat& bg, bool noSmoothing){
 	assert(CV_8U==bg.depth());
 	graph_size = getGraphSize(bg.size());
 	cv::gpu::split(bg,blur_temp);
@@ -210,7 +210,12 @@ void gpu::TexCut::setBackground(const cv::gpu::GpuMat& bg){
 	_bg_sobel_y.resize(channels);
 	_background.resize(channels);
 	for(size_t c = 0; c < channels; c++){
-		cv::gpu::blur(blur_temp[c],_background[c],cv::Size(3,3));
+		if(_doSmoothing && !noSmoothing){
+			cv::gpu::blur(blur_temp[c],_background[c],cv::Size(3,3));
+		}
+		else{
+			_background[c] = blur_temp[c];
+		}
 		cv::gpu::Sobel(_background[c], _bg_sobel_x[c], CV_32S, 1, 0, 3, 1);
 		cv::gpu::Sobel(_background[c], _bg_sobel_y[c], CV_32S, 0, 1, 3, 1);
 	}
@@ -527,7 +532,12 @@ void gpu::TexCut::learnImageNoiseModel(const cv::gpu::GpuMat& bg2){
 	noise_std_dev.assign(channels,0);
 	for(size_t c=0;c<channels;c++){
 		cv::gpu::GpuMat diff,__bg2;
-		cv::gpu::blur(background2[c],blur_temp[c],cv::Size(3,3));
+		if(_doSmoothing){
+			cv::gpu::blur(background2[c],blur_temp[c],cv::Size(3,3));
+		}
+		else{
+			blur_temp[c] = background2[c];
+		}
 		_background[c].convertTo(diff,CV_32FC1);
 		blur_temp[c].convertTo(__bg2,CV_32FC1);
 		cv::gpu::subtract(diff,__bg2,diff);

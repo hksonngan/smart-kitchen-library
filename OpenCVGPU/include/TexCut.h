@@ -37,9 +37,9 @@ namespace skl{
 
 				/* INTERFACES by cv::gpu::GpuMat */
 				TexCut(const cv::gpu::GpuMat& bg1, const cv::gpu::GpuMat& bg2, float alpha=1.0, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8, bool doSmoothing=true);
-				void setBackground(const cv::gpu::GpuMat& bg);
+				void setBackground(const cv::gpu::GpuMat& bg,bool noSmoothing=false);
 				void learnImageNoiseModel(const cv::gpu::GpuMat& bg2);
-				inline void updateBackgroundModel(const cv::gpu::GpuMat& img){setBackground(img);}
+				inline void updateBackgroundModel(const cv::gpu::GpuMat& img){setBackground(img,true);}
 
 				/* Interfaces with cv::Mat */
 //				TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha=1.0, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8, doSmoothing=true);

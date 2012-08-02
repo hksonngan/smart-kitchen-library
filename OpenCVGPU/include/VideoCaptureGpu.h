@@ -54,6 +54,7 @@ namespace skl{
 
 				bool grab();
 				inline virtual bool retrieve(cv::Mat& image, int channel=0){
+					int i = (int)_switch;
 					//if(!isNextFrameUploaded) return false;
 					if(channel!=0) return false;
 					image = switching_mat_cpu[_switch];

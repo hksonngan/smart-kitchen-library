@@ -133,6 +133,9 @@ namespace skl{
 
 	cv::Mat visualizeRegionLabel(const cv::Mat& label,size_t region_num){
 		cv::Mat vis = cv::Mat::zeros(label.size(),CV_8UC3);
+		if(label.type()!=CV_16SC1){
+			assert(label.type()==CV_16SC1);
+		}
 		if(region_num == 0){
 			return vis;
 		}

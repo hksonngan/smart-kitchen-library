@@ -7,14 +7,13 @@
 #ifndef __SKL_GPU_TEX_CUT_H__
 #define __SKL_GPU_TEX_CUT_H__
 #ifdef DEBUG
-#define DEBUG_GPU_TEXCUT
+//#define DEBUG_GPU_TEXCUT
 #endif
 
 #include <cv.h>
 #include <highgui.h>
 #include <opencv2/gpu/gpu.hpp>
-//#include "sklcv.h"
-#include "../../OpenCV/include/Graphcut.h"
+#include "sklcv.h"
 #include "FilterGpuMat2GpuMat.h"
 
 namespace skl{

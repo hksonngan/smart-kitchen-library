@@ -34,6 +34,7 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
@@ -46,6 +47,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>true</CLRSupport>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -69,6 +71,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(ProjectDir)..\..\lib\$(Configuration)\</OutDir>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(ProjectDir)..\..\lib\$(Configuration)\</OutDir>
@@ -76,6 +79,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(ProjectDir)..\..\lib\$(Configuration)\</OutDir>
     <IncludePath>C:\tbb\include;C:\opencv\build\include\opencv;C:\opencv\build\include;C:\Program Files (x86)\boost\boost_1_47;C:\Program Files\Point Grey Research\FlyCapture2\include;$(IncludePath)</IncludePath>
+    <IntDir>$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -115,6 +119,7 @@
       </CallingConvention>
       <FunctionLevelLinking>
       </FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -124,7 +129,7 @@
       <Include>$(ProjectDir)..\include;</Include>
       <Keep>true</Keep>
       <TargetMachinePlatform>64</TargetMachinePlatform>
-      <Defines>WIN32;LIB;DEBUG;</Defines>
+      <Defines>WIN32;LIB;_DEBUG;</Defines>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -157,7 +162,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>HAVE_TBB;WIN32;DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\include;..\..\include;$(CUDA_INC_PATH)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include;..\..\include;$(CUDA_INC_PATH);C:\tbb\include;</AdditionalIncludeDirectories>
       <CompileAsManaged>true</CompileAsManaged>
       <ExceptionHandling>Async</ExceptionHandling>
       <MinimalRebuild>
@@ -166,6 +171,7 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <CallingConvention>
       </CallingConvention>
+      <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -176,6 +182,9 @@
     <CudaCompile>
       <Include>$(ProjectDir)..\include;</Include>
       <Defines>WIN32; LIB;</Defines>
+      <Optimization>O3</Optimization>
+      <TargetMachinePlatform>64</TargetMachinePlatform>
+      <FastMath>true</FastMath>
     </CudaCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -183,7 +192,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\cuda\shared.cpp" />
-    <ClCompile Include="..\src\FilterGpuMat2GpuMat.cpp" />
     <ClCompile Include="..\src\sklcvgpu_utils.cpp" />
     <ClCompile Include="..\src\TexCut.cpp" />
     <ClCompile Include="..\src\VideoCaptureGpu.cpp" />

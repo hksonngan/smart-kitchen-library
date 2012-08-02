@@ -28,6 +28,7 @@ VideoCapture::~VideoCapture(){
 
 
 bool VideoCapture::isOpened()const{
+	if(size()==0) return false;
 	for(size_t i=0;i<size();i++){
 		if(!cam_interface[i]->isOpened()) return false;
 	}

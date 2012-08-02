@@ -24,8 +24,8 @@ class ParallelGHNoiseEstimate{
 	public:
 		ParallelGHNoiseEstimate(
 				const std::vector<float>& noise_std_dev,
-				std::vector<float>* gh_expectation,
-				std::vector<float>* gh_std_dev
+				std::vector<float>* gh_expectation=NULL,
+				std::vector<float>* gh_std_dev=NULL
 				):noise_std_dev(noise_std_dev),gh_expectation(gh_expectation),gh_std_dev(gh_std_dev){}
 
 		void operator()(const cv::BlockedRange& range)const{

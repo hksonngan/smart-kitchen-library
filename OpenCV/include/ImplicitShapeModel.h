@@ -2,7 +2,7 @@
  * @file ImplicitShapeModel.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jul/11
- * @date Last Change:2012/Jul/26.
+ * @date Last Change:2012/Jul/31.
  */
 #ifndef __SKL_IMPLICIT_SHAPE_MODEL_H__
 #define __SKL_IMPLICIT_SHAPE_MODEL_H__
@@ -96,7 +96,7 @@ class ImplicitShapeModel{
 				std::map<int, cv::Mat>* voting_images=NULL,
 				const cv::Size& size = cv::Size(0,0))const;// not implemented
 
-		bool predict(
+		virtual bool predict(
 				const cv::Mat& features,
 				const std::vector<cv::KeyPoint>& feature_points,
 				const cv::KeyPoint& location,
@@ -105,9 +105,9 @@ class ImplicitShapeModel{
 				std::map<int, cv::Mat>* backprojections=NULL,
 				const cv::Size& size = cv::Size(0,0))const;
 
-		void MDLVerification();// not implemented
+		virtual void MDLVerification();// not implemented
 
-		void release();
+		virtual void release();
 
 		bool read(const std::string& filename);
 		bool read_header(const std::string& filename);
@@ -170,11 +170,11 @@ class ImplicitShapeModel{
 			return getRelativeLocation(v1,v2,scale,scale);
 		}
 
+		virtual bool read_header(std::istream& in);
+		virtual bool read_entries(std::istream& in);
+		virtual bool write_header(std::ostream& out)const;
+		virtual bool write_entries(std::ostream& out)const;
 	private:
-		bool read_header(std::istream& in);
-		bool read_entries(std::istream& in);
-		bool write_header(std::ostream& out)const;
-		bool write_entries(std::ostream& out)const;
 };
 
 } // skl

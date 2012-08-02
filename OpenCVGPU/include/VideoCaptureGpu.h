@@ -2,7 +2,7 @@
  * @file VideoCaptureGpu.h
  * @author a_hasimoto
  * @date Date Created: 2012/Feb/10
- * @date Last Change:2012/Jul/31.
+ * @date Last Change:2012/Aug/02.
  */
 #ifndef __SKL_GPU_VIDEO_CAPTURE_GPU_H__
 #define __SKL_GPU_VIDEO_CAPTURE_GPU_H__
@@ -54,14 +54,11 @@ namespace skl{
 
 				bool grab();
 				inline virtual bool retrieve(cv::Mat& image, int channel=0){
-					int i = (int)_switch;
-					//if(!isNextFrameUploaded) return false;
 					if(channel!=0) return false;
 					image = switching_mat_cpu[_switch];
 					return true;
 				}
 				inline virtual bool retrieve(cv::gpu::GpuMat& image, int channel=0){
-					//if(!isNextFrameUploaded) return false;
 					if(channel!=0) return false;
 					image = switching_mat[_switch];
 					return true;

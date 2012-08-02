@@ -2,12 +2,12 @@
  * @file TexCut.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change:2012/Jun/25.
+ * @date Last Change:2012/Aug/02.
  */
 #ifndef __SKL_GPU_TEX_CUT_H__
 #define __SKL_GPU_TEX_CUT_H__
 #ifdef DEBUG
-//#define DEBUG_GPU_TEXCUT
+#define DEBUG_GPU_TEXCUT
 #endif
 
 #include <cv.h>
@@ -24,7 +24,7 @@ namespace skl{
 		class TexCut: public FilterGpuMat2GpuMat<bool>{
 			public:
 				using FilterGpuMat2GpuMat<bool>::compute;
-				TexCut(float alpha=1.5, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
+				TexCut(float alpha=1.5, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8, bool doSmoothing = true);
 				~TexCut();
 				void setParams(float alpha=1.5,float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4, unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
 
@@ -36,13 +36,13 @@ namespace skl{
 				virtual bool compute(const cv::gpu::GpuMat& src, cv::gpu::GpuMat& dest, cv::gpu::Stream& stream_external=cv::gpu::Stream::Null());
 
 				/* INTERFACES by cv::gpu::GpuMat */
-				TexCut(const cv::gpu::GpuMat& bg1, const cv::gpu::GpuMat& bg2, float alpha=1.0, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
+				TexCut(const cv::gpu::GpuMat& bg1, const cv::gpu::GpuMat& bg2, float alpha=1.0, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8, bool doSmoothing=true);
 				void setBackground(const cv::gpu::GpuMat& bg);
 				void learnImageNoiseModel(const cv::gpu::GpuMat& bg2);
 				inline void updateBackgroundModel(const cv::gpu::GpuMat& img){setBackground(img);}
 
 				/* Interfaces with cv::Mat */
-				TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha=1.0, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
+//				TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha=1.0, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8, doSmoothing=true);
 
 				inline void setBackground(const cv::Mat& bg){setBackground(cv::gpu::GpuMat(bg));}
 				inline void learnImageNoiseModel(const cv::Mat& bg2){learnImageNoiseModel(cv::gpu::GpuMat(bg2));}
@@ -57,8 +57,10 @@ namespace skl{
 					cv::merge(temp,__background);
 					return __background;
 				}
-
+				inline bool doSmoothing()const{return _doSmoothing;}
+				inline void doSmoothing(bool __doSmoothing){_doSmoothing = __doSmoothing;}
 			protected:
+				bool _doSmoothing;
 				std::vector<cv::gpu::GpuMat> _background;
 				std::vector<cv::gpu::GpuMat> _bg_sobel_x;
 				std::vector<cv::gpu::GpuMat> _bg_sobel_y;
@@ -101,6 +103,7 @@ namespace skl{
 				size_t stream_num;
 
 				// buffer for calculation
+				std::vector<cv::gpu::GpuMat> blur_temp;
 				std::vector<cv::gpu::GpuMat> sobel_x;
 				std::vector<cv::gpu::GpuMat> sobel_y;
 				std::vector<cv::gpu::GpuMat> fg_tex_intencity;

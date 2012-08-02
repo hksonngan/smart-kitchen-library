@@ -17,6 +17,7 @@ opt_on(unsigned char,over_exposure_thresh,248,"","<UCHAR>","set TexCut parameter
 opt_on(unsigned char,under_exposure_thresh,8,"","<UCHAR>","set TexCut parameter under_exposure_thresh");
 
 opt_on_bool(do_cpu,"","do TexCut on CPU for comparison");
+opt_on(bool,smooth,true,"","<BOOL>","do smoothing before TexCut.");
 
 skl::TexCut* bgs_algo_cpu;
 
@@ -72,9 +73,12 @@ int main(int argc,char* argv[]){
 
 	// prepare background subtraction algorithms
 	skl::gpu::TexCut bgs_algo;
+	bgs_algo.doSmoothing(smooth);
 	if(do_cpu){
 		bgs_algo_cpu = new skl::TexCut();
+		bgs_algo_cpu->doSmoothing(smooth);
 	}
+
 
 	// get first background image
 	cam >> gpu_mat;

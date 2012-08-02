@@ -2,7 +2,7 @@
  * @file ImplicitShapeModel.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jul/11
- * @date Last Change: 2012/Jul/18.
+ * @date Last Change: 2012/Jul/31.
  */
 #include "ImplicitShapeModel.h"
 #include <cassert>
@@ -34,7 +34,7 @@ void ISMEntries::insert(const ISMEntry& entry){
 //		std::cerr << i << "/" << list->size() << std::endl;i++;
 		if(entries[*pp].isSameEvidence(entry)){
 			entries[*pp].merge(entry);
-			std::cerr << "merged at" << i << "/" << list->size() << std::endl;
+//			std::cerr << "merged at" << i << "/" << list->size() << std::endl;
 			return;
 		}
 		i++;

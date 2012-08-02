@@ -2,7 +2,7 @@
  * @file shared_funcs.cu
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change: 2012/Feb/17.
+ * @date Last Change: 2012/Aug/02.
  */
 #ifndef __SKL_GPU_KERNEL_SHARED_FUNCS_CU__
 #define __SKL_GPU_KERNEL_SHARED_FUNCS_CU__
@@ -31,6 +31,29 @@ template<class T> __device__ void sumUp_(T* array, int length,const size_t idx){
 
 inline __device__ void sumUpf(float* array, int length, const size_t idx){sumUp_(array,length,idx);}
 inline __device__ void sumUpi(int* array, int length, const size_t idx){sumUp_(array,length,idx);}
+
+
+template<class T> __device__ void sort_(T* array, int length, const size_t idx, int* order){
+	order[idx] = 0;
+	int i;
+	for(i=0;i<idx;i++){
+		// more smaller order for the same-value elements which lays before idx.
+		if(array[i]<=array[idx]) order[idx]++;
+	}
+	for(i=idx+1;i<length;i++){
+		// more bigger order for the same-value elements which lays after idx;
+		if(array[i]<array[idx]) order[idx]++;
+	};
+}
+inline __device__ void sortf(float* array, int length, const size_t idx, int* order){
+	sort_(array,length,idx,order);
+}
+inline __device__ void sorti(int* array, int length, const size_t idx, int* order){
+	sort_(array,length,idx,order);
+}
+inline __device__ void sortb(char* array, int length, const size_t idx, int* order){
+	sort_(array,length,idx,order);
+}
 
 template<class T> inline __device__ void swap_(T& a, T& b){
 	{

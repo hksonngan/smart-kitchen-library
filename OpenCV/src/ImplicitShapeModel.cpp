@@ -2,7 +2,7 @@
  * @file ImplicitShapeModel.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jul/11
- * @date Last Change: 2012/Jul/27.
+ * @date Last Change: 2012/Jul/31.
  */
 #include "ImplicitShapeModel.h"
 #include <fstream>
@@ -580,4 +580,9 @@ bool ImplicitShapeModel::write_entries(std::ostream& out)const{
 		}
 	}
 	return hasData;
+}
+
+
+void ImplicitShapeModel::MDLVerification(){
+	// not implemented
 }

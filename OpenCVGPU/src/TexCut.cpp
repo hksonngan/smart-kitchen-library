@@ -2,9 +2,8 @@
  * @file TexCut.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change: 2012/Jun/25.
+ * @date Last Change: 2012/Aug/02.
  */
-#pragma unmanaged
 #include "TexCut.h"
 #include "skl.h"
 #include "sklcvgpu_utils.h"
@@ -54,14 +53,16 @@ class ParallelGHNoiseEstimate{
 				for(int e = 0; e < elem_num; e++){
 					powers[e] = static_cast<float>(rayleigh_rand(std::sqrt(6.0)*noise_std_dev));
 				}
-				std::sort(powers.begin(),powers.end(),std::greater<float>());
-				float factor = powers[powers.size()/2];
+//				std::sort(powers.begin(),powers.end(),std::greater<float>());
+//				float factor = powers[powers.size()/2];
+				float factor = *std::min_element(powers.begin(),powers.end());
 				if(factor==0){
 					i--;
 					continue;
 				}
-				moment1 += powers[0]/factor;
-				moment2 += std::pow(powers[0]/factor,2);
+				float val = *std::max_element(powers.begin(),powers.end())/factor;
+				moment2 += val;
+				moment1 += sqrt(val);
 			}
 			moment1 /= iteration_time;
 			moment2 /= iteration_time;
@@ -74,9 +75,10 @@ class ParallelGHNoiseEstimate{
 // internal functions calling cuda kernels for TexCut.
 namespace skl{
 	namespace gpu{
-		void calcGradHetero_gpu(
+		void calcBGDataTerm_gpu(
 				const cv::gpu::DevMem2Di sobel_x,
 				const cv::gpu::DevMem2Di sobel_y,
+				cv::gpu::DevMem2Df tex_intencity,
 				cv::gpu::DevMem2Df gradient_heterogenuity,
 				float gh_expectation,
 				float gh_std_dev,
@@ -88,26 +90,19 @@ namespace skl{
 				cv::gpu::DevMem2Df tex_intencity,
 				cudaStream_t stream=cudaStream_t(),
 				int dev = cv::gpu::getDevice());
-		void calcTexture_gpu(
+		void calcDataTerm_gpu(
 				const cv::gpu::DevMem2Di sobel_x,
 				const cv::gpu::DevMem2Di sobel_y,
 				const cv::gpu::DevMem2Di bg_sobel_x,
 				const cv::gpu::DevMem2Di bg_sobel_y,
 				cv::gpu::DevMem2Df fg_tex_intencity,
 				cv::gpu::DevMem2Df textural_correlation,
+				cv::gpu::DevMem2Df gradient_heterogenuity,
+				float gh_expectation,
+				float gh_std_dev,
 				cudaStream_t stream,
 				int dev = cv::gpu::getDevice());
-
-/*
-		void calcTexturalCorrelation_gpu(
-				const cv::gpu::DevMem2Di sobel_x,
-				const cv::gpu::DevMem2Di sobel_y,
-				const cv::gpu::DevMem2Di bg_sobel_x,
-				const cv::gpu::DevMem2Di bg_sobel_y,
-				cv::gpu::DevMem2Df textural_correlation,
-				cudaStream_t stream=cudaStream_t(),
-				int dev = cv::gpu::getDevice());
-*/		void checkOverExposure_gpu(
+		void checkOverExposure_gpu(
 				const cv::gpu::DevMem2D img,
 				cv::gpu::DevMem2D is_over_exposure,
 				unsigned char thresh,
@@ -170,9 +165,10 @@ inline cv::Size getGraphSize(const cv::Size& img_size){
 }
 
 /*!
- * @brief �ǥե���ȥ��󥹥ȥ饯��
+ * @brief default constructor
  */
-gpu::TexCut::TexCut(float alpha, float smoothing_term_weight, float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh):
+gpu::TexCut::TexCut(float alpha, float smoothing_term_weight, float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh,bool doSmoothing):
+	_doSmoothing(doSmoothing),
 	noise_std_dev(3,3.5f),
 	gh_expectation(3,2.3f),
 	gh_std_dev(3,1.12f)
@@ -187,7 +183,7 @@ gpu::TexCut::~TexCut(){
 
 }
 
-gpu::TexCut::TexCut(const cv::gpu::GpuMat& bg1, const cv::gpu::GpuMat& bg2, float alpha, float smoothing_term_weight, float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh){
+gpu::TexCut::TexCut(const cv::gpu::GpuMat& bg1, const cv::gpu::GpuMat& bg2, float alpha, float smoothing_term_weight, float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh,bool doSmoothing):_doSmoothing(doSmoothing){
 	setParams(alpha,smoothing_term_weight,thresh_tex_diff,over_exposure_thresh,under_exposure_thresh);
 	setBackground(bg1);
 	learnImageNoiseModel(bg2);
@@ -206,13 +202,15 @@ void gpu::TexCut::setParams(float alpha,float smoothing_term_weight,float thresh
 void gpu::TexCut::setBackground(const cv::gpu::GpuMat& bg){
 	assert(CV_8U==bg.depth());
 	graph_size = getGraphSize(bg.size());
-	cv::gpu::split(bg,_background);
+	cv::gpu::split(bg,blur_temp);
 
 	size_t channels = bg.channels();
 
 	_bg_sobel_x.resize(channels);
 	_bg_sobel_y.resize(channels);
+	_background.resize(channels);
 	for(size_t c = 0; c < channels; c++){
+		cv::gpu::blur(blur_temp[c],_background[c],cv::Size(3,3));
 		cv::gpu::Sobel(_background[c], _bg_sobel_x[c], CV_32S, 1, 0, 3, 1);
 		cv::gpu::Sobel(_background[c], _bg_sobel_y[c], CV_32S, 0, 1, 3, 1);
 	}
@@ -222,11 +220,6 @@ void gpu::TexCut::setBackground(const cv::gpu::GpuMat& bg){
 	bg_is_under_exposure = cv::Scalar(255);
 
 	for(size_t c = 0; c < channels; c++){
-		calcTexturalIntencity_gpu(
-				_bg_sobel_x[c],
-				_bg_sobel_y[c],
-				_bg_tex_intencity[c],
-				cv::gpu::StreamAccessor::getStream(stream_setBackground));
 		checkOverExposure_gpu(
 				_background[c],
 				bg_is_over_exposure,
@@ -247,8 +240,9 @@ void gpu::TexCut::setBackground(const cv::gpu::GpuMat& bg){
 	}
 
 	for(size_t c = 0; c < channels; c++){
-		calcGradHetero_gpu(
+		calcBGDataTerm_gpu(
 				_bg_sobel_x[c],_bg_sobel_y[c],
+				_bg_tex_intencity[c],
 				_bg_gradient_heterogenuity[c],
 				gh_expectation[c],
 				gh_std_dev[c],
@@ -287,7 +281,6 @@ void gpu::TexCut::alloc_gpu(
 	sterm_y.resize(channels);
 	sobel_x.resize(channels);
 	sobel_y.resize(channels);
-
 	for(size_t c=0;c<channels;c++){
 		cv::gpu::ensureSizeIsEnough(graph_size,CV_32FC1,_bg_tex_intencity[c]);
 		cv::gpu::ensureSizeIsEnough(graph_size,CV_32FC1,_bg_gradient_heterogenuity[c]);
@@ -329,12 +322,18 @@ bool gpu::TexCut::compute(const cv::gpu::GpuMat& _src, cv::gpu::GpuMat& dest,cv:
 	// start calculations which do not use sobel edges
 	cv::gpu::Stream stream_exposure,stream_data_terms,stream_smoothing_terms;
 	for(size_t c = 0; c < channels; c++){
+		if(_doSmoothing){
+			cv::gpu::blur(src[c],blur_temp[c],cv::Size(3,3));
+		}
+		else{
+			blur_temp[c] = src[c];
+		}
 #ifdef __linux__ 
-		cv::gpu::Sobel(src[c], sobel_x[c], CV_32S, 1, 0, buf_sobel_x, 3,1.0, cv::BORDER_DEFAULT,-1,stream_data_terms);
-		cv::gpu::Sobel(src[c], sobel_y[c], CV_32S, 0, 1, buf_sobel_y, 3, 1.0, cv::BORDER_DEFAULT,-1,stream_data_terms);
+		cv::gpu::Sobel(blur_temp[c], sobel_x[c], CV_32S, 1, 0, buf_sobel_x, 3,1.0, cv::BORDER_DEFAULT,-1,stream_data_terms);
+		cv::gpu::Sobel(blur_temp[c], sobel_y[c], CV_32S, 0, 1, buf_sobel_y, 3, 1.0, cv::BORDER_DEFAULT,-1,stream_data_terms);
 #else
-		cv::gpu::Sobel(src[c], sobel_x[c], CV_32S, 1, 0, 3,1.0,cv::BORDER_DEFAULT,-1,stream_data_terms);
-		cv::gpu::Sobel(src[c], sobel_y[c], CV_32S, 0, 1, 3,1.0,cv::BORDER_DEFAULT,-1,stream_data_terms);
+		cv::gpu::Sobel(blur_temp[c], sobel_x[c], CV_32S, 1, 0, 3,1.0,cv::BORDER_DEFAULT,-1,stream_data_terms);
+		cv::gpu::Sobel(blur_temp[c], sobel_y[c], CV_32S, 0, 1, 3,1.0,cv::BORDER_DEFAULT,-1,stream_data_terms);
 #endif
 	}
 	stream_exposure.enqueueMemSet(fg_is_over_exposure,cv::Scalar(255));
@@ -357,12 +356,12 @@ bool gpu::TexCut::compute(const cv::gpu::GpuMat& _src, cv::gpu::GpuMat& dest,cv:
 #endif
 	for(size_t c = 0; c < channels; c++){
 		checkOverExposure_gpu(
-				src[c],
+				blur_temp[c],
 				fg_is_over_exposure,
 				over_exposure_thresh,
 				cv::gpu::StreamAccessor::getStream(stream_exposure));
 		checkUnderExposure_gpu(
-				src[c],
+				blur_temp[c],
 				fg_is_under_exposure,
 				under_exposure_thresh,
 				cv::gpu::StreamAccessor::getStream(stream_exposure));
@@ -372,27 +371,14 @@ bool gpu::TexCut::compute(const cv::gpu::GpuMat& _src, cv::gpu::GpuMat& dest,cv:
 	stream_data_terms.enqueueMemSet(max_gradient_heterogenuity,cv::Scalar(0));
 	stream_setBackground.waitForCompletion();
 	for(size_t c = 0; c < channels; c++){
-		calcGradHetero_gpu(
+		calcDataTerm_gpu(
 				sobel_x[c], sobel_y[c],
+				_bg_sobel_x[c], _bg_sobel_y[c],
+				fg_tex_intencity[c],
+				textural_correlation[c],
 				fg_gradient_heterogenuity[c],
 				gh_expectation[c], gh_std_dev[c],
 				cv::gpu::StreamAccessor::getStream(stream_data_terms));
-		calcTexture_gpu(
-				sobel_x[c], sobel_y[c],
-				_bg_sobel_x[c], _bg_sobel_y[c],
-				fg_tex_intencity[c],
-				textural_correlation[c],
-				cv::gpu::StreamAccessor::getStream(stream_data_terms));
-/*		calcTexturalIntencity_gpu(
-				sobel_x[c], sobel_y[c],
-				fg_tex_intencity[c],
-				cv::gpu::StreamAccessor::getStream(stream_data_terms));
-		calcTexturalCorrelation_gpu(
-				sobel_x[c], sobel_y[c],
-				_bg_sobel_x[c], _bg_sobel_y[c],
-				textural_correlation[c],
-				cv::gpu::StreamAccessor::getStream(stream_data_terms));
-*/
 	}
 	stream_exposure.waitForCompletion();
 
@@ -408,17 +394,20 @@ bool gpu::TexCut::compute(const cv::gpu::GpuMat& _src, cv::gpu::GpuMat& dest,cv:
 #ifdef DEBUG_GPU_TEXCUT_STOPWATCH
 	std::cerr << "calc DataTerms: " << swatch.lap() << std::endl;
 #endif
-
+/*	cv::namedWindow("hoge",0);
+	cv::imshow("hoge",cv::Mat(fg_gradient_heterogenuity[0]));
+	cv::waitKey(-1);
+*/
 	// start smoothing term calculation
 	stream_smoothing_terms.waitForCompletion();
 	for(size_t c = 0; c < channels; c++){
 		calcSmoothingTermX_gpu(
-				src[c], _background[c],
+				blur_temp[c], _background[c],
 				sterm_x[c],
 				noise_std_dev[c],
 				cv::gpu::StreamAccessor::getStream(stream_smoothing_terms));
 		calcSmoothingTermY_gpu(
-				src[c], _background[c],
+				blur_temp[c], _background[c],
 				sterm_y[c],
 				noise_std_dev[c],
 				cv::gpu::StreamAccessor::getStream(stream_smoothing_terms));
@@ -538,8 +527,9 @@ void gpu::TexCut::learnImageNoiseModel(const cv::gpu::GpuMat& bg2){
 	noise_std_dev.assign(channels,0);
 	for(size_t c=0;c<channels;c++){
 		cv::gpu::GpuMat diff,__bg2;
+		cv::gpu::blur(background2[c],blur_temp[c],cv::Size(3,3));
 		_background[c].convertTo(diff,CV_32FC1);
-		background2[c].convertTo(__bg2,CV_32FC1);
+		blur_temp[c].convertTo(__bg2,CV_32FC1);
 		cv::gpu::subtract(diff,__bg2,diff);
 
 		cv::Scalar mean,stddev;
@@ -581,8 +571,9 @@ void gpu::TexCut::learnImageNoiseModel(const cv::gpu::GpuMat& bg2){
 	std::cerr << std::endl;
 #endif //DEBUG
 	for(size_t c = 0; c < _background.size(); c++){
-		calcGradHetero_gpu(
+		calcBGDataTerm_gpu(
 				_bg_sobel_x[c],_bg_sobel_y[c],
+				_bg_tex_intencity[c],
 				_bg_gradient_heterogenuity[c],
 				gh_expectation[c],
 				gh_std_dev[c]);
@@ -602,8 +593,9 @@ void gpu::TexCut::setNoiseModel(
 	}
 
 	for(size_t c = 0; c < _background.size(); c++){
-		calcGradHetero_gpu(
+		calcBGDataTerm_gpu(
 				_bg_sobel_x[c],_bg_sobel_y[c],
+				_bg_tex_intencity[c],
 				_bg_gradient_heterogenuity[c],
 				gh_expectation[c],
 				gh_std_dev[c]);

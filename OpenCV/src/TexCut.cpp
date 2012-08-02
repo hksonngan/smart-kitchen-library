@@ -4,7 +4,8 @@
 
 
 using namespace skl;
-TexCut::TexCut(float alpha, float smoothing_term_weight,float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh):
+TexCut::TexCut(float alpha, float smoothing_term_weight,float thresh_tex_diff,unsigned char over_exposure_thresh,unsigned char under_exposure_thresh,bool doSmoothing):
+	_doSmoothing(doSmoothing),
 	noise_std_dev(3,3.5),
 	gh_expectation(3,2.3),
 	gh_std_dev(3,1.12),
@@ -51,9 +52,17 @@ void TexCut::setParams(float alpha, float smoothing_term_weight, float thresh_te
 	this->under_exposure_thresh = under_exposure_thresh;
 }
 
-void TexCut::compute(const cv::Mat& _src,const cv::Mat& mask,cv::Mat& dest){
+void TexCut::compute(const cv::Mat& __src,const cv::Mat& mask,cv::Mat& dest){
 	// compute edge capacity and construct graph model
 	// mask is not used.
+	cv::Mat _src;
+	if(_doSmoothing){
+		cv::blur(__src,_src,cv::Size(3,3));
+	}
+	else{
+		_src = __src;
+	}
+	
 	std::vector<cv::Mat> src;
 	if(_src.channels() == 3){
 		cv::split(_src, src);
@@ -98,28 +107,40 @@ void TexCut::compute(const cv::Mat& _src,const cv::Mat& mask,cv::Mat& dest){
 	return;// static_cast<double>(flow);
 }
 
-void TexCut::setBackground(const cv::Mat& bg){
-	_background = bg.clone();
-	if(bg.channels()==3){
-		cv::split(bg,this->bg_img);
+void TexCut::setBackground(const cv::Mat& ___bg){
+	if(_doSmoothing){
+		cv::blur(___bg,_background,cv::Size(3,3));
 	}
 	else{
-		this->bg_img.push_back(bg);
+		_background = ___bg.clone();
+	}
+	if(_background.channels()==3){
+		cv::split(_background,this->bg_img);
+	}
+	else{
+		this->bg_img.push_back(_background);
 	}
 
 
 	getSobel(bg_img,&bg_sobel_x,&bg_sobel_y);
 
-	int graph_width = bg.cols / TEXCUT_BLOCK_SIZE;
-	int graph_height = bg.rows / TEXCUT_BLOCK_SIZE;
+	int graph_width = ___bg.cols / TEXCUT_BLOCK_SIZE;
+	int graph_height = ___bg.rows / TEXCUT_BLOCK_SIZE;
 	nodes.assign(
 			graph_height, std::vector<TexCutGraph::node_id>(graph_width,0));
 }
 
-void TexCut::learnImageNoiseModel(const cv::Mat& bg2){
+void TexCut::learnImageNoiseModel(const cv::Mat& ___bg2){
 	assert(!bg_img.empty());
 	size_t channels = bg_img.size();
 	std::vector<cv::Mat> bg_img2;
+	cv::Mat bg2;
+	if(_doSmoothing){
+		cv::blur(___bg2,bg2,cv::Size(3,3));
+	}
+	else{
+		bg2 = ___bg2;
+	}
 	if(bg2.channels()==3){
 		cv::split(bg2,bg_img2);
 	}

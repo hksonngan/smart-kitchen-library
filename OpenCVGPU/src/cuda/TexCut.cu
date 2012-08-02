@@ -2,7 +2,7 @@
  * @file TexCut.cu
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/25
- * @date Last Change: 2012/Jul/31.
+ * @date Last Change: 2012/Aug/02.
  */
 
 #include <cassert>
@@ -13,7 +13,7 @@
 #include "shared.h"
 #include "shared_funcs.cu"
 
-
+#define ENOUGH_LARGE_NUM 1000
 
 namespace cv{
 	namespace gpu{
@@ -52,22 +52,24 @@ namespace skl{
 			return min(max(val,0.f),1.f);
 		}
 
-		__global__ void calcGradHetero_kernel(
+		__global__ void calcBGDataTerm_kernel(
 				const cv::gpu::PtrStepi sobel_x,
 				const cv::gpu::PtrStepi sobel_y,
+				cv::gpu::PtrStepf tex_intencity,
 				cv::gpu::PtrStepf gradient_heterogenuity,
 				float gh_expectation,
 				float gh_std_dev,
 				int cols,
 				int rows){
+			dim3 gidx = GlobalIdx;
+			if( gidx.x >= cols || gidx.y >= rows) return;
+
 			int smem_step = (TEXCUT_SQUARE_AREA+1) * SquareNum;
 
 			// declare shared_memory
 			int* array = (int*)smem;
-			int* dx = (int*)smem;
-			int* dy = dx + smem_step;
-
-			dim3 gidx = GlobalIdx;
+			int* order = array + smem_step;
+			dim3 graph_node_idx = SquareIdx;
 
 			// odd-even transposition sort ( x and y direction elements at once
 			int in_square_seq_idx = inSquareSeqIdx;
@@ -77,42 +79,39 @@ namespace skl{
 			int offset = (TEXCUT_SQUARE_AREA+1) * square_seq_idx_in_block;
 
 			// copy data to shared_memory
-			dx[offset + in_square_seq_idx] = abs(sobel_x.ptr(gidx.y)[gidx.x]);
-			dy[offset + in_square_seq_idx] = abs(sobel_y.ptr(gidx.y)[gidx.x]);
-
+			int dx = abs(sobel_x.ptr(gidx.y)[gidx.x]);
+			int dy = abs(sobel_y.ptr(gidx.y)[gidx.x]);
+			array[offset + in_square_seq_idx] = dx*dx + dy*dy;
 			__syncthreads();
 
-
-			// an odd idx thread sorts sobel_x, an even sorts sobel_y
-			offset += in_square_seq_idx + ( (in_square_seq_idx % 2) * (smem_step-1) );
-			int idx;
-			for(int i=0;i<TEXCUT_SQUARE_AREA;i++){
-				idx = offset + i % 2;
-				if((idx+1)%(TEXCUT_SQUARE_AREA+1)!=0 && array[idx] < array[idx+1]){
-					swapi(array[idx],array[idx+1]);
-				}
-				__syncthreads();
+			sorti(array+offset,TEXCUT_SQUARE_AREA,in_square_seq_idx,order+offset);
+			float* max = (float*)(array + offset + TEXCUT_SQUARE_AREA);
+			float* min = (float*)(order + offset + TEXCUT_SQUARE_AREA);
+			if(order[offset+in_square_seq_idx]==0){
+				*min = (float)array[offset+in_square_seq_idx];
+			}
+			__syncthreads();
+			if(order[offset+in_square_seq_idx]==TEXCUT_SQUARE_AREA-1){
+				*max = (float)array[offset+in_square_seq_idx];
+				*max = (*min == 0.f) ? 0 : sqrt((float)*max / (float)*min);// (*max==0.f?0.f:FLT_MAX) : sqrt(*max / *min);
+				gradient_heterogenuity.ptr(graph_node_idx.y)[graph_node_idx.x] = (*max >= *min);//normalize(*max,gh_std_dev*2.f,gh_expectation);
 			}
 
-			if(in_square_seq_idx!=0) return;
-
-			dim3 graph_node_idx = SquareIdx;
-			float ghx = (dx[offset + TEXCUT_SQUARE_AREA_HARF] == 0) ?
-				(dx[offset]==0?0.f:FLT_MAX) :
-					((float)dx[offset] / (float)dx[offset + TEXCUT_SQUARE_AREA_HARF]);
-
-			float ghy = (dy[offset + TEXCUT_SQUARE_AREA_HARF] == 0) ?
-				(dy[offset]==0?0.f:FLT_MAX) :
-					((float)dy[offset] / (float)dy[offset + TEXCUT_SQUARE_AREA_HARF]);
-
-			if( gidx.x < cols && gidx.y < rows){
-				gradient_heterogenuity.ptr(graph_node_idx.y)[graph_node_idx.x] = normalize(max(ghx,ghy),gh_std_dev*2.f,gh_expectation);
+			// calc intencity
+			sumUpi(array+offset,
+					TEXCUT_SQUARE_AREA,
+					in_square_seq_idx);
+			if(in_square_seq_idx==0){
+				tex_intencity.ptr(graph_node_idx.y)[graph_node_idx.x] = (float)array[offset];
 			}
+		
+
 		}
 
-		void calcGradHetero_gpu(
+		void calcBGDataTerm_gpu(
 				const cv::gpu::DevMem2Di sobel_x,
 				const cv::gpu::DevMem2Di sobel_y,
+				cv::gpu::DevMem2Df tex_intencity,
 				cv::gpu::DevMem2Df gradient_heterogenuity,
 				float gh_expectation,
 				float gh_std_dev,
@@ -124,83 +123,31 @@ namespace skl{
 //			std::cerr << "GradHetero: " << sharedMemSize << std::endl;
 //			std::cerr << block.x << ", " << block.y << ", " << block.z << std::endl;
 
-			calcGradHetero_kernel<<<grid,block,sharedMemSize,stream>>>(
-					sobel_x,sobel_y,gradient_heterogenuity,
+			calcBGDataTerm_kernel<<<grid,block,sharedMemSize,stream>>>(
+					sobel_x,sobel_y,
+					tex_intencity,
+					gradient_heterogenuity,
 					gh_expectation,gh_std_dev,
 					sobel_x.cols,
 					sobel_y.rows);
 			cudaSafeCall( cudaGetLastError() );
 		}
-/*
-		__global__ void calcTexturalCorrelation_kernel(
-					const cv::gpu::PtrStepi sobel_x,
-					const cv::gpu::PtrStepi sobel_y,
-					const cv::gpu::PtrStepi bg_sobel_x,
-					const cv::gpu::PtrStepi bg_sobel_y,
-					cv::gpu::PtrStepf textural_correlation){
 
-			int in_square_seq_idx = inSquareSeqIdx;
-			dim3 gidx = GlobalIdx;
-
-			// copy data to shared_memory
-			int dx = abs(sobel_x.ptr(gidx.y)[gidx.x]);
-			int dy = abs(sobel_y.ptr(gidx.y)[gidx.x]);
-
-			// declare shared_memory
-			int* correlation = (int*)smem;
-
-			int square_seq_idx_in_block = SquareSeqIdxInBlock;
-			// offset to direct shared memory position
-			// for the belonging square
-			int offset = TEXCUT_SQUARE_AREA * square_seq_idx_in_block;
-
-			correlation[offset + in_square_seq_idx] = 
-				  dx * abs(bg_sobel_x.ptr(gidx.y)[gidx.x])
-				+ dy * abs(bg_sobel_y.ptr(gidx.y)[gidx.x]);
-
-			__syncthreads();
-
-			// reuse dx space for sumup function
-			sumUpi(correlation+offset,
-					TEXCUT_SQUARE_AREA,
-					in_square_seq_idx);
-
-			if(in_square_seq_idx!=0) return;
-
-			dim3 graph_node_idx = SquareIdx;
-			textural_correlation.ptr(graph_node_idx.y)[graph_node_idx.x] = (float)correlation[offset];
-		}
-
-		void calcTexturalCorrelation_gpu(
-				const cv::gpu::DevMem2Di sobel_x,
-				const cv::gpu::DevMem2Di sobel_y,
-				const cv::gpu::DevMem2Di bg_sobel_x,
-				const cv::gpu::DevMem2Di bg_sobel_y,
-				cv::gpu::DevMem2Df textural_correlation,
-				cudaStream_t stream){
-			dim3 block(32,32,1);
-			dim3 grid(divUp(sobel_x.cols,block.x), divUp(sobel_x.rows,block.y));
-
-			int sharedMemSize = block.x * block.y * sizeof(int);
-			calcTexturalCorrelation_kernel<<<grid,block,sharedMemSize,stream>>>(
-					sobel_x, sobel_y,
-					bg_sobel_x, bg_sobel_y,
-					textural_correlation);
-			cudaSafeCall( cudaGetLastError() );
-		}
-*/
-
-		__global__ void calcTexture_kernel(
+		__global__ void calcDataTerm_kernel(
 				const cv::gpu::PtrStepi sobel_x,
 				const cv::gpu::PtrStepi sobel_y,
 				const cv::gpu::PtrStepi bg_sobel_x,
 				const cv::gpu::PtrStepi bg_sobel_y,
 				cv::gpu::PtrStepf fg_tex_intencity,
 				cv::gpu::PtrStepf textural_correlation,
+				cv::gpu::PtrStepf gradient_heterogenuity,
+				float gh_expectation,
+				float gh_std_dev,
 				int cols,
 				int rows){
 			int in_square_seq_idx = inSquareSeqIdx;
 			dim3 gidx = GlobalIdx;
+			if(gidx.x >= cols || gidx.y >= rows) return;
 
 			// copy data to shared_memory
 			int dx = abs(sobel_x.ptr(gidx.y)[gidx.x]);
@@ -227,41 +174,66 @@ namespace skl{
 					in_square_seq_idx);
 
 			dim3 graph_node_idx = SquareIdx;
-			if(in_square_seq_idx==0 && gidx.x < cols && gidx.y < rows){
+			if(in_square_seq_idx==0){
 				textural_correlation.ptr(graph_node_idx.y)[graph_node_idx.x] = (float)buf[offset];
 			}
 
-			// calc intencity
 			buf[offset + in_square_seq_idx] = dx * dx + dy * dy;
 			__syncthreads();
+
+			// calc grad. hetero.
+			int* order = buf + (TEXCUT_SQUARE_AREA + 1) * SquareNum;
+
+			sorti(buf + offset, TEXCUT_SQUARE_AREA,
+					in_square_seq_idx, order + offset);
+			float* _max = (float*)(buf + offset + TEXCUT_SQUARE_AREA);
+			float* _min = (float*)(order + offset + TEXCUT_SQUARE_AREA);
+			if(order[offset + in_square_seq_idx]==0){
+				*_min = (float)buf[offset + in_square_seq_idx];
+			}
+			__syncthreads();
+
+			if(order[offset + in_square_seq_idx]==TEXCUT_SQUARE_AREA-1){
+				*_max = (float)buf[offset + in_square_seq_idx];
+				*_max = (*_min == 0.f) ? (*_max==0.f?0.f:ENOUGH_LARGE_NUM) : sqrt(*_max / *_min);
+				gradient_heterogenuity.ptr(graph_node_idx.y)[graph_node_idx.x] = normalize(*_max,gh_std_dev*2.f,gh_expectation);
+			}
+
+			// calc intencity
 			sumUpi(buf+offset,
 					TEXCUT_SQUARE_AREA,
 					in_square_seq_idx);
-			if(in_square_seq_idx==0 && gidx.x < cols && gidx.y < rows){
+			if(in_square_seq_idx==0){
 				fg_tex_intencity.ptr(graph_node_idx.y)[graph_node_idx.x] = (float)buf[offset];
 			}
 		}
 
-		void calcTexture_gpu(
+		void calcDataTerm_gpu(
 				const cv::gpu::DevMem2Di sobel_x,
 				const cv::gpu::DevMem2Di sobel_y,
 				const cv::gpu::DevMem2Di bg_sobel_x,
 				const cv::gpu::DevMem2Di bg_sobel_y,
 				cv::gpu::DevMem2Df fg_tex_intencity,
 				cv::gpu::DevMem2Df textural_correlation,
+				cv::gpu::DevMem2Df gradient_heterogenuity,
+				float gh_expectation,
+				float gh_std_dev,
 				cudaStream_t stream,
 				int dev){
 			int sharedMemSize;
-			dim3 block = maxBlockSize(&sharedMemSize,(1.f+1.f/TEXCUT_SQUARE_AREA) * sizeof(int),0,0,0,true,dev);
+			dim3 block = maxBlockSize(&sharedMemSize,(1.f+1.f/TEXCUT_SQUARE_AREA) * sizeof(int) * 2, 0,0,0,true,dev);
 			dim3 grid(divUp(sobel_x.cols,block.x), divUp(sobel_x.rows,block.y));
 //			std::cerr << "calcTexture: " << sharedMemSize << std::endl;
 //			std::cerr << block.x << ", " << block.y << ", " << block.z << std::endl;
 
-			calcTexture_kernel<<<grid,block,sharedMemSize,stream>>>(
+			calcDataTerm_kernel<<<grid,block,sharedMemSize,stream>>>(
 					sobel_x, sobel_y,
 					bg_sobel_x, bg_sobel_y,
 					fg_tex_intencity,
 					textural_correlation,
+					gradient_heterogenuity,
+					gh_expectation,
+					gh_std_dev,
 					sobel_x.cols,
 					sobel_y.rows);
 			cudaSafeCall( cudaGetLastError() );

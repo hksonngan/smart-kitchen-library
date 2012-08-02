@@ -69,15 +69,12 @@ int main(int argc,char* argv[]){
 	skl::TexCut bgs_algo;
 
 	// get first background image
-	cv::Mat raw;
-	cam >> raw;
-	cv::blur(raw,mat,cv::Size(3,3));
+	cam >> mat;
 	bgs_algo.setParams(alpha,smoothing_term_weight,thresh_tex_diff,over_exposure_thresh,under_exposure_thresh);
 	bgs_algo.setBackground(mat);
 
 	// get second background image
-	cam >> raw;
-	cv::blur(raw,mat,cv::Size(3,3));
+	cam >> mat;
 	bgs_algo.learnImageNoiseModel(mat);
 
 
@@ -86,8 +83,7 @@ int main(int argc,char* argv[]){
 	unsigned int _step_buf=0;
 	while('q'!=cv::waitKey(10)){
 		std::cout << "frame: " << frame++ << std::endl;
-		cam >> raw;
-		cv::blur(raw,mat,cv::Size(3,3));
+		cam >> mat;
 		_step_buf++;
 		if(step>_step_buf){
 			continue;
@@ -95,7 +91,7 @@ int main(int argc,char* argv[]){
 		else{
 			_step_buf=0;
 		}
-		if(!cam.isOpened()||raw.cols==0||raw.rows==0) break;
+		if(!cam.isOpened()||mat.cols==0||mat.rows==0) break;
 
 		cv::imshow("image",mat);
 

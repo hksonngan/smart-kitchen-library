@@ -22,7 +22,7 @@ namespace skl{
 		public:
 			using BackgroundSubtractAlgorithm::compute;
 			typedef Graph<int,int,int> TexCutGraph;
-			TexCut(float alpha=1.5, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
+			TexCut(float alpha=1.5, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8,bool doSmoothing = true);
 			TexCut(const cv::Mat& bg1, const cv::Mat& bg2, float alpha=1.0, float smoothing_term_weight=1.0, float thresh_tex_diff = 0.4,unsigned char over_exposure_thresh = 248,unsigned char under_exposure_thresh = 8);
 			~TexCut();
 			virtual void setBackground(const cv::Mat& bg);
@@ -35,7 +35,10 @@ namespace skl{
 					const std::vector<float>& noise_std_dev,
 					const std::vector<float>& gh_expectation,
 					const std::vector<float>& gh_std_dev);
+			inline bool doSmoothing()const{return _doSmoothing;}
+			inline void doSmoothing(bool __doSmoothing){_doSmoothing = __doSmoothing;}
 		protected:
+			bool _doSmoothing;
 			virtual void compute(const cv::Mat& src,const cv::Mat& mask, cv::Mat& dest);
 			void calcEdgeCapacity(
 					const std::vector<cv::Mat>& src,

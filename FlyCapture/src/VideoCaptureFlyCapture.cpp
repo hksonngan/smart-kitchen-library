@@ -2,7 +2,7 @@
  * @file VideoCaptureFlyCapture.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change: 2012/Jun/11.
+ * @date Last Change: 2012/Sep/24.
  */
 #include "VideoCaptureFlyCapture.h"
 
@@ -13,7 +13,7 @@ std::map<capture_property_t, FlyCapture2::PropertyType> VideoCaptureFlyCapture::
 /*!
  * @brief デフォルトコンストラクタ
  */
-VideoCaptureFlyCapture::VideoCaptureFlyCapture(FlyCapture2::BusManager* busMgr):is_opened(false),is_started(false),busMgr(busMgr){
+VideoCaptureFlyCapture::VideoCaptureFlyCapture(cv::Ptr<FlyCapture2::BusManager> busMgr):is_opened(false),is_started(false),busMgr(busMgr){
 	if(prop_type_map.empty()){
 		initialize_prop_type_map();
 	}
@@ -41,7 +41,7 @@ bool VideoCaptureFlyCapture::open(int device){
 	FlyCapture2::PGRGuid guid;
 	FlyCapture2::CameraInfo camInfo;
 
-	if(busMgr==NULL) return false;
+	if(busMgr.empty()) return false;
 	error = busMgr->GetCameraFromIndex( device, &guid );
 	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
 
@@ -57,10 +57,9 @@ bool VideoCaptureFlyCapture::open(int device){
 	std::cout << "\n*** INFORMATION FOR CAMERA " << device << " ***" << std::endl;
 	FlyCapture2PrintCameraInfo(camInfo);
 #endif
-
 	error = camera.SetVideoModeAndFrameRate(
 			FlyCapture2::VIDEOMODE_1024x768Y8,
-			FlyCapture2::FRAMERATE_30);
+			FlyCapture2::FRAMERATE_15);
 	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
 
 	FlyCapture2::TriggerDelay trigger_delay;
@@ -78,7 +77,7 @@ void VideoCaptureFlyCapture::release(){
 	int i=0;
 	// カメラ内部のバッファに溜まっている画像を全て吐き出さないと終了できないので、吐き出す
 	while(grab() && i < 128){i++;}
-	std::cerr << "Stop Capture" << std::endl;
+//	std::cerr << "Stop Capture" << std::endl;
 	is_opened = false;
 	is_started = false;
 	camera.StopCapture();
@@ -294,7 +293,7 @@ double VideoCaptureFlyCapture::get_flycap(capture_property_t prop_id){
 
 	FlyCapture2::PropertyInfo prop_info(pp->second);
 	FlyCapture2::Error error = camera.GetPropertyInfo(&prop_info);
-	if(error == FlyCapture2::PGRERROR_PROPERTY_NOT_PRESENT){
+	if(error.GetType() == FlyCapture2::PGRERROR_PROPERTY_NOT_PRESENT){
 		return 0.0;
 	}
 	assert(SKL_FLYCAP2_CHECK_ERROR(error));

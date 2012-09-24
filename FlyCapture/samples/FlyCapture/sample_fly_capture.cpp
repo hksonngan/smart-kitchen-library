@@ -32,7 +32,7 @@ int main(int argc,char* argv[]){
 
 
 	if(input_file.empty()){
-		cam.open();
+		if(!cam.open()) return EXIT_FAILURE;
 	}
 	else{
 		cam.open(input_file);
@@ -57,12 +57,14 @@ int main(int argc,char* argv[]){
 		cv::namedWindow(ss.str(),0);
 		ss.str("");
 	}
-	std::vector<cv::Mat> images;
-
+	std::vector<cv::Mat> images(cam.size());
 
 	int frame_num = 0;
 	while('q'!=cv::waitKey(10)){
-		cam >> images;
+		cam.grab();
+		for(size_t i=0;i<cam.size();i++){
+			cam[i].retrieve(images[i]);
+		}
 		if(!cam.isOpened()) break;
 
 		for(size_t i=0;i<cam.size();i++){

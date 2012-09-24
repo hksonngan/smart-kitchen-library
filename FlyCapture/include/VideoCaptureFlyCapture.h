@@ -2,7 +2,7 @@
  * @file VideoCaptureFlyCapture.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change:2012/Jan/19.
+ * @date Last Change:2012/Sep/24.
  */
 #ifndef __SKL_VIDEO_CAPTURE_FLY_CAPTURE_H__
 #define __SKL_VIDEO_CAPTURE_FLY_CAPTURE_H__
@@ -28,7 +28,7 @@ namespace skl{
 		public:
 			using _VideoCaptureInterface::set;
 			using _VideoCaptureInterface::get;
-			VideoCaptureFlyCapture(FlyCapture2::BusManager* busMgr=NULL);
+			VideoCaptureFlyCapture(cv::Ptr<FlyCapture2::BusManager> busMgr=NULL);
 			virtual ~VideoCaptureFlyCapture();
 			virtual bool open(int device);
 			virtual bool isOpened()const{return is_opened;}
@@ -46,7 +46,7 @@ namespace skl{
 			FlyCapture2::Camera camera;
 			FlyCapture2::Image flycap_image;
 
-			FlyCapture2::BusManager* busMgr;
+			cv::Ptr<FlyCapture2::BusManager> busMgr;
 
 			bool set_flycap(capture_property_t prop_id,double val);
 			bool set_for_develop(capture_property_t prop_id, double val);

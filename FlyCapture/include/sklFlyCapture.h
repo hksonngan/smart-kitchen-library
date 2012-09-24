@@ -2,7 +2,7 @@
  * @file FlyCapture.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/12
- * @date Last Change:2012/Feb/10.
+ * @date Last Change:2012/Sep/24.
  */
 #ifndef __SKL_FLY_CAPTURE_H__
 #define __SKL_FLY_CAPTURE_H__
@@ -49,7 +49,7 @@ namespace skl{
 			bool sync_capture_start(FlyCapture2::Camera** ppCameras);
 
 			// PC毎に共通のBusManager
-			static FlyCapture2::BusManager* busMgr;
+			static cv::Ptr<FlyCapture2::BusManager> busMgr;
 
 		private:
 			virtual inline bool push_back(int device){return false;}

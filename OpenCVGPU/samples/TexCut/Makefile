@@ -19,8 +19,10 @@ CFLAGS_D = -Wall
 # skl用の設定
 PATH_TO_SKL_ROOT = ../../../
 BINDIR = ${PATH_TO_SKL_ROOT}/bin/
-ADDITIONAL_SKL_MODULE = OpenCVGPU FlyCapture OpenCV Core
-ADDITIONAL_SKL_MODULEs = opencvgpu flycapture opencv core
+#ADDITIONAL_SKL_MODULE = OpenCVGPU FlyCapture OpenCV Core
+#ADDITIONAL_SKL_MODULEs = opencvgpu flycapture opencv core
+ADDITIONAL_SKL_MODULE = OpenCVGPU OpenCV Core
+ADDITIONAL_SKL_MODULEs = opencvgpu opencv core
 SKL_LIBDIR = ${PATH_TO_SKL_ROOT}/lib
 INC += -I${PATH_TO_SKL_ROOT}include
 LIBS += -L${SKL_LIBDIR} ${ADDITIONAL_SKL_MODULEs:%=-lskl_%}
@@ -46,9 +48,9 @@ LIBS_OPT += -L/usr/local/cuda/lib64 -lcudart
 
 
 # FlyCaptureの読み込み
-INC += -I/usr/include/flycapture/
-LIBS += -lflycapture
-LIBS_DEBUG += -lflycapture
+#INC += -I/usr/include/flycapture/
+#LIBS += -lflycapture
+#LIBS_DEBUG += -lflycapture
 
 
 

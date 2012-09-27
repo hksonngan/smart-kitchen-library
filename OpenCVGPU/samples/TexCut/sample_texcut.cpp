@@ -1,7 +1,7 @@
 #define USE_VIDEO_CAPTURE_OPT_PARSER
 #include "skl.h"
 #include "sklcv.h"
-#include "sklflycap.h"
+//#include "sklflycap.h"
 #include <sstream>
 #include "opencv2/gpu/gpu.hpp"
 
@@ -31,7 +31,8 @@ int main(int argc,char* argv[]){
 		return EXIT_FAILURE;
 	}
 
-	skl::gpu::VideoCaptureGpu cam(new skl::FlyCapture());
+//	skl::gpu::VideoCaptureGpu cam(new skl::FlyCapture());
+	skl::gpu::VideoCaptureGpu cam(new skl::VideoCapture());
 	skl::VideoCaptureParams params;
 
 	if(!camera_setting.empty()){

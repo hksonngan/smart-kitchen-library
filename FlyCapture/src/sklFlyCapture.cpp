@@ -2,7 +2,7 @@
  * @file FlyCapture.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/12
- * @date Last Change: 2012/Sep/24.
+ * @date Last Change: 2012/Sep/27.
  */
 #include "sklFlyCapture.h"
 

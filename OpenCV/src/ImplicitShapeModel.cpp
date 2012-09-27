@@ -2,7 +2,7 @@
  * @file ImplicitShapeModel.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jul/11
- * @date Last Change: 2012/Jul/31.
+ * @date Last Change: 2012/Aug/12.
  */
 #include "ImplicitShapeModel.h"
 #include <fstream>
@@ -482,10 +482,12 @@ bool ImplicitShapeModel::read_header(std::istream& in){
 	in.read((char*)buf,6*sizeof(float));
 	_entry_threshold = buf[0]; _hypothesis_threshold = buf[1]; _kapper1 = buf[2];
 	_kapper2 = buf[3]; _object_kernel_ratio = buf[4]; _std_size = buf[5];
+
 	int temp;
 	in.read((char*)&temp,sizeof(int));
-	_feature_type = (FeatureType)temp;
-	return false;
+	this->feature_type((FeatureType)temp);
+	
+	return true;
 }
 
 bool ImplicitShapeModel::read_entries(std::istream& in){

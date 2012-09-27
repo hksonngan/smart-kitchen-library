@@ -2,7 +2,7 @@
  * @file ImplicitShapeModel.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jul/11
- * @date Last Change:2012/Jul/31.
+ * @date Last Change:2012/Aug/12.
  */
 #ifndef __SKL_IMPLICIT_SHAPE_MODEL_H__
 #define __SKL_IMPLICIT_SHAPE_MODEL_H__
@@ -27,8 +27,8 @@ class ISMEntry{
 		inline const cv::Point2f& pt()const{return _pt;}
 		inline int class_response()const{return _class_response;}
 		inline const cv::Mat& patch()const{return _patch;}
-		void read(std::istream& in);
-		void write(std::ostream& out)const;
+		virtual void read(std::istream& in);
+		virtual void write(std::ostream& out)const;
 	protected:
 		cv::Point2f _pt;
 		int _class_response;

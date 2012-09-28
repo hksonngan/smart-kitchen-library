@@ -2,7 +2,7 @@
  * @file VideoCaptureParams.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change:2012/Jan/18.
+ * @date Last Change:2012/Sep/27.
  */
 #ifndef __SKL_VIDEO_CAPTURE_PARAMS_H__
 #define __SKL_VIDEO_CAPTURE_PARAMS_H__

@@ -1,7 +1,6 @@
 #ifndef __TEXCUT_H__
 #define __TEXCUT_H__
 #include "skl.h"
-#include "sklcv.h"
 #include <highgui.h>
 #include "BackgroundSubtractAlgorithm.h"
 

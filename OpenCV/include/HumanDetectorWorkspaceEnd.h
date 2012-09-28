@@ -13,6 +13,7 @@ namespace skl{
 	class HumanDetectorWorkspaceEnd : public FilterMat2Mat<std::list<size_t> > {
 		public:
 			HumanDetectorWorkspaceEnd();
+			HumanDetectorWorkspaceEnd(const cv::Mat& workspace_end);
 			~HumanDetectorWorkspaceEnd();
 
 			void setWorkspaceEnd(const cv::Mat& workspace_end);

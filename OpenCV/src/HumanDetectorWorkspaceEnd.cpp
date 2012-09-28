@@ -3,6 +3,10 @@
 using namespace skl;
 
 HumanDetectorWorkspaceEnd::HumanDetectorWorkspaceEnd(){}
+HumanDetectorWorkspaceEnd::HumanDetectorWorkspaceEnd(const cv::Mat& workspace_end){
+	setWorkspaceEnd(workspace_end);
+}
+
 HumanDetectorWorkspaceEnd::~HumanDetectorWorkspaceEnd(){}
 
 void HumanDetectorWorkspaceEnd::setWorkspaceEnd(const cv::Mat& workspace_end){

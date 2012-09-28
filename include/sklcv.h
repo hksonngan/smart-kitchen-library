@@ -1,14 +1,23 @@
+#ifndef __SKL_CV_H__
+#define __SKL_CV_H__
+
 #include "../OpenCV/include/cvtypes.h"
 #include "../OpenCV/include/sklcvutils.h"
+
 #include "../OpenCV/include/BackgroundSubtractAlgorithm.h"
 #include "../OpenCV/include/HumanDetectorWorkspaceEnd.h"
+
+
 //#include "../OpenCV/include/JointBoost.h"
 //#include "../OpenCV/include/Labeling.h"
+
 #include "../OpenCV/include/MotionHistory.h"
 //#include "../OpenCV/include/PatchModel.h"
+
 #include "../OpenCV/include/RegionLabelingSimple.h"
 //#include "../OpenCV/include/RegressionStump.h"
 //#include "../OpenCV/include/RegressionStump_parallel.h"
+
 #include "../OpenCV/include/StaticRegionDetector.h"
 #include "../OpenCV/include/TexCut.h"
 //#include "../OpenCV/include/BackgroundCut.h"
@@ -23,4 +32,10 @@
 #include "../OpenCV/include/Graphcut.h"
 #include "../OpenCV/include/Flow.h"
 #include "../OpenCV/include/MatReader.h"
-#include "../OpenCV/include/ImplicitShapeModel.h"
+//#include "../OpenCV/include/ImplicitShapeModel.h"
+
+#include "../OpenCV/include/TableObjectManager.h"
+#include "../OpenCV/include/TableObjectManagerWithTouchReasoning.h"
+#include "../OpenCV/include/TableObjectManagerBiBackground.h"
+
+#endif // __SKL_CV_H__

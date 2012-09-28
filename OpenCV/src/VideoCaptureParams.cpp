@@ -2,7 +2,7 @@
  * @file VideoCaptureParams.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change: 2012/Jan/18.
+ * @date Last Change: 2012/Sep/27.
  */
 
 // C++
@@ -77,7 +77,7 @@ bool VideoCaptureParams::set(capture_property_t prop_id,double val){
 }
 
 double VideoCaptureParams::get(const std::string& prop_name)const{
-	std::map<std::string,capture_property_t>::iterator pp = property_name_id_map.find(prop_name);
+	std::map<std::string,capture_property_t>::const_iterator pp = property_name_id_map.find(prop_name);
 	if(property_name_id_map.end()==pp) return 0.0;
 	return get(pp->second);
 }
@@ -110,7 +110,6 @@ bool VideoCaptureParams::scan(const std::string& str){
 	for(size_t i=0;i<buf.size();i++){
 		std::vector<std::string> key_val = split(buf[i],":");
 		if(key_val.size()!=0) continue;
-		std::map<std::string,capture_property_t>::iterator pp = property_name_id_map.find(key_val[0]);
 		if( !set( key_val[0], atof(key_val[1].c_str()) ) ){
 			return false;
 		}

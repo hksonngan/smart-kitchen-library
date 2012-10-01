@@ -2,7 +2,7 @@
  * @file FlyCapture.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/12
- * @date Last Change:2012/Sep/24.
+ * @date Last Change:2012/Oct/01.
  */
 #ifndef __SKL_FLY_CAPTURE_H__
 #define __SKL_FLY_CAPTURE_H__

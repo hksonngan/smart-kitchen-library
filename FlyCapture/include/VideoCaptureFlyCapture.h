@@ -2,7 +2,7 @@
  * @file VideoCaptureFlyCapture.h
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change:2012/Sep/24.
+ * @date Last Change:2012/Oct/01.
  */
 #ifndef __SKL_VIDEO_CAPTURE_FLY_CAPTURE_H__
 #define __SKL_VIDEO_CAPTURE_FLY_CAPTURE_H__
@@ -58,7 +58,16 @@ namespace skl{
 		private:
 			static void initialize_prop_type_map();
 			virtual bool open(const std::string& filename);
-
+			static FlyCapture2::FrameRate getFrameRate(double fps);
+			inline FlyCapture2::FrameRate getFrameRate(){
+				return getFrameRate(get(skl::FPS));
+			}
+			static FlyCapture2::VideoMode getVideoMode(int width,int height);
+			inline FlyCapture2::VideoMode getVideoMode(){
+				return getVideoMode(
+							get(skl::FRAME_WIDTH),
+							get(skl::FRAME_HEIGHT));
+			}
 	};
 
 } // skl

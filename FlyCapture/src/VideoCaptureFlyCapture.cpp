@@ -2,7 +2,7 @@
  * @file VideoCaptureFlyCapture.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change: 2012/Sep/27.
+ * @date Last Change: 2012/Oct/01.
  */
 #include "VideoCaptureFlyCapture.h"
 
@@ -17,6 +17,10 @@ VideoCaptureFlyCapture::VideoCaptureFlyCapture(cv::Ptr<FlyCapture2::BusManager> 
 	if(prop_type_map.empty()){
 		initialize_prop_type_map();
 	}
+	set(skl::FPS, 15);
+	set(skl::FRAME_WIDTH, 1024);
+	set(skl::FRAME_HEIGHT, 680);
+	set(skl::CONVERT_RGB,1);
 }
 
 /*!
@@ -58,8 +62,18 @@ bool VideoCaptureFlyCapture::open(int device){
 	FlyCapture2PrintCameraInfo(camInfo);
 #endif
 	error = camera.SetVideoModeAndFrameRate(
-			FlyCapture2::VIDEOMODE_1024x768Y8,
-			FlyCapture2::FRAMERATE_15);
+			getVideoMode(),
+			getFrameRate());
+	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
+
+	// Set mode for Y8 returning image
+	// 0x80000080 -> return by bayer array
+	// 0x80000000 -> return by normal gray scale.
+	int reg_val = 0x80000000;
+	if(get(skl::CONVERT_RGB)>=0 || get(skl::MONOCROME)<=0){
+		reg_val = 0x80000080;
+	}
+	error = camera.WriteRegister(0x1048,reg_val);
 	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
 
 	FlyCapture2::TriggerDelay trigger_delay;
@@ -71,6 +85,47 @@ bool VideoCaptureFlyCapture::open(int device){
 
 
 	return is_opened = set(CONVERT_RGB,1.0);
+}
+
+FlyCapture2::FrameRate VideoCaptureFlyCapture::getFrameRate(double fps){
+	if(fps >= 240){
+		return FlyCapture2::FRAMERATE_240;
+	}
+	if(fps >= 120){
+		return FlyCapture2::FRAMERATE_120;
+	}
+	if(fps >= 60){
+		return FlyCapture2::FRAMERATE_60;
+	}
+	if(fps >= 30){
+		return FlyCapture2::FRAMERATE_30;
+	}
+	if(fps >= 15){
+		return FlyCapture2::FRAMERATE_15;
+	}
+	if(fps >= 7.5){
+		return FlyCapture2::FRAMERATE_7_5;
+	}
+	if(fps >= 3.75){
+		return FlyCapture2::FRAMERATE_3_75;
+	}
+	return FlyCapture2::FRAMERATE_1_875;
+}
+
+#define caseVideoMode( _width, _height, suffix)\
+	case _width:\
+		assert(height==_height);\
+		return FlyCapture2::VIDEOMODE_##_width##x##_height##suffix
+
+
+FlyCapture2::VideoMode VideoCaptureFlyCapture::getVideoMode(int width,int height){
+	switch(width){
+		caseVideoMode(640,480,Y8);
+		caseVideoMode(1024,768,Y8);
+		caseVideoMode(1280,960,Y8);
+		caseVideoMode(1600,1200,Y8);
+	}
+	return FlyCapture2::VIDEOMODE_640x480Y8;
 }
 
 void VideoCaptureFlyCapture::release(){
@@ -141,7 +196,7 @@ bool VideoCaptureFlyCapture::retrieve(cv::Mat& image, int channels){
 }
 
 bool VideoCaptureFlyCapture::set(capture_property_t prop_id,double val){
-	if(isFlyCapProperty(prop_id)){
+	if( isFlyCapProperty(prop_id) && isOpened() ){
 		return set_flycap(prop_id,val);
 	}
 	return set_for_develop(prop_id,val);
@@ -273,7 +328,7 @@ bool VideoCaptureFlyCapture::set_flycap(capture_property_t prop_id,double val){
 }
 
 double VideoCaptureFlyCapture::get(capture_property_t prop_id){
-	if(isFlyCapProperty(prop_id)){
+	if(isFlyCapProperty(prop_id) && isOpened()){
 		return get_flycap(prop_id);
 	}
 	return get_for_develop(prop_id);
@@ -326,7 +381,6 @@ bool VideoCaptureFlyCapture::isFlyCapProperty(capture_property_t prop_id){
 	prop_type_map[skl::prop] = FlyCapture2::prop;
 
 void VideoCaptureFlyCapture::initialize_prop_type_map(){
-	prop_type_map[skl::FPS] = FlyCapture2::FRAME_RATE;
 	set_map(BRIGHTNESS);
 	set_map(AUTO_EXPOSURE);
 	set_map(SHARPNESS);

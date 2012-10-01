@@ -2,7 +2,7 @@
  * @file FlyCapture.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/12
- * @date Last Change: 2012/Sep/27.
+ * @date Last Change: 2012/Oct/01.
  */
 #include "sklFlyCapture.h"
 
@@ -19,7 +19,6 @@ FlyCapture::FlyCapture():is_started(false){
  * @brief デストラクタ
  */
 FlyCapture::~FlyCapture(){
-
 }
 
 bool FlyCapture::open(){

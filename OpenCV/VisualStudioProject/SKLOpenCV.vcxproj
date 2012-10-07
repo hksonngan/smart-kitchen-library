@@ -177,6 +177,11 @@
     <ClCompile Include="..\src\BackgroundSubtractAlgorithm.cpp" />
     <ClCompile Include="..\src\ImplicitShapeModel_Entries.cpp" />
     <ClCompile Include="..\src\ImplicitShapeModel_Entry.cpp" />
+    <ClCompile Include="..\src\Patch.cpp" />
+    <ClCompile Include="..\src\PatchLayer.cpp" />
+    <ClCompile Include="..\src\PatchModel.cpp" />
+    <ClCompile Include="..\src\PatchModelBiBackground.cpp" />
+    <ClCompile Include="..\src\RegionLabelingEfficientGraph.cpp" />
     <ClCompile Include="..\src\RegionLabelingSimple.cpp" />
     <ClCompile Include="..\src\StaticRegionDetector.cpp" />
     <ClCompile Include="..\src\MotionHistory.cpp" />
@@ -201,6 +206,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\BackgroundCut.h" />
     <ClInclude Include="..\include\Labeling.h" />
+    <ClInclude Include="..\include\RegionLabelingEfficientGraph.h" />
     <ClInclude Include="..\include\RegionLabelingSimple.h" />
     <ClInclude Include="..\include\MotionHistory.h" />
     <ClInclude Include="..\include\HumanDetectorWorkspaceEnd.h" />

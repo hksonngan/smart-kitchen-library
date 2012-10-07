@@ -1,5 +1,6 @@
 #ifndef __FILTER_MAT2MAT_H__
 #define __FILTER_MAT2MAT_H__
+
 #include <cv.h>
 #include "skl.h"
 

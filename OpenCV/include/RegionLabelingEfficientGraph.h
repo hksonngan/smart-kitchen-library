@@ -16,6 +16,7 @@ namespace skl{
 /*!
  * @class ""に基づく領域分割
  * @note "Efficient Graph-Based Image Segmentation," Pedro F. Felzenszwalb and Daniel P. Huttenlocher, International Journal of Computer Vision, 59(2) September 2004.
+ * @example ../samples/Segmentation/sample_segmentation_efficient_graph.cpp
  */
  class RegionLabelingEfficientGraph: public FilterMat2Mat<size_t>{
 

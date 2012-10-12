@@ -15,6 +15,7 @@
 //#include "../OpenCV/include/PatchModel.h"
 
 #include "../OpenCV/include/RegionLabelingSimple.h"
+#include "../OpenCV/include/RegionLabelingEfficientGraph.h"
 //#include "../OpenCV/include/RegressionStump.h"
 //#include "../OpenCV/include/RegressionStump_parallel.h"
 

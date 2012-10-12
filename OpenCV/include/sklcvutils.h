@@ -6,6 +6,8 @@
 #endif
 #include <cv.h>
 
+bool checkMat(const cv::Mat& mat, int depth = -1,int channels = 0,cv::Size size = cv::Size(0,0) );
+
 /*
  * return common region of left and right;
  */

@@ -140,8 +140,15 @@ namespace skl{
 			return vis;
 		}
 		std::vector<cv::Vec3b> colors(region_num);
-		for(size_t i=0;i<colors.size();i++){
-			colors[i] = assignColor(i);
+		for(size_t i=0;i<region_num;i++){
+			if(region_num<32){
+				colors[i] = assignColor(i);
+			}
+			else{
+				for(size_t c=0;c<3;c++){
+					colors[i][c] = rand() % UCHAR_MAX;
+				}
+			}
 			//		std::cerr << (int)colors[i][0] << ", " << (int)colors[i][1] << ", " << (int)colors[i][2] << std::endl;
 		}
 
@@ -658,3 +665,27 @@ namespace skl{
 	}
 
 }// namespace skl
+
+template<typename ValType> bool _checkMat(
+		const ValType val,
+		const ValType condition,
+		const ValType skipConditionVal, 
+		const std::string& debug_comment){
+	if(condition == skipConditionVal) return true;// skip
+	if(val == condition) return true;
+#ifdef DEBUG
+	std::cerr << "ERROR: " << debug_comment << std::endl;
+	std::cerr << "       value '" << val << "' does not equal to '"<<condition<<"'." << std::endl;
+#endif
+	return false;
+}
+bool checkMat(const cv::Mat& mat, int depth,int channels,cv::Size size){
+	bool result = true;
+	assert(!mat.empty());
+	result &= _checkMat(mat.depth(),depth,-1,"depth does not fit.");
+	result &= _checkMat(mat.channels(),channels,0,"channels does not fit.");
+	result &= _checkMat(mat.cols,size.width,0,"image width does not fit.");
+	result &= _checkMat(mat.rows,size.height,0,"image height does not fit.");
+	return result;
+}
+

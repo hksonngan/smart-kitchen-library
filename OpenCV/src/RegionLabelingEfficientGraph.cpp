@@ -2,7 +2,7 @@
  * @file RegionLabelingEfficientGraph.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Oct/07
- * @date Last Change: 2012/Oct/07.
+ * @date Last Change: 2012/Oct/12.
  */
 #include "RegionLabelingEfficientGraph.h"
 #include "RegionLabelingEfficientGraph/segment-image.h"
@@ -25,7 +25,7 @@ RegionLabelingEfficientGraph::~RegionLabelingEfficientGraph(){
 
 }
 
-size_t RegionLabelingEfficientGraph::compute(const cv::Mat& col_image, cv::Mat& region_labels){
+size_t RegionLabelingEfficientGraph::compute(const cv::Mat& col_image, const cv::Mat& mask,cv::Mat& region_labels){
 	int width = col_image.cols;
 	int height = col_image.rows;
 	assert(!col_image.empty());
@@ -108,13 +108,41 @@ size_t RegionLabelingEfficientGraph::compute(const cv::Mat& col_image, cv::Mat& 
 		|| CV_16SC1 != region_labels.type()){
 		region_labels = cv::Mat(col_image.size(),CV_16SC1);
 	}
+	if(num_ccs >= SHRT_MAX) return num_ccs;
 
-	for (int y = 0; y < height; y++) {
-		for (int x = 0; x < width; x++) {
-			int comp = u->find(y * width + x);
-			region_labels.at<short>(y,x) = comp;
+	short *label_map = new short[width*height];
+	memset(label_map,0,sizeof(short)*width*height);
+	short count = 1;
+	if(!mask.empty()){
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				int comp = u->find(y * width + x);
+				if(label_map[comp]==0){
+					label_map[comp] = count;
+					count++;
+				}
+				if(mask.at<unsigned char>(y,x)==0){
+					region_labels.at<short>(y,x) = 0;
+					continue;
+				}
+				region_labels.at<short>(y,x) = label_map[comp];
+			}
 		}
-	}  
+	}
+	else{
+		for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				int comp = u->find(y * width + x);
+				if(label_map[comp] == 0){
+					label_map[comp] = count;
+					count++;
+				}
+				region_labels.at<short>(y,x) = label_map[comp];
+			}
+		}
+	}
+	assert(count-1 == num_ccs);
+	delete label_map;
 
 	delete u;
 

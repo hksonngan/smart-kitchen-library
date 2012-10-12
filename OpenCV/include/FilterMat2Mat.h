@@ -24,7 +24,7 @@ namespace skl{
 	template<class T> T FilterMat2Mat<T>::compute(
 			const cv::Mat& src,
 			cv::Mat& labels){
-		cv::Mat mask = cv::Mat(src.size(),src.depth(),1);
+		cv::Mat mask = cv::Mat(src.size(),src.depth(),cv::Scalar(1));
 		return compute(src,src,labels);
 	}
 }

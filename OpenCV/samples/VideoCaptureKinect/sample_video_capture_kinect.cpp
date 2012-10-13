@@ -5,10 +5,8 @@
 opt_on(std::string, camera_setting, "", "-C","<FILE>","load camera conf parameters.");
 opt_on(std::string, input_file,"","-i","<FILE>","load video file");
 
-opt_on(std::string, output_file,"","-o","<FILE>","save video");
 
 opt_on(int,dev,0,"-d","<DEVICE_ID>","direct device id.");
-opt_on_bool(trackbar,"","create track bar with the window.");
 
 int main(int argc,char* argv[]){
 	skl::OptParser options;
@@ -54,41 +52,24 @@ int main(int argc,char* argv[]){
 
 	cv::namedWindow("image",0);
 	cv::namedWindow("depth",0);
-	int pos_frames;
-	if(trackbar && !input_file.empty()){
-		cv::createTrackbar("pos","image",&pos_frames, cam.get(skl::FRAME_COUNT)-1);
-	}
-	cv::Mat image, depth;
+	cv::namedWindow("valid depth mask",0);
+	cv::Mat image, depth, valid_depth_mask;
 
-	cv::VideoWriter writer;
-	if(!output_file.empty()){
-		cam >> image;
-		if(!writer.open(
-					output_file,
-					CV_FOURCC('D','V','I','X'),
-					cam.get(skl::FPS),
-					image.size(),
-					(cam.get(skl::MONOCROME)<=0))){
-			std::cerr << "WARNING: failed to open " << output_file << ".";
-		}
-		writer << image;
-	}
 
 	while('q'!=cv::waitKey(10) && cam.grab()){
-		if(trackbar && !input_file.empty()){
-			int frame_id = cv::getTrackbarPos("pos","image");
-			cam.set(skl::POS_FRAMES,frame_id);
-		}
 		cam.retrieve(depth,CV_CAP_OPENNI_DEPTH_MAP) ;
+		assert(checkMat(depth,CV_16U,1));
 		cam.retrieve(image,CV_CAP_OPENNI_BGR_IMAGE) ;
-		if(writer.isOpened()){
-			writer << image;
-		}
+		assert(checkMat(image,CV_8U,3,depth.size()));
+		cam.retrieve(valid_depth_mask,CV_CAP_OPENNI_VALID_DEPTH_MASK);
+		assert(checkMat(valid_depth_mask,CV_8U,1,depth.size()));
+
 		cv::imshow("image",image);
 		cv::imshow("depth",depth);
+		cv::imshow("valid depth mask",valid_depth_mask);
 	}
 	cv::destroyWindow("image");
 	cv::destroyWindow("depth");
-
+	cv::destroyWindow("valid depth mask");
 	return EXIT_SUCCESS;
 }

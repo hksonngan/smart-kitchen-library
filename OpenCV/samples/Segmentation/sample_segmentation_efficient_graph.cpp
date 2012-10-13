@@ -6,7 +6,7 @@ opt_on(std::string, output_file,"","-o","<DIR>","save image file");
 
 opt_on(float, sigma,0.5,"-s","<FLOAT>","parameter for smoothing preprocess.")
 opt_on(float, unit_segment_size,300,"-k","<FLOAT>","parameter for deciding unit of homogenious block.");
-opt_on(float, min_size, 30,"-m","<UINT>","minimum segment size");
+opt_on(int, min_size, 30,"-m","<UINT>","minimum segment size");
 
 
 int main(int argc,char* argv[]){

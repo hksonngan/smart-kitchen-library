@@ -7,3 +7,4 @@
 #include "../Core/include/StopWatch.h"
 #include "../Core/include/Serializable.h"
 #include "../Core/include/SensorModuleBase.h"
+#include "../Core/include/KeyInput.h"

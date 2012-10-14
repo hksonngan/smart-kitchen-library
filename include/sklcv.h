@@ -7,6 +7,7 @@
 #include "../OpenCV/include/BackgroundSubtractAlgorithm.h"
 #include "../OpenCV/include/HumanDetectorWorkspaceEnd.h"
 
+#include "../OpenCV/include/CvMouseData.h"
 
 //#include "../OpenCV/include/JointBoost.h"
 //#include "../OpenCV/include/Labeling.h"

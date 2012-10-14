@@ -1,193 +1,102 @@
 /*!
- * @file MultiFunctionalFileCameraViewer.cpp
+ * @file sample_mouse_data.cpp
  *
  * @author 橋本敦史
- * @date Last Change: 2010/Jul/24.
+ * @date Last Change: 2012/Oct/14.
  * */
 
-#include "ImageImage.h"
-#include "ImageCameraFileCamera.h"
-#include "CvMouseData.h"
-#include "KeyInput.h"
-#include "ParamReader.h"
+#include "sklcv.h"
 
 #include <iostream>
 #include <csignal>
 
-void usage(const std::string& command);
-void printSelectedRegionColors(const mmpl::image::Image& frame,const CvRect& selected_area);
-mmpl::image::camera::FileCamera* createCamera(const mmpl::ParamReader& args);
-void draw_rect(const CvRect& rect, const CvScalar& color, mmpl::image::Image* img);
+void printEvent(const skl::MouseEvent& event);
+void printFlag(int flag);
 
 int main(int argc,char **argv){
-	mmpl::ParamReader args(argc,argv);
 
-	if(args.getArgSize()<2 || args.hasHelp()){
-		usage(args[0]);
-		return EXIT_FAILURE;
-	}
+	cv::Mat canvas(cv::Size(1024,768), CV_8UC3, cv::Scalar(255,255,255));
 
-	mmpl::image::camera::FileCamera *cam;
-	cam = createCamera(args);
+	// GUI
+	cv::namedWindow("canvas",0);
 
-	mmpl::image::Image frame;
-	int index=0;
-	int step=0;
-	int last_index=-1;
+	// マウスイベントを取得する関数on_mouseの設定
+	skl::CvMouseData mouse_on_canvas("canvas");
 
-	//! GUIの設定
-	cvInitSystem(argc,argv);
-	cvNamedWindow("frame",0);
-	cvCreateTrackbar("INDEX","frame",&index,cam->getLength()-1,NULL);
-	cvCreateTrackbar("STEP","frame",&step,256,NULL);
+	// KeyInput
+	skl::KeyInput key;
 
-	//! キーボードの入力を処理するクラス
-	mmpl::KeyInput key;
+	cv::Point mouse_location;
 
-	//! マウスイベントを取得する関数on_mouseの設定
-	mmpl::CvMouseData md;
-	cvSetMouseCallback ("frame", mmpl::onMouse, (void *)&md);
-
-	CvRect selected_area;
-	bool hasSelectedRegion = false;
-	CvScalar red = CV_RGB(255,0,0);
-	CvScalar blue = CV_RGB(0,0,255);
-
-	//! ここから画像読み込み・表示部分
-	while('q'!=(char)( key.regulate( cvWaitKey(10) ) ) ){
-		//! キーボードに入力があった場合、内容を出力
-		if(key.isValid()){
-			if(key.CTRL && 's'==key.getKey()->key){
-				std::cerr << "保存先のファイル名を入力してください:" << std::endl;
-				std::string filename;
-				std::cin >> filename;
-				frame.saveImage(filename);
-			}
+	// ここから画像読み込み・表示部分
+	while('q'!=key.set( cvWaitKey(10) ) ){
+		if(key.getChar()=='c'){
+			canvas =  cv::Mat(canvas.size(),canvas.type(),cv::Scalar(255,255,255));
 		}
 
-		//! キャプチャする
-		cam->capture(&frame,index);
-		if(index!=last_index){
-			std::cout << cam->getCurrentFileName() << std::endl;
-			last_index=index;
+		// print mouse location
+		if(mouse_location != mouse_on_canvas.location()){
+			// current mouse location
+			std::cerr << "Mouse is on (" << mouse_on_canvas.location().x << ", " << mouse_on_canvas.location().y << ")." << std::endl;
+			// current mosue flag
+			printFlag(mouse_on_canvas.flag());
+			mouse_location = mouse_on_canvas.location();
+		}
+
+
+		// print mouse event
+		while(!mouse_on_canvas.events().empty()){
+			skl::MouseEvent event = mouse_on_canvas.events().front();
+			printEvent(event);
+			printFlag(event.flag);
+			mouse_on_canvas.events().pop();
 		}
 
 		//! マウスで指定した範囲の色を出力
-		switch(md.popEvent()){
-			case CV_EVENT_LBUTTONDOWN:	
-				selected_area.x = md.eventPoint.x;
-				selected_area.y = md.eventPoint.y;
-				hasSelectedRegion=true;
-				std::cerr << __LINE__ << ": " << selected_area.x << ", " << selected_area.y << std::endl;
-				break;
-			case CV_EVENT_MBUTTONDOWN:
-				break;
-			case CV_EVENT_RBUTTONDOWN:
-				break;
-			case CV_EVENT_LBUTTONUP:
-				selected_area.width = md.eventPoint.x - selected_area.x;
-				if(selected_area.width<0){
-					selected_area.width *= -1;
-					selected_area.x -=selected_area.width;
-				}
-				selected_area.height = md.eventPoint.y - selected_area.y;
-				if(selected_area.height<0){
-					selected_area.height *= -1;
-					selected_area.y -= selected_area.height;
-				}
-				//! 描画色
-				draw_rect(selected_area,red,&frame);
-				printSelectedRegionColors(frame,selected_area);
-				hasSelectedRegion=false;
-				break;
-			case CV_EVENT_RBUTTONUP:
-				break;
-			case CV_EVENT_MBUTTONUP:
-				break;
-			case CV_EVENT_LBUTTONDBLCLK: //! OpenCV側で未実装(reserved)
-				break;
-			case CV_EVENT_RBUTTONDBLCLK: //! OpenCV側で未実装(reserved)
-				break;
-			case CV_EVENT_MBUTTONDBLCLK:
-				break;
-		}
-
-		if(hasSelectedRegion==true){
-			selected_area.width = md.mousePoint.x - selected_area.x;
-			if(selected_area.width<0){
-				selected_area.width *= -1;
-				selected_area.x -=selected_area.width;
-			}
-			selected_area.height = md.mousePoint.y - selected_area.y;
-			if(selected_area.height<0){
-				selected_area.height *= -1;
-				selected_area.y -= selected_area.height;
-			}
-			//! 描画色
-			draw_rect(selected_area,blue,&frame);
-		}
-		index+=step;
-		if(static_cast<unsigned int>(index)>=cam->getLength()){
-			continue;
-		}
-
-		//! トラックバーの移動
-		cvSetTrackbarPos("INDEX","frame",index);
-
-		//! 画像の表示
-		cvShowImage("frame",frame.getIplImage());
+		cv::imshow("canvas",canvas);
 	}
 
-	delete cam;
-	cvDestroyWindow("frame");
+	cv::destroyWindow("canvas");
 	return EXIT_SUCCESS;
 }
 
-mmpl::image::camera::FileCamera* createCamera(const mmpl::ParamReader& args){
-	if(!args["bayer_pattern"].empty() && args["bayer_pattern"]=="BGGR"){
-		return new mmpl::image::camera::FileCamera(args[1],mmpl::image::Image::BAYEREDGESENSE,mmpl::image::Image::BAYER_PATTERN_BGGR);
-	}
-	else if(!args["bayer_pattern"].empty() && args["bayer_pattern"]=="RGGB"){
-		return new mmpl::image::camera::FileCamera(args[1],mmpl::image::Image::BAYEREDGESENSE,mmpl::image::Image::BAYER_PATTERN_RGGB);
-	}
-	else if(!args["bayer_pattern"].empty() && args["bayer_pattern"]=="GRBG"){
-		return new mmpl::image::camera::FileCamera(args[1],mmpl::image::Image::BAYEREDGESENSE,mmpl::image::Image::BAYER_PATTERN_GRBG);
-	}
-	else if(!args["bayer_pattern"].empty() && args["bayer_pattern"]=="GBRG"){
-		return new mmpl::image::camera::FileCamera(args[1],mmpl::image::Image::BAYEREDGESENSE,mmpl::image::Image::BAYER_PATTERN_GBRG);
-	}
-	return new mmpl::image::camera::FileCamera(args[1],mmpl::image::Image::DEFAULT);
-}
+#define caseEventType(type) \
+	case CV_EVENT_##type: \
+		std::cout << #type;\
+		break
 
-void draw_rect(const CvRect& rect, const CvScalar& color, mmpl::image::Image* img){
-	CvPoint cvPt1,cvPt2;
-	cvPt1.x = rect.x;
-	cvPt1.y = rect.y;
-	cvPt2.x = rect.x + rect.width;
-	cvPt2.y = rect.y + rect.height;
-	cvRectangle(img->getIplImage(),cvPt1,cvPt2,color,1,CV_AA,0);
-}
-
-void printSelectedRegionColors(const mmpl::image::Image& frame,const CvRect& selected_area){
-	std::string name;
-	std::cerr << "Region Name: " << std::flush;
-	std::cin >> name;
-	for(int y=0;y<selected_area.height;y++){
-		for(int x=0;x<selected_area.width;x++){
-			mmpl::Color col = frame.getColor(selected_area.x+x,selected_area.y+y);
-//			col = col.convColor(mmpl::Color::BGR);
-			std::cout << name << ", FORMAT: BGR";
-			for(int c=0;c<3;c++){
-				std::cout << ", " << static_cast<int>(col[c]);
-			}
-			std::cout << std::endl;
-		}
+void printEvent(const skl::MouseEvent& event){
+	std::cout << "EventType: ";
+	switch(event.type){
+		case CV_EVENT_LBUTTONDOWN:
+			std::cout << "LBUTTON_DOWN";
+			break;
+		// do similar process (by macro function)
+		caseEventType(RBUTTONDOWN);
+		caseEventType(MBUTTONDOWN);
+		caseEventType(LBUTTONUP);
+		caseEventType(RBUTTONUP);
+		caseEventType(MBUTTONUP);
+		caseEventType(LBUTTONDBLCLK);
+		caseEventType(RBUTTONDBLCLK);
+		caseEventType(MBUTTONDBLCLK);
+		default:
+			std::cout << "UNKNOWN";
 	}
+	std::cout << std::endl;
+
 }
 
 
-void usage(const std::string& command){
-	std::cerr << "Usage: " << command << " image.lst0" << std::endl;
-	std::cerr << "--bayer_pattern=<PATTERN>: set bayer_pattern" << std::endl;
-	std::cerr << "\t<PATTERN>: BGGR, RGGB, GRBG, GBRG" << std::endl;
+#define _printFlag(_flag)\
+	std::cout << #_flag << ": " << ((flag&CV_EVENT_##_flag) > 0) << std::endl
+
+void printFlag(int flag){
+	std::cout << "FLAG_LBUTTON" << ": " << ((flag&CV_EVENT_FLAG_LBUTTON)>0) << std::endl;
+	// do similar process (by macro function)
+	_printFlag(FLAG_RBUTTON);
+	_printFlag(FLAG_MBUTTON);
+	_printFlag(FLAG_CTRLKEY);
+	_printFlag(FLAG_SHIFTKEY);
+//	_printFlag(FLAG_ALTKEY); // FLAG_ALTKEY conflict with NumLock. (this looks a bug in OpenCV)
 }

@@ -35,7 +35,7 @@ namespace skl{
 
 			virtual void compute(const cv::Mat& src, cv::Mat& human, std::vector<size_t>& put_objects, std::vector<size_t>& taken_objects);
 
-#ifdef DEBUG
+#ifdef _DEBUG
 			cv::Mat update_mask;
 #endif
 			inline const cv::Mat& bg2()const{return _bg2;}

@@ -68,7 +68,7 @@ int main(int argc, char* argv[]){
 	// input images must be color for TableObjectManager.
 	assert(cam.get(skl::MONOCROME)<=0);
 
-#ifdef DEBUG // make debugしたときだけ実行される
+#ifdef _DEBUG // make debugしたときだけ実行される
 	std::cout << "=== Parameter Setting of camera ===" << std::endl;
 	std::cout << cam.get();
 	std::cerr << std::endl;

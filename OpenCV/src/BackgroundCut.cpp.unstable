@@ -7,7 +7,7 @@
 #include "BackgroundCut.h"
 #define QUANTIZATION_LEVEL SHRT_MAX//32767.0f
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define DEBUG_BACKGROUND_CUT
 #endif
 #define BGCUT_SAMPLE_NUM 7680.f /*320*240*/

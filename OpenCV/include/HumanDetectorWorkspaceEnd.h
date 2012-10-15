@@ -5,7 +5,7 @@
 #include <list>
 #include "FilterMat2Mat.h"
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define DEBUG_HUMAN_DETECTOR_WORKSPACE_END
 #endif
 

@@ -131,7 +131,7 @@ void TableObjectManagerBiBackground::compute(const cv::Mat& src, cv::Mat& human,
 	non_update_mask *= _learning_rate;
 	non_update_mask += 1.0 - _learning_rate;
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	update_mask = cv::Mat(non_update_mask.size(),CV_8UC1);
 	non_update_mask.convertTo(update_mask,CV_8UC1,255);
 	update_mask = cv::Scalar(255.0) - update_mask;

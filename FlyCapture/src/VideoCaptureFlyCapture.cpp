@@ -57,7 +57,7 @@ bool VideoCaptureFlyCapture::open(int device){
 	error = camera.GetCameraInfo( &camInfo );
 	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	std::cout << "\n*** INFORMATION FOR CAMERA " << device << " ***" << std::endl;
 	FlyCapture2PrintCameraInfo(camInfo);
 #endif

@@ -170,9 +170,9 @@ size_t ObjectManager::updateObjectStatus(
 		size_t threshold_min_point_num,
 		double threshold_grab,
 		double threshold_release){
-#ifdef DEBUG
+#ifdef _DEBUG
 	std::cerr << "Not implemented updateObjectStatus." << std::endl;
-#endif // DEBUG
+#endif // _DEBUG
 
 	_getGrabbed.assign(size(),false);
 

@@ -49,12 +49,12 @@ bool VideoCaptureOptFlowImageList::grab(){
 
 	checked_frame_pos = index;
 	hasFlow = flow.read(img_list[checked_frame_pos]);
-#ifdef DEBUG
+#ifdef _DEBUG
 	if(!hasFlow){
 		std::cerr << "hasFlow fail to read'" << img_list[checked_frame_pos] << "'." << std::endl;
 	}
 #endif
-/*#ifdef DEBUG
+/*#ifdef _DEBUG
 	std::cerr << checked_frame_pos << ": " << img_list[checked_frame_pos] << ": " << hasFlow << std::endl;
 #endif
 */

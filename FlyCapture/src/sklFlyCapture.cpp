@@ -26,17 +26,17 @@ bool FlyCapture::open(){
 
 	FlyCapture2::Error error;
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	FlyCapture2PrintBuildInfo();
-#endif // DEBUG
+#endif // _DEBUG
 
 	busMgr = new FlyCapture2::BusManager();
 	unsigned int numCameras;
 	error = busMgr->GetNumOfCameras(&numCameras);
 	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
-#ifdef DEBUG
+#ifdef _DEBUG
 	printf( "Number of flycapture cameras: %u\n", numCameras );
-#endif // DEBUG
+#endif // _DEBUG
 	if(numCameras==0) return false;
 
 	cam_interface.resize(numCameras);

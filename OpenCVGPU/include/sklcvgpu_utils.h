@@ -7,7 +7,7 @@
 #ifndef __SKL_CV_GPU_UTILS_H__
 #define __SKL_CV_GPU_UTILS_H__
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define DEBUG_CV_GPU_UTILS
 #endif
 

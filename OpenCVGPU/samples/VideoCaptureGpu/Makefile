@@ -61,10 +61,10 @@ ${OBJNAME}:${OBJNAME}.o  ${OPT:%=%.o}
 	$(CC) -c ${CFLAGS} -o $@ $? $(INC)
 
 ${OBJNAME}_d:${OBJNAME}_d.o  ${OPT:%=%_d.o}
-	$(CC) ${CFLAGS} -o $@ $@.o ${OPT:%=%_d.o} $(INC) $(LIBS_DEBUG) $(LIBS_OPT) -DDEBUG
+	$(CC) ${CFLAGS} -o $@ $@.o ${OPT:%=%_d.o} $(INC) $(LIBS_DEBUG) $(LIBS_OPT) -D_DEBUG
 
 %_d.o:%.cpp
-	$(CC) -g -c $(CFLAGS_D) -o $@ $? $(INC) -DDEBUG -D__linux_
+	$(CC) -g -c $(CFLAGS_D) -o $@ $? $(INC) -D_DEBUG -D__linux_
 
 clean:
 	rm -rf $(OBJNAME).o $(OBJNAME)_d.o ${OPT:%=%.o} ${OPT:%=%_d.o} $(OBJNAME) $(OBJNAME)_d

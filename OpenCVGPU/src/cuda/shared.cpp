@@ -42,7 +42,7 @@ dim3 skl::gpu::maxBlockSize(int* shared_mem_size, float byte_per_thread,float by
 		if(near_square) which_dim = !which_dim;
 		assert(block[0]>0 && block[1]>0);
 	}
-#ifdef DEBUG
+#ifdef _DEBUG
 	std::cerr << "Block Size: " << block[0] << ", " << block[1] << std::endl;
 #endif
 	return dim3(block[0],block[1]);

@@ -6,7 +6,7 @@
  */
 #ifndef __SKL_GPU_TEX_CUT_H__
 #define __SKL_GPU_TEX_CUT_H__
-#ifdef DEBUG
+#ifdef _DEBUG
 //#define DEBUG_GPU_TEXCUT
 #endif
 

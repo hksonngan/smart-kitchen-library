@@ -6,7 +6,7 @@
  */
 #include "MotionHistory.h"
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define DEBUG_MOTION_HISTORY
 #endif
 

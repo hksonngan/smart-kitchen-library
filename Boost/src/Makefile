@@ -36,7 +36,7 @@ LIBS += -lboost_regex -lboost_tokenizer
 
 # hoge.cpp -> hoge_d.o
 %_d.o:%.cpp
-	$(CC) -g -c $(CFLAGS) -o $@ $< $(INC) -DDEBUG -D__linux__ $(LIBS)
+	$(CC) -g -c $(CFLAGS) -o $@ $< $(INC) -D_DEBUG -D__linux__ $(LIBS)
 
 clean:
 	rm -f *.o

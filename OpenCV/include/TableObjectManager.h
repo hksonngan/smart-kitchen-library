@@ -9,7 +9,7 @@
 #include "PatchModel.h"
 
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define DEBUG_TABLE_OBJECT_MANAGER
 #endif
 

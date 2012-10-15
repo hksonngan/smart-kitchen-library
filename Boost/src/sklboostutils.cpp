@@ -3,7 +3,7 @@
 
 #include "sklboostutils.h"
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define DEBUG_BOOST_UTILS
 #include <iostream>
 #endif

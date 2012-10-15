@@ -71,8 +71,6 @@ end
 
 source = File.open(input_file).read
 
-
-
 def renewList(buf, tag, project_file,directories,filter)
 	exist_files = getFileList(project_file,directories,filter)
 	registered_files = []
@@ -111,13 +109,15 @@ src_list = []
 while /<ItemGroup>([\w\W]*?)<\/ItemGroup>([\w\W]*)/ =~ source do
 	buf = $1
 	source = $2
-	if /<ClCompile Include='..\\src\\.+\.(c|cpp|cu)'\/>/ =~ buf then
+	if /<ClCompile Include=\"..\\src\\.+\.(c|cpp|cu)\"\s*\/>/ =~ buf then
 		new_buf = renewList(buf,"ClCompile",input_file,src_file_directories,SRC_EXT)
 		result.sub!(buf,new_buf)
-	elsif /<ClInclude Include='..\\include\\.+\.(h|hpp)'\/>/ =~ buf then
+	elsif /<ClInclude Include=\"..\\include\\.+\.(h|hpp)\"\s*\/>/ =~ buf then
 		new_buf = renewList(buf,"ClInclude",input_file,header_file_directories, HEADER_EXT)
 		result.sub!(buf,new_buf)
 	end
 end
 
 print result
+
+

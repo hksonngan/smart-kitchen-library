@@ -5,7 +5,7 @@
 #include "TexCut.h"
 #include "sklcv.h"
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define DEBUG_TABLE_OBJECT_MANAGER
 #endif
 

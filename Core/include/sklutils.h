@@ -6,7 +6,7 @@
 namespace skl{
 	double gauss_rand();
 	double rayleigh_rand(double sigma);
-#ifdef DEBUG
+#ifdef _DEBUG
 #define printLocation() std::cerr << "in " << __FILE__ << ": at " << __LINE__ << std::endl
 #else
 #define printLocation() 

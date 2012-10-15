@@ -83,7 +83,7 @@ namespace skl{
 			if(buf[0].empty()) continue;
 			buf = split_strip(buf[0],deliminator,2);
 			if(buf.size()<2 || buf[0].empty()){
-#ifdef DEBUG
+#ifdef _DEBUG
 				std::cerr << "WARNING: invalid format '" << str << "'." << std::endl;
 #endif
 				return false;

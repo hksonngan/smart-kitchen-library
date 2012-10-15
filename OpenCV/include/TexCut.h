@@ -5,7 +5,7 @@
 #include "BackgroundSubtractAlgorithm.h"
 
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define DEBUG_TEXCUT
 #endif
 

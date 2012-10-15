@@ -3,7 +3,7 @@ VSPROJ = VisualStudioProject/SKLOpenCV.vcxproj
 all:
 	cd src;$(MAKE)
 	cp src/libskl_opencv.a ../lib
-	ruby ../support/VSProjectFileMaintainer.rb -i $(VSPROJ) -s src:src/cuda -h include > temp.proj;mv temp.proj $(VSPROJ)
+	ruby ../support/VSProjectFileMaintainer.rb -i $(VSPROJ) -s src -h include > temp.proj;mv temp.proj $(VSPROJ)
 
 .PHONY: clean debug
 

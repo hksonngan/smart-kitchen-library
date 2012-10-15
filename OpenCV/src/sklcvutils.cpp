@@ -6,7 +6,7 @@
 in = in > 255 ? 255 : in;\
 out=in;
 
-#ifdef DEBUG
+#ifdef _DEBUG
 #define DEBUG_SKLUTILS
 #endif
 
@@ -673,7 +673,7 @@ template<typename ValType> bool _checkMat(
 		const std::string& debug_comment){
 	if(condition == skipConditionVal) return true;// skip
 	if(val == condition) return true;
-#ifdef DEBUG
+#ifdef _DEBUG
 	std::cerr << "ERROR: " << debug_comment << std::endl;
 	std::cerr << "       value '" << val << "' does not equal to '"<<condition<<"'." << std::endl;
 #endif

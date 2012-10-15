@@ -49,7 +49,7 @@ ${LIBNAME}_d(%_d.o):%_d.o
 	$(CC) -O4 -c $(CFLAGS) -o $@ $< $(INC) -D__linux__
 # hoge.cpp -> hoge_d.o
 %_d.o:%.cpp
-	$(CC) -g -c $(CFLAGS_D) -o $@ $< $(INC) -DDEBUG -D__linux__
+	$(CC) -g -c $(CFLAGS_D) -o $@ $< $(INC) -D_DEBUG -D__linux__
 
 clean:
 	rm -f *.o

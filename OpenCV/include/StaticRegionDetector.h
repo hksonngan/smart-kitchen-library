@@ -4,7 +4,7 @@
 #include <map>
 #include "FilterMat2Mat.h"
 
-#ifdef DEBUG
+#ifdef _DEBUG
 //#define DEBUG_STATIC_REGION_DETECTOR
 #endif
 

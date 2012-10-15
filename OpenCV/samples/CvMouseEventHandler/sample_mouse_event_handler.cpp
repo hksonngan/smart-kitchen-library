@@ -20,7 +20,7 @@ int main(int argc,char **argv){
 	// GUI
 	cv::namedWindow("canvas",0);
 
-	// マウスイベントを取得する関数on_mouseの設定
+	// マウスイベントを取得するClassの作成
 	skl::CvMouseEventHandler mouse_on_canvas("canvas");
 
 	// KeyInput

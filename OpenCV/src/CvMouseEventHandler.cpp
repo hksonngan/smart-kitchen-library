@@ -1,26 +1,26 @@
 ﻿/*!
- * @file CvMouseData.cpp
+ * @file CvMouseEventHandler.cpp
  *
- * OpenCV Window上でのマウスイベントをMouseCallback関数の外に持ち出す変数とonMouse関数
+ * OpenCV Window上でのマウスイベントをMouseCallback関数の外に持ち出すClass
  * @author 橋本敦史
- * @date Last Change:2012/Oct/14.
+ * @date Last Change:2012/Oct/15.
  * */
 
-#include "CvMouseData.h"
+#include "CvMouseEventHandler.h"
 
 namespace skl{
 
 	/*!
 	 * @brief コンストラクタ
 	 * */
-	CvMouseData::CvMouseData(const std::string& win_name){
+	CvMouseEventHandler::CvMouseEventHandler(const std::string& win_name){
 		cvSetMouseCallback (win_name.c_str(), this->onMouse, (void *)this);
 	}
 
 	/*!
 	 * @brief デストラクタ
 	 * */
-	CvMouseData::~CvMouseData(){}
+	CvMouseEventHandler::~CvMouseEventHandler(){}
 
 	/*!
 	 * @brief cvSetMouseCallbackの第二引数としてセットするコールバック関数
@@ -28,10 +28,10 @@ namespace skl{
 	 * @param x マウスのx座標(OpenCV側から与えられる)
 	 * @param y マウスのy座標(OpenCV側から与えられる)
 	 * @param flag マウスの状態フラグ(OpenCV側から与えられる)
-	 * @param params 外部で定義されたobjectへのポインタ(ここではMouseDataを想定)
+	 * @param params 外部で定義されたobjectへのポインタ(ここではMouseEventHandlerを想定)
 	 * */
-	void CvMouseData::onMouse(int event_type, int x, int y, int flag, void *params){
-		CvMouseData *md = (CvMouseData*)params;
+	void CvMouseEventHandler::onMouse(int event_type, int x, int y, int flag, void *params){
+		CvMouseEventHandler *md = (CvMouseEventHandler*)params;
 		// マウスの現在地を獲得
 		md->_location = cv::Point(x,y);
 

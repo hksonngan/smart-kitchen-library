@@ -1,13 +1,13 @@
 ﻿/*!
- * @file CvMouseData.h
+ * @file CvMouseEventHandler.h
  *
  * CvWindow上でのマウスイベントなどをMouseCallback関数の外に持ち出す変数とonMouse関数
  * @author 橋本敦史
- * @date Last Change:2012/Oct/14.
+ * @date Last Change:2012/Oct/15.
  * */
 
-#ifndef __SKL_CV_MOUSE_DATA__
-#define __SKL_CV_MOUSE_DATA__
+#ifndef __SKL_CV_MOUSE_EVENT_HANDLER__
+#define __SKL_CV_MOUSE_EVENT_HANDLER__
 
 #include "cv.h"
 #include "highgui.h"
@@ -24,11 +24,11 @@ namespace skl{
 	/*
 	 * @class OpenCV上でのマウス操作を取得するためのクラス
 	 * */
-	class CvMouseData{
+	class CvMouseEventHandler{
 
 		public:
-			CvMouseData(const std::string& window_name);
-			~CvMouseData();
+			CvMouseEventHandler(const std::string& window_name);
+			~CvMouseEventHandler();
 
 			inline cv::Point location()const{return _location;}
 			inline int flag()const{return _flag;}

@@ -75,10 +75,12 @@ def renewList(buf, tag, project_file,directories,filter)
 	exist_files = getFileList(project_file,directories,filter)
 	registered_files = []
 	temp = buf
-	while /<#{tag} Include='(.*?)'\/>([\W\w]*)/ =~ temp do
+	while /<#{tag} Include=\"(.*?)\"\s*\/>([\W\w]*)/ =~ temp do
 		registered_files << $1
 		temp = $2
 	end
+	registered_files.sort!
+	exist_files.sort!
 	temp = buf.clone
 	added = exist_files - registered_files
 	deleted = registered_files - exist_files
@@ -87,7 +89,7 @@ def renewList(buf, tag, project_file,directories,filter)
 #	puts "Added"
 #	puts added
 	for file in deleted do
-		regex = /(\n*\s*<#{tag} Include='#{file.gsub('\\','\\\\\\\\')}'\/>)(\s*)/
+		regex = /(\n*\s*<#{tag} Include=\"#{file.gsub('\\','\\\\\\\\')}\"\s*\/>)(\s*)/
 		if Regexp.compile(regex) =~ temp then
 			temp.sub!($1+$2,$2)
 		else
@@ -96,7 +98,7 @@ def renewList(buf, tag, project_file,directories,filter)
 		end
 	end
 	for file in added do
-		temp += "\n    <#{tag} Include='#{file}'/>"
+		temp += "\n    <#{tag} Include=\"#{file}\"/>"
 	end
 
 	return temp
@@ -109,12 +111,15 @@ src_list = []
 while /<ItemGroup>([\w\W]*?)<\/ItemGroup>([\w\W]*)/ =~ source do
 	buf = $1
 	source = $2
-	if /<ClCompile Include=\"..\\src\\.+\.(c|cpp|cu)\"\s*\/>/ =~ buf then
+	if /<ClCompile Include="..\\src\\.+\.(c|cpp|cu)"\s*\/>/ =~ buf then
+#    <ClCompile Include="..\src\BackgroundSubtractAlgorithm.cpp" />
 		new_buf = renewList(buf,"ClCompile",input_file,src_file_directories,SRC_EXT)
 		result.sub!(buf,new_buf)
+#		p "source file updated"
 	elsif /<ClInclude Include=\"..\\include\\.+\.(h|hpp)\"\s*\/>/ =~ buf then
 		new_buf = renewList(buf,"ClInclude",input_file,header_file_directories, HEADER_EXT)
 		result.sub!(buf,new_buf)
+#		p "header file updated"
 	end
 end
 

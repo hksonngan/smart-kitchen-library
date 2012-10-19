@@ -1,5 +1,6 @@
 ﻿#include "sklcvutils.h"
 #include <highgui.h>
+#include <algorithm>
 
 #define CLIP(in, out)\
 	in = in < 0 ? 0 : in;\
@@ -664,7 +665,6 @@ namespace skl{
 ///
 	}
 
-}// namespace skl
 
 template<typename ValType> bool _checkMat(
 		const ValType val,
@@ -681,7 +681,7 @@ template<typename ValType> bool _checkMat(
 }
 bool checkMat(const cv::Mat& mat, int depth,int channels,cv::Size size){
 	bool result = true;
-	assert(!mat.empty());
+	if(mat.empty()) return false;
 	result &= _checkMat(mat.depth(),depth,-1,"depth does not fit.");
 	result &= _checkMat(mat.channels(),channels,0,"channels does not fit.");
 	result &= _checkMat(mat.cols,size.width,0,"image width does not fit.");
@@ -689,3 +689,129 @@ bool checkMat(const cv::Mat& mat, int depth,int channels,cv::Size size){
 	return result;
 }
 
+bool ensureMat(cv::Mat& mat, int depth,int channels,cv::Size size){
+	if(checkMat(mat,depth,channels,size)) return true;
+	mat = cv::Mat(size, CV_MAKETYPE(depth,channels));
+	return !mat.empty();
+}
+
+#define cvTypeTemplateCall(MatType,FuncName,ReturnVal,DefaultType,...)\
+	switch(MatType){\
+		case CV_8U:\
+			ReturnVal = FuncName<unsigned char>(__VA_ARGS__);\
+			break;\
+		case CV_8S:\
+			ReturnVal = FuncName<char>(__VA_ARGS__);\
+			break;\
+		case CV_16U:\
+			ReturnVal = FuncName<unsigned short>(__VA_ARGS__);\
+			break;\
+		case CV_16S:\
+			ReturnVal = FuncName<short>(__VA_ARGS__);\
+			break;\
+		case CV_32S:\
+			ReturnVal = FuncName<int>(__VA_ARGS__);\
+			break;\
+		case CV_32F:\
+			ReturnVal = FuncName<float>(__VA_ARGS__);\
+			break;\
+		case CV_64F:\
+			ReturnVal = FuncName<double>(__VA_ARGS__);\
+			break;\
+		default:\
+			ReturnVal = FuncName<DefaultType>(__VA_ARGS__);\
+	}
+
+
+template<typename Iter> cv::Mat fitModel(const cv::Mat& samples, Iter begin, Iter end){
+	cv::Mat model(cv::Size(samples.cols,1),samples.type(),cv::Scalar(0));
+	
+	size_t count = 0;
+	cv::Rect roi(0,0,samples.cols,1);
+	for(Iter it = begin; it != end; it++){
+		size_t idx = *it;
+		roi.y = idx;
+		model += cv::Mat(samples,roi);
+		count++;
+	}
+	return model / count;
+}
+
+template<typename Iter>double calcError(const cv::Mat& samples, const cv::Mat& model, Iter begin, Iter end){
+	double error = 0;
+	size_t count = 0;
+	
+	cv::Rect roi(0,0,samples.cols,1);
+	for(Iter it = begin; it != end; it++){
+		size_t idx = *it;
+		roi.y = idx;
+		error += cv::norm(model, cv::Mat(samples,roi));
+		count++;
+	}
+	return error / count;
+}
+
+cv::Mat ransac(const cv::Mat& samples, cv::TermCriteria termcrit, double thresh_outliar, double sampling_rate, double minimum_inliar_rate){
+	assert(0 < sampling_rate && sampling_rate <= 1);
+	assert(0 < minimum_inliar_rate && minimum_inliar_rate <= 1);
+
+
+	cv::Mat best_model(cv::Size(samples.cols,1),samples.type(),cv::Scalar(0));
+	size_t dim = samples.cols;
+	size_t sample_num = samples.rows;
+
+	size_t iterations = 0;
+	size_t sampling_num = sample_num * sampling_rate;
+	size_t minimum_inliar_num = sample_num * minimum_inliar_rate;
+
+	double best_error = DBL_MAX;
+
+	std::vector<size_t> sample_index(sample_num);
+	for(size_t i=0;i<sample_num;i++) sample_index[i] = i;
+
+
+	while( ( termcrit.type & CV_TERMCRIT_ITER == 0 || iterations < termcrit.maxCount) 
+		&& ( termcrit.type & CV_TERMCRIT_EPS == 0 || best_error > termcrit.epsilon) ){
+		// main loop
+
+		// random sampling (use first part as sampled data.)
+		std::random_shuffle(sample_index.begin(),sample_index.end());
+
+		std::vector<size_t> consensus_set(sampling_num);
+		std::copy(sample_index.begin(),sample_index.begin()+sampling_num,consensus_set.begin());
+
+		cv::Mat this_model = fitModel(samples,sample_index.begin(),sample_index.begin()+sampling_num);
+
+		// do process for not-sampled elements.
+		cv::Rect roi(0,0,dim,1);
+		for(size_t _i=sampling_num;_i<sample_num;_i++){
+			size_t idx = sample_index[_i];
+			
+			roi.y = idx;
+			if(cv::norm(this_model,cv::Mat(samples,roi))<thresh_outliar){
+				consensus_set.push_back(idx);
+			}
+		}
+
+		// increment iteration before checking validity
+		iterations++;
+
+		// check validity
+		if(consensus_set.size() < minimum_inliar_num) continue;
+		if(consensus_set.size() > sampling_num){
+			cv::Mat refinement = fitModel(samples,consensus_set.begin()+sampling_num,consensus_set.end());
+			this_model = ( sampling_num * this_model + (consensus_set.size()-sampling_num) * refinement ) /consensus_set.size();
+		}
+		double this_error = calcError(samples, this_model, consensus_set.begin(),consensus_set.end());
+		if(this_error < best_error){
+			best_error = this_error;
+			best_model = this_model;
+		}
+
+	}
+
+	return best_model;
+}
+
+
+}// namespace skl

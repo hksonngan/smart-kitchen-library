@@ -6,7 +6,6 @@
 #endif
 #include <cv.h>
 
-bool checkMat(const cv::Mat& mat, int depth = -1,int channels = 0,cv::Size size = cv::Size(0,0) );
 
 /*
  * return common region of left and right;
@@ -24,6 +23,10 @@ bool operator&&(const cv::Rect& left, const cv::Rect& right);
 cv::Rect operator|(const cv::Rect& left, const cv::Rect& right);
 
 namespace skl{
+	bool checkMat(const cv::Mat& mat, int depth = -1,int channels = 0,cv::Size size = cv::Size(0,0) );
+	bool ensureMat(cv::Mat& mat, int depth, int channels, cv::Size);
+	cv::Mat ransac(const cv::Mat& samples, cv::TermCriteria termcrit, double thresh_outliar, double sampling_rate = 0.2, double minimum_inliar_rate = 0.2);
+
 	void fillColorPalette(
 			std::vector<cv::Scalar>& palette,
 			size_t hue_pattern_num=7,

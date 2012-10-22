@@ -12,6 +12,8 @@
 
 using namespace skl;
 
+#define SKL_GRAY 128
+
 Patch::Patch(){
 
 }
@@ -170,7 +172,7 @@ void Patch::save(const std::string& filename,Type type,const std::string& edge_f
 
 cv::Mat Patch::blur_mask(const cv::Mat& mask, size_t blur_width){
 	cv::Mat dest = mask.clone();
-	cv::Size kernel_size(blur_width,blur_width);
+	cv::Size kernel_size((int)blur_width,(int)blur_width);
 
 	cv::blur(dest, dest, kernel_size);
 	if(mask.depth()==CV_8U){
@@ -218,7 +220,7 @@ cv::Mat Patch::print_mask(Type type)const{
 	for(int y = 0; y < dest_roi.rows; y++){
 		for(int x = 0; x < dest_roi.cols; x++){
 			if(_mask[type].at<float>(y,x)==0)continue;
-			dest_roi.at<cv::Vec3b>(y,x) = _mask[type].at<float>(y,x) * 255;
+			dest_roi.at<cv::Vec3b>(y,x) = (unsigned char)(_mask[type].at<float>(y,x) * 255);
 		}
 	}
 	return dest;

@@ -90,7 +90,7 @@ std::string TimeInterval::print()const{
 	int sec = val%60;
 	val /= 60;
 	int minute = val%60;
-	int hour  = val/60;
+	int hour  = (int)(val/60);
 	ss << hour << ":";
 	ss << std::setw(2) << std::setfill('0') << minute << ":";
 	ss << std::setw(2) << std::setfill('0') << sec << ".";
@@ -119,7 +119,7 @@ bool TimeInterval::scan(const std::string& _str){
 		str = str.substr(1,std::string::npos);
 	}
 	// HHの読み取り
-	unsigned int idx = str.find(":");
+	size_t idx = str.find(":");
 	if(idx==std::string::npos){
 		return false;
 /*		std::cerr << "at " << __FILE__ << ": "<< __LINE__ << std::endl;

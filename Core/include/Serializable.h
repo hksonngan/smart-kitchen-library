@@ -37,7 +37,7 @@ class Serializable{
 		virtual void _deserialize(const char* buf,long buf_size)=0;	
 };
 
-} // namespace mmpl
+} // namespace skl
 
 namespace skl{
 	typedef skl::Serializable Serializable;

@@ -7,61 +7,74 @@
 #include <cv.h>
 
 
-/*
- * return common region of left and right;
- */
+// &(get the "and" region, cap operation)
+// |(get the "or" region, cup operation)
 cv::Rect operator&(const cv::Rect& left, const cv::Rect& right);
-
-/*!
- * return true when left and right intersects.
- */
-bool operator&&(const cv::Rect& left, const cv::Rect& right);
-
-/*!
- * return minimum rectangle which include both left and right
- */
 cv::Rect operator|(const cv::Rect& left, const cv::Rect& right);
 
+// && returns true if two rectanbles are overlapped.
+bool operator&&(const cv::Rect& left, const cv::Rect& right);
+
+// Bayer to BGR image interpolation
+// Used in class skl::VideoCaptureFlyCapture
+#include "sklcvutils_bayer_conversion.h"
+
+// template subfunctions for skl::blending
+#include "sklcvutils_blending.h"
+
+// use with a template function like below
+// int FuncName<MatType>(...);
+// sample code are available in 
+#define cvMatTypeTemplateCall(MatType,FuncName,ReturnVal,DefaultType,...)\
+	switch(MatType){\
+		case CV_8U:\
+			ReturnVal = FuncName<unsigned char>(__VA_ARGS__);\
+			break;\
+		case CV_8S:\
+			ReturnVal = FuncName<char>(__VA_ARGS__);\
+			break;\
+		case CV_16U:\
+			ReturnVal = FuncName<unsigned short>(__VA_ARGS__);\
+			break;\
+		case CV_16S:\
+			ReturnVal = FuncName<short>(__VA_ARGS__);\
+			break;\
+		case CV_32S:\
+			ReturnVal = FuncName<int>(__VA_ARGS__);\
+			break;\
+		case CV_32F:\
+			ReturnVal = FuncName<float>(__VA_ARGS__);\
+			break;\
+		case CV_64F:\
+			ReturnVal = FuncName<double>(__VA_ARGS__);\
+			break;\
+		default:\
+			ReturnVal = FuncName<DefaultType>(__VA_ARGS__);\
+	}
+
 namespace skl{
+
+	// check cv::Mat type/size and return debug message.	
 	bool checkMat(const cv::Mat& mat, int depth = -1,int channels = 0,cv::Size size = cv::Size(0,0) );
+	// check cv::Mat type/size and allocate the appropriate matrix if needed.
 	bool ensureMat(cv::Mat& mat, int depth, int channels, cv::Size);
+
+	cv::Rect fitRect(const std::vector< cv::Point >& points);
+
+	// a simple ransac estimation.
+	// the error for model evaluation is calcurated by sum of L2 norm between "estimated model parameter" and sample parameters.
+	// see http://en.wikipedia.org/wiki/RANSAC for algorithm details.
 	cv::Mat ransac(const cv::Mat& samples, cv::TermCriteria termcrit, double thresh_outliar, double sampling_rate = 0.2, double minimum_inliar_rate = 0.2);
 
+	//! fill color palette acording to palette.size(). Different colors are set to each elem in palette.
+	//! the difference are decided in HLS color space.
 	void fillColorPalette(
 			std::vector<cv::Scalar>& palette,
 			size_t hue_pattern_num=7,
 			bool use_gray=true,
 			int min_luminance_value=20);
 
-#define SKL_GRAY 128
-	typedef enum{
-		BAYER_SIMPLE,	//!< 単純なベイヤー変換
-		BAYER_NN,		//!< NNを考慮したベイヤー
-		BAYER_EDGE_SENSE,//,//!< エッジを考慮したベイヤー
-	} ColorInterpolationType;
-	void cvtBayer2BGR(const cv::Mat& bayer, cv::Mat& bgr, int code=CV_BayerBG2BGR, int	algo_type=BAYER_SIMPLE);
-
-
-	cv::Rect fitRect(const std::vector< cv::Point >& points);
-
-	/*!
-	 * @brief get non Zero value points
-	 * */
-	template<class ElemType> void getPoints(
-			const cv::Mat& mask, std::vector<cv::Point>& points,
-			ElemType val = 0){
-		points.clear();
-		for(int y=0;y<mask.rows;y++){
-			const ElemType* pix = mask.ptr<const ElemType>(y);
-			for(int x=0;x<mask.rows;x++){
-				if(val == pix[x]) continue;
-				points.push_back(cv::Point(x,y));
-			}
-		}
-	}
-
-	cv::Vec3b convHLS2BGR(const cv::Vec3b& hls);
-	cv::Vec3b assignColor(size_t ID);
+	// for visualize the result returned by RegionLabelingAlgorith classes.
 	cv::Mat visualizeRegionLabel(const cv::Mat& label,size_t region_num);
 
 	enum ArrowType{
@@ -82,6 +95,7 @@ namespace skl{
 		ABS_DIAMOND_FILL
 	};
 
+	// you can easily draw an arrow instead of cv::line!
 	void arrow(
 		cv::Mat& img,
 		cv::Point pt1,
@@ -97,48 +111,6 @@ namespace skl{
 		int tail_degree = 30,
 		int shift=0);
 
-
-	template<class T> void setWeight(const T& mask,double* w1, double* w2){
-		*w1 = mask;
-		*w2 = 1.0 - mask;
-	}
-
-	template<> void setWeight<unsigned char>(const unsigned char& mask, double* w1, double* w2);
-
-	template<class T> T blend(const T& pix1, const T& pix2, double w1,double w2){
-		return static_cast<T>(w1 * pix1 + w2 * pix2);
-	}
-	template<> cv::Vec3b blend(const cv::Vec3b& pix1,const cv::Vec3b& pix2, double w1, double w2);
-
-
-	template <class ElemType,class WeightType> class ParallelBlending{
-		public:
-			ParallelBlending(
-					const cv::Mat& src1,
-					const cv::Mat& src2,
-					const cv::Mat& mask,
-					cv::Mat& dest):
-				src1(src1),src2(src2),mask(mask),dest(dest){}
-			~ParallelBlending(){}
-			void operator()(const cv::BlockedRange& range)const{
-				for(int i=range.begin();i!=range.end();i++){
-					int y = i / mask.cols;
-					int x = i % mask.cols;
-					double weight1, weight2;
-					setWeight<WeightType>(mask.at<WeightType>(y,x), &weight1,&weight2);
-					dest.at<ElemType>(y,x) = blend<ElemType>(
-							src1.at<ElemType>(y,x),
-							src2.at<ElemType>(y,x),
-							weight1,weight2);
-				}
-			}
-		protected:
-			const cv::Mat& src1;
-			const cv::Mat& src2;
-			const cv::Mat& mask;
-			cv::Mat& dest;
-
-	};
 
 	template<class ElemType,class WeightType> void blending(const cv::Mat& src1,const cv::Mat& src2, const cv::Mat& weight_mask, cv::Mat& dest){
 		assert(weight_mask.size()==src1.size());
@@ -159,11 +131,21 @@ namespace skl{
 	}
 
 
+
+	/********************************************************/
+	/*                                                      */
+	/*        "not very common" functions are below.        */
+	/*                                                      */
+	/********************************************************/
+
+
+	// used in Patch.cpp
 	cv::Mat blur_mask(const cv::Mat& mask, size_t blur_width);
 
+	// used in Patch.cpp
 	void edge_difference(const cv::Mat& src1, const cv::Mat& src2, cv::Mat& edge1, cv::Mat& edge2, double canny_thresh1=24, double canny_thresh2=24, int aperture_size=3, int dilate_size=3);
 
-
+	// used in TableObjectManager.cpp
 	template <class LabelType> void resize_label(const cv::Mat& label_small,size_t scale, cv::Mat& label){
 		assert(label_small.channels()==1);
 		assert(label_small.type()==label.type());
@@ -215,6 +197,7 @@ namespace skl{
 		}
 	}
 
+	// used in TableObjectManager.cpp
 	template <class LabelType> cv::Mat resize_label(const cv::Mat& label_small,size_t scale){
 		cv::Size label_size = label_small.size();
 		label_size.width *= (int)scale;

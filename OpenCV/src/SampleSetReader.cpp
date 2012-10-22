@@ -146,11 +146,11 @@ bool SampleSetReader::_readKeyPoints(std::istream& in, size_t sample_num, std::v
 	keypoints.resize(sample_num);
 	for(size_t i=0;i<sample_num;i++){
 		keypoints[i] = cv::KeyPoint(
-				atof(buf[0][i].c_str()),//x
-				atof(buf[1][i].c_str()),//y
-				atof(buf[2][i].c_str()),//size
-				atof(buf[3][i].c_str()),//angle
-				atof(buf[4][i].c_str()),//response
+				(float)atof(buf[0][i].c_str()),//x
+				(float)atof(buf[1][i].c_str()),//y
+				(float)atof(buf[2][i].c_str()),//size
+				(float)atof(buf[3][i].c_str()),//angle
+				(float)atof(buf[4][i].c_str()),//response
 				atoi(buf[5][i].c_str()),//octave
 				atoi(buf[6][i].c_str()) //class_id
 				);

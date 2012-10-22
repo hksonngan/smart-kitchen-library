@@ -55,22 +55,22 @@ cv::Scalar convHSV2BGR(double h,double s,double v){
 
 	switch(hi){
 		case 0:
-			r=v;g=t;b=p;
+			r=(unsigned char)v;g=(unsigned char)t;b=(unsigned char)p;
 			break;
 		case 1:
-			r=q;g=v;b=p;
+			r=(unsigned char)q;g=(unsigned char)v;b=(unsigned char)p;
 			break;
 		case 2:
-			r=p;g=v;b=t;
+			r=(unsigned char)p;g=(unsigned char)v;b=(unsigned char)t;
 			break;
 		case 3:
-			r=p;g=q;b=v;
+			r=(unsigned char)p;g=(unsigned char)q;b=(unsigned char)v;
 			break;
 		case 4:
-			r=t;g=p;b=v;
+			r=(unsigned char)t;g=(unsigned char)p;b=(unsigned char)v;
 			break;
 		case 5:
-			r=v;g=p;b=q;
+			r=(unsigned char)v;g=(unsigned char)p;b=(unsigned char)q;
 			break;
 	}
 	return cv::Scalar(b,g,r);

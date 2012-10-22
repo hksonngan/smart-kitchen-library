@@ -38,7 +38,7 @@ bool VideoCaptureOptFlowImageList::open(const std::string& filename){
 		img_list.push_back(str);
 	}
 	fin.close();
-	return params.set(FRAME_COUNT,img_list.size());
+	return params.set(FRAME_COUNT,(double)img_list.size());
 }
 
 bool VideoCaptureOptFlowImageList::grab(){

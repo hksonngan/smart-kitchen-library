@@ -35,7 +35,7 @@ bool VideoCaptureImageList::open(const std::string& filename){
 		img_list.push_back(str);
 	}
 	fin.close();
-	return params.set(FRAME_COUNT,img_list.size());
+	return params.set(FRAME_COUNT,(double)img_list.size());
 }
 
 void VideoCaptureImageList::release(){
@@ -115,7 +115,7 @@ double VideoCaptureImageList::get(capture_property_t prop_id){
 		case POS_FRAMES:
 			return checked_frame_pos;
 		case FRAME_COUNT:
-			return img_list.size();
+			return (double)img_list.size();
 		case MONOCROME:
 			if(imread_option==0){
 				return 1.0;

@@ -53,7 +53,6 @@ namespace skl{
 	}
 
 
-	cv::Mat visualizeRegionLabel(const cv::Mat& label,size_t region_num){
 
 
 	template<> void setWeight<unsigned char>(const unsigned char& mask, double* w1, double* w2){
@@ -205,8 +204,8 @@ cv::Mat ransac(const cv::Mat& samples, cv::TermCriteria termcrit, double thresh_
 	for(size_t i=0;i<sample_num;i++) sample_index[i] = i;
 
 
-	while( ( termcrit.type & CV_TERMCRIT_ITER == 0 || iterations < termcrit.maxCount) 
-		&& ( termcrit.type & CV_TERMCRIT_EPS == 0 || best_error > termcrit.epsilon) ){
+	while( ( (termcrit.type & CV_TERMCRIT_ITER) == 0 || iterations < (size_t)termcrit.maxCount) 
+		&& ( (termcrit.type & CV_TERMCRIT_EPS) == 0 || best_error > termcrit.epsilon) ){
 		// main loop
 
 		// random sampling (use first part as sampled data.)

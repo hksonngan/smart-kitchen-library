@@ -21,7 +21,7 @@ namespace skl{
 		double degree);
 
 	/* defininition of the public function */
-	void skl::arrow(
+	void arrow(
 		cv::Mat& img,
 		cv::Point pt1,
 		cv::Point pt2,

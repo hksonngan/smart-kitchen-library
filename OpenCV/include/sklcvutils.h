@@ -22,6 +22,8 @@ bool operator&&(const cv::Rect& left, const cv::Rect& right);
 // template subfunctions for skl::blending
 #include "sklcvutils_blending.h"
 
+
+
 // use with a template function like below
 // int FuncName<MatType>(...);
 // sample code are available in 
@@ -53,6 +55,17 @@ bool operator&&(const cv::Rect& left, const cv::Rect& right);
 	}
 
 namespace skl{
+	template <typename MatElem> int convTypeName2CVTypeID(){
+		return -1;
+	}
+	template <> inline int convTypeName2CVTypeID<unsigned char>(){return CV_8U;}
+	template <> inline int convTypeName2CVTypeID<char>(){return CV_8S;}
+	template <> inline int convTypeName2CVTypeID<unsigned short>(){return CV_16U;}
+	template <> inline int convTypeName2CVTypeID<short>(){return CV_16S;}
+	template <> inline int convTypeName2CVTypeID<int>(){return CV_32S;}
+	template <> inline int convTypeName2CVTypeID<float>(){return CV_32F;}
+	template <> inline int convTypeName2CVTypeID<double>(){return CV_64F;}
+
 
 	// check cv::Mat type/size and return debug message.	
 	bool checkMat(const cv::Mat& mat, int depth = -1,int channels = 0,cv::Size size = cv::Size(0,0) );
@@ -74,8 +87,42 @@ namespace skl{
 			bool use_gray=true,
 			int min_luminance_value=20);
 
+	cv::Vec3b assignColor(size_t ID);
+
 	// for visualize the result returned by RegionLabelingAlgorith classes.
-	cv::Mat visualizeRegionLabel(const cv::Mat& label,size_t region_num);
+	template<typename MatElem> cv::Mat visualizeRegionLabel4MultiType(const cv::Mat& label,size_t region_num){
+		cv::Mat vis = cv::Mat::zeros(label.size(),CV_8UC3);
+		if(label.type()!=convTypeName2CVTypeID<MatElem>()){
+			assert(label.type()==CV_16SC1);
+		}
+		if(region_num == 0){
+			return vis;
+		}
+		std::vector<cv::Vec3b> colors(region_num);
+		for(size_t i=0;i<region_num;i++){
+			if(region_num<32){
+				colors[i] = assignColor(i);
+			}
+			else{
+				for(size_t c=0;c<3;c++){
+					colors[i][c] = rand() % UCHAR_MAX;
+				}
+			}
+			//		std::cerr << (int)colors[i][0] << ", " << (int)colors[i][1] << ", " << (int)colors[i][2] << std::endl;
+		}
+
+		for(int y=0;y<label.rows;y++){
+			for(int x=0;x<label.cols;x++){
+				MatElem l = label.at<MatElem>(y,x);
+				if(l==0) continue;
+				vis.at<cv::Vec3b>(y,x) = colors[l-1];
+			}
+		}
+		return vis;
+	}
+	inline cv::Mat visualizeRegionLabel(const cv::Mat& label,size_t region_num){
+		return visualizeRegionLabel4MultiType<short>(label,region_num);
+	}
 
 	enum ArrowType{
 		NONE,

@@ -54,35 +54,6 @@ namespace skl{
 
 
 	cv::Mat visualizeRegionLabel(const cv::Mat& label,size_t region_num){
-		cv::Mat vis = cv::Mat::zeros(label.size(),CV_8UC3);
-		if(label.type()!=CV_16SC1){
-			assert(label.type()==CV_16SC1);
-		}
-		if(region_num == 0){
-			return vis;
-		}
-		std::vector<cv::Vec3b> colors(region_num);
-		for(size_t i=0;i<region_num;i++){
-			if(region_num<32){
-				colors[i] = assignColor(i);
-			}
-			else{
-				for(size_t c=0;c<3;c++){
-					colors[i][c] = rand() % UCHAR_MAX;
-				}
-			}
-			//		std::cerr << (int)colors[i][0] << ", " << (int)colors[i][1] << ", " << (int)colors[i][2] << std::endl;
-		}
-
-		for(int y=0;y<label.rows;y++){
-			for(int x=0;x<label.cols;x++){
-				short l = label.at<short>(y,x);
-				if(l==0) continue;
-				vis.at<cv::Vec3b>(y,x) = colors[l-1];
-			}
-		}
-		return vis;
-	}
 
 
 	template<> void setWeight<unsigned char>(const unsigned char& mask, double* w1, double* w2){

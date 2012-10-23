@@ -176,7 +176,6 @@
   <ItemGroup>
     <ClCompile Include="..\src\BackgroundSubtractAlgorithm.cpp" />
     <ClCompile Include="..\src\ImplicitShapeModel.cpp" />
-    <ClCompile Include="..\src\sklcvutils_bayer_conversion.cpp" />
     <ClCompile Include="..\src\sklcvutils_colorpalette.cpp" />
     <ClCompile Include="..\src\CvMouseEventHandler.cpp" />
     <ClCompile Include="..\src\Flow.cpp" />
@@ -193,7 +192,6 @@
     <ClCompile Include="..\src\RegionLabelingSimple.cpp" />
     <ClCompile Include="..\src\SampleSetReader.cpp" />
     <ClCompile Include="..\src\SampleSetWriter.cpp" />
-    <ClCompile Include="..\src\sklcvutils_rect_operation.cpp" />
     <ClCompile Include="..\src\StaticRegionDetector.cpp" />
     <ClCompile Include="..\src\TableObjectManager.cpp" />
     <ClCompile Include="..\src\TableObjectManagerBiBackground.cpp" />
@@ -208,7 +206,9 @@
     <ClCompile Include="..\src\sklVideoCapture.cpp" />
     <ClCompile Include="..\src\sklcvutils.cpp" />
     <ClCompile Include="..\src\sklcvutils_arrow.cpp" />
-  </ItemGroup>
+  
+    <ClCompile Include="..\src\sklcvutils_bayer_conversion.cpp"/>
+    <ClCompile Include="..\src\sklcvutils_rect_operation.cpp"/></ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\BackgroundCut.h" />
     <ClInclude Include="..\include\Labeling.h" />

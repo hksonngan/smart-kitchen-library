@@ -247,5 +247,26 @@ cv::Mat ransac(const cv::Mat& samples, cv::TermCriteria termcrit, double thresh_
 	return best_model;
 }
 
+template <typename MatElem> cv::Mat _generateGaussianMask(cv::Point2f mean_flt, const cv::Mat& covariance){
+	cv::Point mean_int((int)mean_flt.x,(int)mean_flt.y);
+
+	cv::Mat W,U,V;
+	cv::SVD(covariance,W,U,V);
+
+	std::cout << covariance << std::endl;
+	std::cout << (U*W*V) << std::endl;
+
+	
+	cv::Point2f mean_pt_diff(mean.x-pt.x,mean.y-pt.y);
+
+}
+
+
+cv::Mat generateGaussianMask(cv::Point2f mean, const cv::Mat& covariance){
+	cv::Mat mask;
+	cvMatTypeTemplateCall(covariance.type(),_generateGaussianMask,mask,float,mean,covariance);
+
+	return mask;
+}
 
 }// namespace skl

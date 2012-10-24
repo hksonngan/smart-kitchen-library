@@ -1,6 +1,6 @@
 # @file Makefile for sample_sampleset_read_write
 # @author a_hasimoto
-OBJNAME = sample_sampleset_read_write
+OBJNAME = sample_generate_gaussian_mask
 
 OPT = 
 

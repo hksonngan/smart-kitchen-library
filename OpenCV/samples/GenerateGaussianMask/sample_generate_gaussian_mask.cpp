@@ -1,16 +1,11 @@
 #include "skl.h"
 #include "sklcv.h"
 
-opt_on(std::string, input_file,"","-i","<FILE>","sample.csv");
-opt_on(std::string, output_file,"","-o","<FILE>","sample.csv");
-
-opt_on(size_t,sample_num,4,"-n","<UINT>","number of samples synthesized.");
-opt_on(size_t,sample_dim,6,"-d","<UINT>","number of feature dimensions synthesized.");
-
-size_t class_num = 2;// synthesized sample set always has only two classes.
+double _covariance[4] = {2,0,0,1};
+std::vector<double> covariance(_covariance,_covariance+4);
+opt_on_container(std::vector,double,covariance,"","<DBL:DBL:DBL:DBL>","set covariance. elems are m_{0,0}:m_{0,1}:m_{1,0}:m_{1,1}.",":",4);
 
 
-void synthesize(cv::Mat& samples,cv::Mat& responces,cv::Mat& likelihoods,std::vector<skl::Time>& timestamps);
 
 int main(int argc,char* argv[]){
 	skl::OptParser options;
@@ -22,60 +17,16 @@ int main(int argc,char* argv[]){
 		return EXIT_FAILURE;
 	}
 
-	cv::Mat samples,responces,likelihoods;
-	std::vector<skl::Time> timestamps;
-	if(!input_file.empty()){
-		if(!skl::SampleSetReader::read(input_file,&samples,&responces,&likelihoods,&timestamps)){
-			std::cerr << "ERROR: failed to read a sample set data from '" << input_file << "'." << std::endl;
-		}
-	}
-	else{
-		synthesize(samples,responces,likelihoods,timestamps);
-	}
+	cv::Mat covariance_mat(cv::Size(2,2),CV_64FC1,&covariance[0]);
 
-
-	if(!output_file.empty()){
-		if(!skl::SampleSetWriter::write(output_file,&samples,&responces,&likelihoods,&timestamps)){
-			std::cerr << "ERROR: failed to write the sample set data into '" << output_file << "'." << std::endl;
-		}
-	}
-	else{
-		skl::SampleSetWriter::write(std::cout,&samples,&responces,&likelihoods,&timestamps);
-		std::cerr << std::endl;
-	}
+	cv::Mat gaussian_mask = skl::generateGaussianMask(covariance_mat);
+	std::cout << "mask size: " << gaussian_mask.cols << "x" << gaussian_mask.rows << std::endl;
+//	std::cout << gaussian_mask << std::endl;
+	std::cout << "sum of mask: " << cv::sum(gaussian_mask)[0] << std::endl;
+	cv::namedWindow("gaussian mask",0);
+	cv::imshow("gaussian mask",gaussian_mask*10);
+	cv::waitKey(-1);
 
 	return EXIT_SUCCESS;
 }
 
-void synthesize(cv::Mat& samples,cv::Mat& responces,cv::Mat& likelihoods,std::vector<skl::Time>& timestamps){
-	samples = cv::Mat::zeros(cv::Size(sample_dim,sample_num),CV_32FC1);
-	responces = cv::Mat::zeros(cv::Size(1,sample_num),CV_32SC1);
-	likelihoods = cv::Mat::zeros(cv::Size(class_num,sample_num),CV_32FC1);
-	timestamps.resize(sample_num);
-
-	for(size_t i=0;i<sample_num;i++){
-		float likelihood = 0.f;
-		if(i%2==0){
-			responces.at<int>(1,i) = 1;
-			for(size_t d=0;d<sample_dim;d++){
-				float feature = 20.f - (12.f * (float)(rand())/RAND_MAX);
-				samples.at<float>(i,d) = feature;
-				likelihood+= feature/20;
-			}
-			likelihood /= sample_dim;
-			likelihoods.at<float>(i,0) = likelihood;
-			likelihoods.at<float>(i,1) = 1.f - likelihood;
-		}
-		else{
-			for(size_t d=0;d<sample_dim;d++){
-				float feature = 12.f * (float)(rand())/RAND_MAX;
-				samples.at<float>(i,d) = feature;
-				likelihood+= feature/20;
-			}
-			likelihood /= sample_dim;
-			likelihoods.at<float>(i,1) = likelihood;
-			likelihoods.at<float>(i,0) = 1.f - likelihood;
-		}
-		timestamps[i] = skl::Time::now();
-	}
-}

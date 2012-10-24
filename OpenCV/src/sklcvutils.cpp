@@ -1,4 +1,5 @@
-﻿#include "sklcvutils.h"
+﻿#include "skl.h"
+#include "sklcvutils.h"
 #include <highgui.h>
 #include <algorithm>
 
@@ -247,24 +248,90 @@ cv::Mat ransac(const cv::Mat& samples, cv::TermCriteria termcrit, double thresh_
 	return best_model;
 }
 
-template <typename MatElem> cv::Mat _generateGaussianMask(cv::Point2f mean_flt, const cv::Mat& covariance){
-	cv::Point mean_int((int)mean_flt.x,(int)mean_flt.y);
+template <typename MatElem> cv::Mat _generateGaussianMask(const cv::Mat& covariance, double ignore_rate){
+	assert(skl::checkMat(covariance,-1,1,cv::Size(2,2)));
 
-	cv::Mat W,U,V;
-	cv::SVD(covariance,W,U,V);
+	cv::Mat Wvec,U,Vt;
+	cv::SVD svd;
+	svd.compute(covariance,Wvec,U,Vt);
+	cv::Mat W(covariance.size(),covariance.type());
 
-	std::cout << covariance << std::endl;
-	std::cout << (U*W*V) << std::endl;
+	std::vector<MatElem> std_dev(W.rows);
+	for(int i=0;i<W.rows;i++){
+		std_dev[i] = std::sqrt(Wvec.at<MatElem>(i,0));
+	}
 
-	
-	cv::Point2f mean_pt_diff(mean.x-pt.x,mean.y-pt.y);
+	// mask size must be odd num
+	cv::Point center(
+		static_cast<int>(std_dev[0] * ignore_rate/2),
+		static_cast<int>(std_dev[1] * ignore_rate/2));
 
+	cv::Size mask_size(
+			center.x*2+1,
+			center.y*2+1);
+	cv::Mat gaussian_x = cv::getGaussianKernel(mask_size.width ,-1, covariance.depth());
+	cv::Mat gaussian_y = cv::getGaussianKernel(mask_size.height,-1, covariance.depth());
+
+	cv::Mat gaussian_mask = gaussian_y * gaussian_x.t();
+
+
+/*	for(int i=0;i<Wvec.rows;i++){
+		W.at<MatElem>(i,i) = Wvec.at<MatElem>(i,0);
+	}
+
+	std::cout << "covariance >> " << covariance << std::endl;
+	std::cout << "W >> " << W << std::endl;
+	std::cout << "U >> " << U << std::endl;
+	std::cout << "Vt >> " << Vt << std::endl;
+	std::cout << (U*W*Vt) << std::endl;
+*/
+
+
+	float rad = skl::radian(cv::Point2f(U.at<MatElem>(0,0),U.at<MatElem>(0,1)));
+	float degree = rad*180/CV_PI;
+//	std::cout << "gausiann rotation: " << degree << std::endl;
+
+/*
+	// DEBUG CODE: draw vertical/horizontal lines crossing at the center.
+	for(int x=0;x<gaussian_mask.cols;x++){
+		gaussian_mask.at<MatElem>(center.y,x) = 1;
+	}
+	for(int y=0;y<gaussian_mask.rows;y++){
+		gaussian_mask.at<MatElem>(y,center.x) = 1;
+	}
+*/
+	// rotate gaussian mask
+	int max_length = std::max(mask_size.width,mask_size.height);
+	cv::Size dist_size(max_length,max_length);
+	cv::Mat gaussian_mask_max_length(dist_size,gaussian_mask.type(),cv::Scalar(0));
+	int diff_x = max_length - mask_size.width;
+	int diff_y = max_length - mask_size.height;
+	gaussian_mask.copyTo(
+			cv::Mat(
+				gaussian_mask_max_length,
+				cv::Rect(diff_x/2,diff_y/2,mask_size.width,mask_size.height)
+				)
+			);
+
+	cv::Mat affin_mat = cv::getRotationMatrix2D(cv::Point(max_length/2,max_length/2),degree,1.0);
+
+//	std::cout << affin_mat << std::endl;
+
+	cv::Mat gaussian_mask_rotated;
+
+/*
+	cv::namedWindow("before rotation",0);
+	cv::imshow("before rotation",gaussian_mask_max_length);
+*/
+	cv::warpAffine(gaussian_mask_max_length,gaussian_mask_rotated,affin_mat,dist_size);
+	return gaussian_mask_rotated;
 }
 
 
-cv::Mat generateGaussianMask(cv::Point2f mean, const cv::Mat& covariance){
+cv::Mat generateGaussianMask(const cv::Mat& covariance,double ingnore_rate){
+	assert(covariance.depth()==CV_32F || covariance.depth()==CV_64F);
 	cv::Mat mask;
-	cvMatTypeTemplateCall(covariance.type(),_generateGaussianMask,mask,float,mean,covariance);
+	cvMatTypeTemplateCall(covariance.type(),_generateGaussianMask,mask,float,covariance,ingnore_rate);
 
 	return mask;
 }

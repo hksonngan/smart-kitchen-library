@@ -62,7 +62,8 @@ namespace skl{
 	cv::Rect fitRect(const std::vector< cv::Point >& points);
 
 	// generate gaussian mask.
-	cv::Mat generateGaussianMask(cv::Point2f mean, const cv::Mat& covariance);
+	// ignore_rate: approximate mask value to 0 if the point is futher than ignore_rate * sigma, where sigma is standard variance. ignore_rate = 2 means 96% of vote are taken in consideration.
+	cv::Mat generateGaussianMask(const cv::Mat& covariance,double ignore_rate=2.0);
 
 	// a simple ransac estimation.
 	// the error for model evaluation is calcurated by sum of L2 norm between "estimated model parameter" and sample parameters.

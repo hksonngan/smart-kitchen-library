@@ -289,7 +289,7 @@ template <typename MatElem> cv::Mat _generateGaussianMask(const cv::Mat& covaria
 
 	std::vector<MatElem> std_dev(W.rows);
 	for(int i=0;i<W.rows;i++){
-		std_dev[i] = std::sqrt(Wvec.at<MatElem>(i,0));
+		std_dev[i] = std::sqrt((double)Wvec.at<MatElem>(i,0));
 	}
 
 	// mask size must be odd num

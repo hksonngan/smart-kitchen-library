@@ -208,7 +208,8 @@
     <ClCompile Include="..\src\sklcvutils_arrow.cpp" />
   
     <ClCompile Include="..\src\sklcvutils_bayer_conversion.cpp"/>
-    <ClCompile Include="..\src\sklcvutils_rect_operation.cpp"/></ItemGroup>
+    <ClCompile Include="..\src\sklcvutils_rect_operation.cpp"/>
+    <ClCompile Include="..\src\GraphCutMultiLabel.cpp"/></ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\BackgroundCut.h" />
     <ClInclude Include="..\include\Labeling.h" />
@@ -247,7 +248,9 @@
     <ClInclude Include="..\include\cvtypes.h" />
     <ClInclude Include="..\include\sklVideoCapture.h" />
     <ClInclude Include="..\include\sklcvutils.h" />
-  </ItemGroup>
+  
+    <ClInclude Include="..\include\GraphCutMultiLabel.h"/>
+    <ClInclude Include="..\include\ParticleFilter.hpp"/></ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

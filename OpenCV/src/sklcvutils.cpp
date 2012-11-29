@@ -85,6 +85,10 @@ namespace skl{
 		assert(label.type()==CV_16SC1);
 		return visualizeRegionLabel4MultiType<short>(label,region_num);
 	}
+	cv::Mat visualizeRegionLabel_int(const cv::Mat& label,size_t region_num){
+		assert(label.type()==CV_32SC1);
+		return visualizeRegionLabel4MultiType<int>(label,region_num);
+	}
 
 
 	template<> void setWeight<unsigned char>(const unsigned char& mask, double* w1, double* w2){

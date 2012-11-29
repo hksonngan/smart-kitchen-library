@@ -80,7 +80,7 @@ namespace skl{
 
 	// for visualize the result returned by RegionLabelingAlgorith classes.
 	cv::Mat visualizeRegionLabel(const cv::Mat& label,size_t region_num);
-
+	cv::Mat visualizeRegionLabel_int(const cv::Mat& label,size_t region_num);
 	enum ArrowType{
 		NONE,
 		ARROW,

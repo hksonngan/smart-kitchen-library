@@ -40,4 +40,6 @@
 #include "../OpenCV/include/TableObjectManagerWithTouchReasoning.h"
 #include "../OpenCV/include/TableObjectManagerBiBackground.h"
 
+#include "../OpenCV/include/GraphCutMultiLabel.h"
+#include "../OpenCV/include/ParticleFilter.hpp"
 #endif // __SKL_CV_H__

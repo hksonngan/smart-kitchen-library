@@ -28,10 +28,16 @@ namespace skl{
 			return compute(col_image,cv::Mat(),segment_labels);
 		};
 		
-		float _sigma;//>get,set
-		float _k;//>get,set
-		int _min_size;//>get,set
+		inline float sigma()const{return _sigma;}
+		inline void sigma(float __sigma){_sigma = __sigma;}
+		inline float k()const{return _k;}
+		inline void k(float __k){_k = __k;}
+		inline int min_size()const{return _min_size;}
+		inline void min_size(int __min_size){_min_size = __min_size;}
 	protected:
+		float _sigma;
+		float _k;
+		int _min_size;
 	private:
 		
 };

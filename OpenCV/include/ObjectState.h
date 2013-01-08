@@ -41,7 +41,9 @@ namespace skl{
 		cv::Point argmax_location(float& prob)const;
 		float probHandlingState(HandlingState h)const;
 
-		int resolution()const;
+		inline int resolution()const{
+			return v.cols;
+		}
 
 		inline const cv::Mat& location(HandlingState h_state)const{
 			assert(0<=h_state && h_state<2);

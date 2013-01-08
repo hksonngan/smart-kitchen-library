@@ -2,7 +2,7 @@
  * @file GraphCutMultiLabel.h
  * @author a_hasimoto
  * @date Date Created: 2012/Nov/14
- * @date Last Change:2012/Nov/29.
+ * @date Last Change:2012/Nov/30.
  */
 #ifndef __SKL_GRAPH_CUT_MULTI_LABEL_H__
 #define __SKL_GRAPH_CUT_MULTI_LABEL_H__
@@ -36,6 +36,7 @@ class GraphCutMultiLabel{
 		class Node{
 			public:
 				Node(size_t label_num, int default_data_term=ENOUGH_SMALL_VALUE);
+				Node(const Node& other);
 				~Node(){}
 				std::vector<Graph_i::node_id> layers;
 				std::vector<int> data_terms;
@@ -68,21 +69,18 @@ class GraphCutMultiLabel{
 		int compute(std::vector<size_t>& labels);
 
 		inline NodeID addNode(int term_between_labels=ENOUGH_SMALL_VALUE){
-			_nodes.push_back(new Node(_label_num,term_between_labels));
+			_nodes.push_back(cv::Ptr<Node>(new Node(_label_num,term_between_labels)));
 			return _nodes.size()-1;
 		}
 		inline void setDataTerm(NodeID n, int data_term_src, int data_term_sink){
 			assert(n < _nodes.size());
 			assert(!_nodes[n].empty());
 			assert(_nodes[n]->label_num()==_label_num);
+			assert(_nodes[n]->data_terms.size()>0);
 			_nodes[n]->data_terms[0] = data_term_src;
 			_nodes[n]->data_terms[_nodes[n]->data_terms.size()-1] = data_term_sink;
 		}
-		inline NodeID addNode(int data_term_src,int data_term_sink,int term_between_labels=ENOUGH_SMALL_VALUE){
-			NodeID n = addNode(term_between_labels);
-			setDataTerm(n,data_term_src,data_term_sink);
-			return n;
-		}
+		NodeID addNode(int data_term_src,int data_term_sink,int term_between_labels=ENOUGH_SMALL_VALUE);
 
 		void addEdge(NodeID node1, NodeID node2, int smoothing_term, int smoothing_term_inv = SET_SYMMETRY_VALUE);
 

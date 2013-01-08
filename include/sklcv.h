@@ -33,6 +33,7 @@
 #include "../OpenCV/include/SampleSetWriter.h"
 #include "../OpenCV/include/Graphcut.h"
 #include "../OpenCV/include/Flow.h"
+#include "../OpenCV/include/ObjectState.h"
 #include "../OpenCV/include/MatReader.h"
 //#include "../OpenCV/include/ImplicitShapeModel.h"
 

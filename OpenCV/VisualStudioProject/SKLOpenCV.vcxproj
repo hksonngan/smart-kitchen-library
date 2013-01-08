@@ -209,7 +209,8 @@
   
     <ClCompile Include="..\src\sklcvutils_bayer_conversion.cpp"/>
     <ClCompile Include="..\src\sklcvutils_rect_operation.cpp"/>
-    <ClCompile Include="..\src\GraphCutMultiLabel.cpp"/></ItemGroup>
+    <ClCompile Include="..\src\GraphCutMultiLabel.cpp"/>
+    <ClCompile Include="..\src\ObjectState.cpp"/></ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\BackgroundCut.h" />
     <ClInclude Include="..\include\Labeling.h" />
@@ -250,7 +251,8 @@
     <ClInclude Include="..\include\sklcvutils.h" />
   
     <ClInclude Include="..\include\GraphCutMultiLabel.h"/>
-    <ClInclude Include="..\include\ParticleFilter.hpp"/></ItemGroup>
+    <ClInclude Include="..\include\ParticleFilter.hpp"/>
+    <ClInclude Include="..\include\ObjectState.h"/></ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

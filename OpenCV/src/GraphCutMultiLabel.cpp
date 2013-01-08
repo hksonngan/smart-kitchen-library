@@ -2,7 +2,7 @@
  * @file GraphCutMultiLabel.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Nov/14
- * @date Last Change: 2012/Nov/27.
+ * @date Last Change: 2012/Nov/30.
  */
 #include "GraphCutMultiLabel.h"
 
@@ -18,6 +18,17 @@ GraphCutMultiLabel::Node::Node(size_t label_num, int default_data_term)
 {
 }
 
+GraphCutMultiLabel::Node::Node(const Node& other)
+	:layers(other.layers),data_terms(other.data_terms)
+{
+}
+
+GraphCutMultiLabel::NodeID GraphCutMultiLabel::addNode(int data_term_src,int data_term_sink,int term_between_labels){
+	NodeID n = addNode(term_between_labels);
+	setDataTerm(n,data_term_src,data_term_sink);
+	return n;
+}
+
 size_t GraphCutMultiLabel::Node::getLabel(const cv::Ptr<Graph_i> graph)const{
 	for(size_t l = 0; l < layers.size(); l++){
 		if( graph->what_segment( layers[l], Graph_i::SINK ) ) return l;
@@ -25,10 +36,10 @@ size_t GraphCutMultiLabel::Node::getLabel(const cv::Ptr<Graph_i> graph)const{
 	return layers.size();
 }
 
-GraphCutMultiLabel::Edge::Edge(size_t label_num,const cv::Ptr<Node> __from, const cv::Ptr<Node> __to)
-	:smoothing_terms(label_num,ENOUGH_SMALL_VALUE),
-	 smoothing_terms_inv(label_num,ENOUGH_SMALL_VALUE),
-	 from(__from),to(__to)
+	GraphCutMultiLabel::Edge::Edge(size_t label_num,const cv::Ptr<Node> __from, const cv::Ptr<Node> __to)
+:smoothing_terms(label_num-1,ENOUGH_SMALL_VALUE),
+	smoothing_terms_inv(label_num-1,ENOUGH_SMALL_VALUE),
+	from(__from),to(__to)
 {
 }
 
@@ -50,7 +61,6 @@ GraphCutMultiLabel::~GraphCutMultiLabel(){
 cv::Ptr<Graph_i> GraphCutMultiLabel::constructGraph(){
 	assert(_label_num>1);
 	cv::Ptr<Graph_i> pGraph = new Graph_i(_node_num(),_edge_num());
-
 	// vertical edges
 	for(size_t n=0;n<_nodes.size();n++){
 		cv::Ptr<Node> pNode = _nodes[n];
@@ -92,10 +102,10 @@ cv::Ptr<Graph_i> GraphCutMultiLabel::constructGraph(){
 		cv::Ptr<Node> to = pEdge->to;
 		for(size_t l=0;l<from->layers.size();l++){
 			pGraph->add_edge(
-				from->layers[l],
-				to->layers[l],
-				pEdge->smoothing_terms[l],
-				pEdge->smoothing_terms_inv[l]);
+					from->layers[l],
+					to->layers[l],
+					pEdge->smoothing_terms[l],
+					pEdge->smoothing_terms_inv[l]);
 		}
 	}
 
@@ -111,8 +121,10 @@ void GraphCutMultiLabel::addEdge(NodeID node1, NodeID node2, int smoothing_term,
 		smoothing_term_inv = smoothing_term;
 	}
 	cv::Ptr<Edge> edge = new Edge(_label_num,_nodes[node1],_nodes[node2]);
-	edge->smoothing_terms.assign(_label_num-1,smoothing_term);
-	edge->smoothing_terms_inv.assign(_label_num-1,smoothing_term_inv);
+	edge->smoothing_terms.assign(
+			edge->smoothing_terms.size(),smoothing_term);
+	edge->smoothing_terms_inv.assign(
+			edge->smoothing_terms.size(),smoothing_term_inv);
 }
 
 int GraphCutMultiLabel::compute(std::vector<size_t>& labels){

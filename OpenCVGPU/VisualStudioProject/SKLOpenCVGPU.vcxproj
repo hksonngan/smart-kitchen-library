@@ -199,23 +199,25 @@
     <None Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\cuda\shared.cpp" />
     <ClCompile Include="..\src\sklcvgpu_utils.cpp" />
     <ClCompile Include="..\src\TexCut.cpp" />
     <ClCompile Include="..\src\VideoCaptureGpu.cpp" />
-  
-    <ClCompile Include="..\src\TableObjectManager.cpp"/>
-    <ClCompile Include="..\src\TableObjectManagerBiBackground.cpp"/>
-    <ClCompile Include="..\src\TableObjectManagerWithTouchReasoning.cpp"/></ItemGroup>
+    <ClCompile Include="..\src\TableObjectManager.cpp" />
+    <ClCompile Include="..\src\TableObjectManagerBiBackground.cpp" />
+    <ClCompile Include="..\src\TableObjectManagerWithTouchReasoning.cpp" />
+  </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\FilterGpuMat2GpuMat.h" />
     <ClInclude Include="..\include\shared.h" />
     <ClInclude Include="..\include\sklcvgpu_utils.h" />
     <ClInclude Include="..\include\TexCut.h" />
     <ClInclude Include="..\include\VideoCaptureGpu.h" />
-  
-    <ClInclude Include="..\include\TableObjectManagerBiBackgroundGpu.h"/>
-    <ClInclude Include="..\include\TableObjectManagerGpu.h"/>
-    <ClInclude Include="..\include\TableObjectManagerWithTouchReasoningGpu.h"/>    <ClInclude Include="..\src\TexCut_share.hpp"/></ItemGroup>
+    <ClInclude Include="..\include\TableObjectManagerBiBackgroundGpu.h" />
+    <ClInclude Include="..\include\TableObjectManagerGpu.h" />
+    <ClInclude Include="..\include\TableObjectManagerWithTouchReasoningGpu.h" />
+    <ClInclude Include="..\src\TexCut_share.hpp" />
+  </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\cuda\shared_funcs.cu">
       <FileType>Document</FileType>

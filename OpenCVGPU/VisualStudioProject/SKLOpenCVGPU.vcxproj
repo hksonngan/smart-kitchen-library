@@ -51,7 +51,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.1.props" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.2.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -205,8 +205,7 @@
   
     <ClCompile Include="..\src\TableObjectManager.cpp"/>
     <ClCompile Include="..\src\TableObjectManagerBiBackground.cpp"/>
-    <ClCompile Include="..\src\TableObjectManagerWithTouchReasoning.cpp"/>
-    <ClCompile Include="..\src\TexCut_share.hpp"/></ItemGroup>
+    <ClCompile Include="..\src\TableObjectManagerWithTouchReasoning.cpp"/></ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\FilterGpuMat2GpuMat.h" />
     <ClInclude Include="..\include\shared.h" />
@@ -216,7 +215,7 @@
   
     <ClInclude Include="..\include\TableObjectManagerBiBackgroundGpu.h"/>
     <ClInclude Include="..\include\TableObjectManagerGpu.h"/>
-    <ClInclude Include="..\include\TableObjectManagerWithTouchReasoningGpu.h"/></ItemGroup>
+    <ClInclude Include="..\include\TableObjectManagerWithTouchReasoningGpu.h"/>    <ClInclude Include="..\src\TexCut_share.hpp"/></ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\src\cuda\shared_funcs.cu">
       <FileType>Document</FileType>
@@ -227,6 +226,6 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.1.targets" />
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\CUDA 4.2.targets" />
   </ImportGroup>
 </Project>

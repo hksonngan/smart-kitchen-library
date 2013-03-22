@@ -17,6 +17,7 @@
 
 #include "../OpenCV/include/RegionLabelingSimple.h"
 #include "../OpenCV/include/RegionLabelingEfficientGraph.h"
+#include "../OpenCV/include/RegionLabelingMerge.h"
 //#include "../OpenCV/include/RegressionStump.h"
 //#include "../OpenCV/include/RegressionStump_parallel.h"
 

@@ -2,7 +2,7 @@
  * @file GraphCutMultiLabel.h
  * @author a_hasimoto
  * @date Date Created: 2012/Nov/14
- * @date Last Change:2012/Nov/30.
+ * @date Last Change:2013/Jan/23.
  */
 #ifndef __SKL_GRAPH_CUT_MULTI_LABEL_H__
 #define __SKL_GRAPH_CUT_MULTI_LABEL_H__
@@ -87,7 +87,8 @@ class GraphCutMultiLabel{
 		inline size_t label_num()const{return _label_num;}
 		inline const std::vector<cv::Ptr<Node> >& nodes()const{return _nodes;}
 		inline const std::vector<cv::Ptr<Edge> >& edges()const{return _edges;}
-
+		inline const cv::Ptr<Graph_i>& graph()const{return _graph;}
+		inline cv::Ptr<Graph_i> graph(){return _graph;}
 	protected:
 		size_t _label_num;
 		std::vector<cv::Ptr<Node> > _nodes;

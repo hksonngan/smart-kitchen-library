@@ -2,11 +2,11 @@
  * @file RegionLabelingEfficientGraph.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Oct/07
- * @date Last Change: 2012/Oct/12.
+ * @date Last Change: 2013/Mar/21.
  */
 #include "RegionLabelingEfficientGraph.h"
 #include "RegionLabelingEfficientGraph/segment-image.h"
-
+#include "sklcvutils.h"
 
 using namespace skl;
 
@@ -31,10 +31,18 @@ size_t RegionLabelingEfficientGraph::compute(const cv::Mat& col_image, const cv:
 	assert(!col_image.empty());
 	assert(CV_8UC3 == col_image.type());
 
-	image<float> *r = new image<float>(width, height);
+/*	skl::ensureMat(_temp,CV_32F,col_image.channels(), col_image.size());
+	col_image.convertTo(_temp,CV_32F);
+*/	image<float> *r = new image<float>(width, height);
 	image<float> *g = new image<float>(width, height);
 	image<float> *b = new image<float>(width, height);
+/*
+	_single_channels.push_back(cv::Mat(height,width,CV_32FC1,r));
+	_single_channels.push_back(cv::Mat(height,width,CV_32FC1,g));
+	_single_channels.push_back(cv::Mat(height,width,CV_32FC1,b));
 
+	cv::split(_temp,_single_channels);
+*/
 	// smooth each color channel  
 	for (int y = 0; y < height; y++) {
 		for (int x = 0; x < width; x++) {
@@ -44,9 +52,12 @@ size_t RegionLabelingEfficientGraph::compute(const cv::Mat& col_image, const cv:
 			imRef(b, x, y) = col[0];
 		}
 	}
+
 	image<float> *smooth_r = smooth(r, _sigma);
 	image<float> *smooth_g = smooth(g, _sigma);
 	image<float> *smooth_b = smooth(b, _sigma);
+
+//	_single_channels.clear();
 	delete r;
 	delete g;
 	delete b;
@@ -141,7 +152,7 @@ size_t RegionLabelingEfficientGraph::compute(const cv::Mat& col_image, const cv:
 			}
 		}
 	}
-	assert(count-1 == num_ccs);
+	assert(count-1 == (short)num_ccs);
 	delete label_map;
 
 	delete u;

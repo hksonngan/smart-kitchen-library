@@ -134,6 +134,80 @@ namespace skl{
 		return dest;
 	}
 
+	template<class T>
+	bool isInRange(const T& val, const T& min, const T& max){
+		return (min<val) && (val<max);
+	}
+
+#define MEDIAN_SD_RATIO 0.67449f
+	template<class T> void estimate_noise(const cv::Mat& src, std::vector<T>& std_dev){
+		assert(src.type()==CV_8UC3);
+		size_t channels = src.channels();
+
+		std::vector<std::vector<T> > abs_diff(channels),diff(channels);
+
+		const cv::Vec3b* upper_column;
+		const cv::Vec3b* lower_column;
+		T temp;
+
+		for(int y=0,idx=0;y<src.rows;y++){
+			upper_column = src.ptr<cv::Vec3b>(y);
+			if(y!=src.rows-1){
+				lower_column = src.ptr<cv::Vec3b>(y+1);
+			}
+			else{
+				lower_column = NULL;
+			}
+
+			for(int x=0;x<src.cols;x++,idx++){
+				for(size_t c=0;c<channels;c++){
+					if(!isInRange((int)upper_column[x][c],0,255)) continue;
+
+					if(x<src.cols-1){
+						if(!isInRange((int)upper_column[x+1][c],0,255)) continue;
+						temp = (T)upper_column[x][c] - (T)upper_column[x+1][c];
+//						if(temp==0) continue;
+						diff[c].push_back(temp);
+						abs_diff[c].push_back(std::abs(temp));
+					}
+
+					if(lower_column!=NULL){
+						if(!isInRange((int)lower_column[x][c],0,255)) continue;
+						temp = (T)upper_column[x][c]-(T)lower_column[x][c];
+//						if(temp==0) continue;
+						diff[c].push_back(temp);
+						abs_diff[c].push_back(std::abs(temp));
+					}
+				}
+			}
+		}
+
+		std_dev.resize(channels);
+		for(size_t c=0;c<channels;c++){
+			size_t valid_num = diff[c].size();
+			size_t median_index = valid_num/2;
+			assert(valid_num>0);
+			std::nth_element(abs_diff[c].begin(),abs_diff[c].begin()+median_index,abs_diff[c].end());
+
+			T threshold = std::max(abs_diff[c][median_index],1.f) * static_cast<T>(4.f/MEDIAN_SD_RATIO);
+//			std::cerr << "std_dev by median [" << c << "] = " << (threshold/2) << std::endl;
+			T mean(0), square_mean(0);
+			abs_diff[c].clear();
+			size_t count(0);
+			for(size_t i=0;i<diff[c].size();i++){
+				if(std::abs(diff[c][i]) > threshold) continue;
+				mean += diff[c][i];
+				square_mean += std::pow(diff[c][i],static_cast<T>(2));
+				count++;
+			}
+			square_mean /= count;
+			mean /= count;
+			std_dev[c] = std::sqrt(square_mean - std::pow(mean,static_cast<T>(2)));
+//			std::cerr << "std_dev[" << c << "] = " << std_dev[c] << std::endl;
+		}
+
+
+	}
 
 
 	/********************************************************/

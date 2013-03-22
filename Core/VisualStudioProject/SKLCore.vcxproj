@@ -183,7 +183,8 @@
     <ClCompile Include="..\src\TimeFormatter.cpp" />
     <ClCompile Include="..\src\TimeFormatterDefault.cpp" />
     <ClCompile Include="..\src\TimeInterval.cpp" />
-  </ItemGroup>
+  
+    <ClCompile Include="..\src\InterPolater.cpp"/></ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\block.h" />
     <ClInclude Include="..\include\Comparable.h" />
@@ -203,7 +204,8 @@
     <ClInclude Include="..\include\TimeInterval.h" />
   
     <ClInclude Include="..\include\SensorModuleBase.h"/>
-    <ClInclude Include="..\include\graph_instances.inc"/></ItemGroup>
+    <ClInclude Include="..\include\graph_instances.inc"/>
+    <ClInclude Include="..\include\InterPolater.h"/></ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

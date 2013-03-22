@@ -2,7 +2,7 @@
  * @file RegionLabelingEfficientGraph.h
  * @author a_hasimoto
  * @date Date Created: 2012/Oct/07
- * @date Last Change:2012/Oct/22.
+ * @date Last Change:2013/Mar/21.
  */
 #ifndef __SKL_REGION_LABELING_EFFICIENT_GRAPH_H__
 #define __SKL_REGION_LABELING_EFFICIENT_GRAPH_H__
@@ -39,7 +39,8 @@ namespace skl{
 		float _k;
 		int _min_size;
 	private:
-		
+		cv::Mat _temp;
+		std::vector<cv::Mat> _single_channels;
 };
 
 } // skl

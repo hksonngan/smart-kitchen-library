@@ -21,10 +21,11 @@ namespace cv{
 #if CV_MINOR_VERSION < 4
 	typedef PtrStep PtrStepb;
 #endif
-#elif WIN32
+#endif
+/*#elif WIN32
 	typedef PtrStep PtrStepb;
 #endif
-
+	*/
 	}
 }
 
@@ -704,4 +705,3 @@ namespace skl{
 
 	}
 }
-

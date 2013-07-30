@@ -22,7 +22,7 @@ TableObjectManagerBiBackground::TableObjectManagerBiBackground(
 		cv::Ptr<RegionLabelingAlgorithm> __srd_algo,
 		cv::Ptr<RegionLabelingAlgorithm> __trd_algo,
 		cv::Ptr<skl::gpu::TexCut> __bgs_algo2,
-		cv::Ptr<PatchModelBiBackground> __patch_model):
+		cv::Ptr<skl::PatchModelBiBackground> __patch_model):
 	TableObjectManagerWithTouchReasoning(__learning_rate,__bgs_algo,__rl_algo,__hd_algo,__srd_algo,__trd_algo,static_cast<cv::Ptr<PatchModel> >(__patch_model)),
 	_learning_rate2(__learning_rate2),
 	_bgs_algo2(__bgs_algo2), 

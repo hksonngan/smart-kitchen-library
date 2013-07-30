@@ -25,15 +25,21 @@ namespace skl{
 		};
 
 		ObjectState(int location_resolution=SKL_LOCATION_RESOLUTION_DEFAULT);
+		ObjectState(const Flow& other);
 		virtual ~ObjectState();
 
+		inline ObjectState& operator=(const ObjectState& other){
+			Flow::operator=(static_cast<Flow>(other));
+			return *this;
+		}
+
 		inline cv::Point argmax_location(HandlingState h)const{
-			float prob = -FLT_MAX;
+			float prob = 0;
 			return argmax_location(h,prob);
 		}
 
 		inline cv::Point argmax_location()const{
-			float prob = -FLT_MAX;
+			float prob = 0;
 			return argmax_location(prob);
 		}
 
@@ -62,6 +68,7 @@ namespace skl{
 		inline const cv::Mat& operator[](HandlingState h)const{return location(h);}
 		inline cv::Mat& operator[](HandlingState h){return location(h);}
 
+		// read(std::string filename) と write(std::string filename)でファイルからの読み書きが可能！
 	protected:
 	private:
 		

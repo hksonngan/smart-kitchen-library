@@ -13,6 +13,7 @@ cv::Ptr<FlyCapture2::BusManager> FlyCapture::busMgr;
  * @brief デフォルトコンストラクタ
  */
 FlyCapture::FlyCapture():is_started(false){
+	initialize();
 }
 
 /*!
@@ -21,9 +22,7 @@ FlyCapture::FlyCapture():is_started(false){
 FlyCapture::~FlyCapture(){
 }
 
-bool FlyCapture::open(){
-	release();
-
+void FlyCapture::initialize(){
 	FlyCapture2::Error error;
 
 #ifdef _DEBUG
@@ -33,20 +32,36 @@ bool FlyCapture::open(){
 	busMgr = new FlyCapture2::BusManager();
 	unsigned int numCameras;
 	error = busMgr->GetNumOfCameras(&numCameras);
-	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
+	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return;
 #ifdef _DEBUG
 	printf( "Number of flycapture cameras: %u\n", numCameras );
 #endif // _DEBUG
-	if(numCameras==0) return false;
 
 	cam_interface.resize(numCameras);
 	fcam_interface.resize(numCameras);
 
 	for(size_t i=0;i<numCameras;i++){
 		VideoCaptureFlyCapture* capture = new VideoCaptureFlyCapture(busMgr);
-		if(!capture->open(i)) return false;
 		cam_interface[i] = capture;
 		fcam_interface[i] = capture;
+	}
+#ifdef DEBUG
+	FlyCapture2PrintBuildInfo();
+#endif // DEBUG
+}
+
+bool FlyCapture::open(){
+	if(isOpened()){
+		release();
+		initialize();
+	}
+	FlyCapture2::Error error;
+
+	if(size()==0) return false;
+
+
+	for(size_t i=0;i<size();i++){
+		if(!fcam_interface[i]->open(i)) return false;
 	}
 
 	return true;

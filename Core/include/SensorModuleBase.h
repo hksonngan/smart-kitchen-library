@@ -7,7 +7,6 @@
 #ifndef __SKL_SENSOR_MODULE_BASE_H__
 #define __SKL_SENSOR_MODULE_BASE_H__
 
-
 namespace skl{
 
 /*!

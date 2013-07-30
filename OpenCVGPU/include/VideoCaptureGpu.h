@@ -98,6 +98,8 @@ namespace skl{
 				bool isNextFrameUploaded;
 				bool _switch;
 				cv::gpu::Stream s;
+
+				bool grabNextFrame();
 			private:
 		};
 

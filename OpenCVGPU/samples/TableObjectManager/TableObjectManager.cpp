@@ -144,7 +144,7 @@ int main(int argc, char* argv[]){
 		// 3. 前のフレームまで隠されていたが現フレームでは隠されていない物体
 		// のIDを取得できる
 		hidden_objects = to_manager->patch_model()->hidden_objects();
-		newly_hidden_objects = to_manager->patch_model()->hidden_objects();
+		newly_hidden_objects = to_manager->patch_model()->newly_hidden_objects();
 		reappeared_objects = to_manager->patch_model()->reappeared_objects();
 		// これらのIDの物体の領域画像はput_objects,taken_objectsと同様の方法で取得できる
 

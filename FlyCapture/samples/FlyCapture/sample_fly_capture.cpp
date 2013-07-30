@@ -60,12 +60,11 @@ int main(int argc,char* argv[]){
 	std::vector<cv::Mat> images(cam.size());
 
 	int frame_num = 0;
-	while('q'!=cv::waitKey(10)){
-		cam.grab();
+	while('q'!=cv::waitKey(10) && cam.grab() && cam.isOpened()){
+
 		for(size_t i=0;i<cam.size();i++){
 			cam[i].retrieve(images[i]);
 		}
-		if(!cam.isOpened()) break;
 
 		for(size_t i=0;i<cam.size();i++){
 			ss << "image" << i;

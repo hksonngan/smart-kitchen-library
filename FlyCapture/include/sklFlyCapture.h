@@ -50,7 +50,7 @@ namespace skl{
 
 			// PC毎に共通のBusManager
 			static cv::Ptr<FlyCapture2::BusManager> busMgr;
-
+			void initialize();
 		private:
 			virtual inline bool push_back(int device){return false;}
 			std::vector<VideoCaptureFlyCapture*> fcam_interface;

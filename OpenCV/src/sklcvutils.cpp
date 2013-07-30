@@ -85,10 +85,6 @@ namespace skl{
 		assert(label.type()==CV_16SC1);
 		return visualizeRegionLabel4MultiType<short>(label,region_num);
 	}
-	cv::Mat visualizeRegionLabel_int(const cv::Mat& label,size_t region_num){
-		assert(label.type()==CV_32SC1);
-		return visualizeRegionLabel4MultiType<int>(label,region_num);
-	}
 
 
 	template<> void setWeight<unsigned char>(const unsigned char& mask, double* w1, double* w2){
@@ -293,7 +289,7 @@ template <typename MatElem> cv::Mat _generateGaussianMask(const cv::Mat& covaria
 
 	std::vector<MatElem> std_dev(W.rows);
 	for(int i=0;i<W.rows;i++){
-		std_dev[i] = std::sqrt((double)Wvec.at<MatElem>(i,0));
+		std_dev[i] = (MatElem)std::sqrt((double)Wvec.at<MatElem>(i,0));
 	}
 
 	// mask size must be odd num

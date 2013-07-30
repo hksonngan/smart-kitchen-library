@@ -19,6 +19,12 @@ ObjectState::ObjectState(int location_resolution){
 }
 
 /*!
+ * @brief 他のインスタンスからのコンストラクタ．Shallow Copyであることに注意
+ */
+ObjectState::ObjectState(const Flow& other):Flow(other){
+}
+
+/*!
  * @brief デストラクタ
  */
 ObjectState::~ObjectState(){
@@ -41,6 +47,10 @@ cv::Point ObjectState::argmax_location(HandlingState h,float& prob)const{
 }
 
 cv::Point ObjectState::argmax_location(float& prob)const{
+	assert(u.cols == resolution());
+	assert(u.rows == resolution());
+	assert(v.cols == resolution());
+	assert(v.rows == resolution());
 	cv::Point argmax(0,0);
 	for(int y=0;y<resolution();y++){
 		const float* pu = u.ptr<float>(y);

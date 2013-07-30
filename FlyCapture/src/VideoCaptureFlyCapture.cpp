@@ -19,8 +19,7 @@ VideoCaptureFlyCapture::VideoCaptureFlyCapture(cv::Ptr<FlyCapture2::BusManager> 
 	}
 	set(skl::FPS, 15);
 	set(skl::FRAME_WIDTH, 1024);
-	set(skl::FRAME_HEIGHT, 680);
-	set(skl::CONVERT_RGB,1);
+	set(skl::FRAME_HEIGHT, 768);
 }
 
 /*!
@@ -64,7 +63,11 @@ bool VideoCaptureFlyCapture::open(int device){
 	error = camera.SetVideoModeAndFrameRate(
 			getVideoMode(),
 			getFrameRate());
-	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
+	if(!SKL_FLYCAP2_CHECK_ERROR(error)){
+		std::cerr << "WARNING: The camera does not support directed VideoMode/FrameRate." << std::endl;
+		std::cerr << "VideoMode: " << (int)get(skl::FRAME_WIDTH) << "x" << (int)get(skl::FRAME_HEIGHT) << "Y8" <<  std::endl;
+		std::cerr << "FrameRate: " << get(skl::FPS) << std::endl;
+	}
 
 	// Set mode for Y8 returning image
 	// 0x80000080 -> return by bayer array
@@ -79,12 +82,12 @@ bool VideoCaptureFlyCapture::open(int device){
 	FlyCapture2::TriggerDelay trigger_delay;
 	trigger_delay.onOff = true;
 	trigger_delay.valueA = 0;
+	trigger_delay.type = FlyCapture2::TRIGGER_DELAY;
 	error = camera.SetTriggerDelay(
 			&trigger_delay);
-	if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
 
-
-	return is_opened = set(CONVERT_RGB,1.0);
+	is_opened = set(CONVERT_RGB,1.0);
+	return is_opened;
 }
 
 FlyCapture2::FrameRate VideoCaptureFlyCapture::getFrameRate(double fps){
@@ -212,6 +215,11 @@ bool VideoCaptureFlyCapture::set_for_develop(capture_property_t prop_id,double v
 		case skl::MONOCROME:
 			if(val>0) capture_color_image = false;
 			break;
+		case skl::FPS:
+		case skl::FRAME_HEIGHT:
+		case skl::FRAME_WIDTH:
+			params.set(prop_id,val);
+			return true;
 		default:
 			return false;
 	}

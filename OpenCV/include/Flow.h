@@ -19,8 +19,15 @@ class Flow{
 	public:
 		enum Direction{X=0,Y=1};
 		Flow();
+		Flow(const Flow& other);
 		Flow(const cv::Mat& u,const cv::Mat& v);
+		Flow clone()const;
 		virtual ~Flow();
+		inline Flow& operator=(const Flow& other){
+			this->u = other.u;
+			this->v = other.v;
+			return *this;
+		}
 		cv::Mat u;
 		cv::Mat v;
 		void distance(cv::Mat& r);

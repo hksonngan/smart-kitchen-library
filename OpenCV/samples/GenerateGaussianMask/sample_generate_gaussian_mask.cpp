@@ -7,7 +7,7 @@ opt_on_container(std::vector,double,covariance,"","<DBL:DBL:DBL:DBL>","set covar
 
 
 
-int main(int argc,char* argv[]){
+int ___main(int argc,char* argv[]){
 	skl::OptParser options;
 	std::vector<std::string> args;
 	opt_parse(options,argc,argv,args);

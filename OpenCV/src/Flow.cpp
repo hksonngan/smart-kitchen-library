@@ -20,6 +20,13 @@ Flow::Flow(){
 }
 
 /*!
+ * @brief Shallow Copyするコンストラクタ
+ */
+Flow::Flow(const Flow& other):u(other.u),v(other.v){
+
+}
+
+/*!
  * @brief Constractor which sets u and v.
  * */
 Flow::Flow(const cv::Mat& u,const cv::Mat& v):u(u.clone()),v(v.clone()){
@@ -30,6 +37,10 @@ Flow::Flow(const cv::Mat& u,const cv::Mat& v):u(u.clone()),v(v.clone()){
  */
 Flow::~Flow(){
 
+}
+
+Flow Flow::clone()const{
+	return Flow(this->u.clone(),this->v.clone());
 }
 
 /*!

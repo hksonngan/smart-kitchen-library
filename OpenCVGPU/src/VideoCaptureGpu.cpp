@@ -28,32 +28,35 @@ VideoCaptureGpu::~VideoCaptureGpu(){
 
 bool VideoCaptureGpu::grab(){
 	if(!isNextFrameUploaded){
-		if(!video_capture_cpu->grab()){
+		if(!grabNextFrame()){
 			return false;
 		}
-		if(!video_capture_cpu->retrieve(switching_mat_cpu[!_switch])){
-			return false;
-		}
-//		std::cerr << switching_mat_cpu[!_switch].cols << " x " << switching_mat_cpu[!_switch].rows << std::endl;
-		cv::gpu::ensureSizeIsEnough(switching_mat_cpu[!_switch].size(),switching_mat_cpu[!_switch].type(),switching_mat[!_switch]);
-		s.enqueueUpload(switching_mat_cpu[!_switch],switching_mat[!_switch]);
 	}
 
 	// get NextFrame;
 	s.waitForCompletion();
 	_switch = !_switch;
+
+	if(!grabNextFrame()){
+		return false;
+	}
+	isNextFrameUploaded = true;
+	return true;
+}
+
+bool VideoCaptureGpu::grabNextFrame(){
+	bool next_frame = !_switch;
 	if(!video_capture_cpu->grab()){
 		isNextFrameUploaded = false;
-		return true;
+		return false;
 	}
-	if(!video_capture_cpu->retrieve(switching_mat_cpu[!_switch])){
+	if(!video_capture_cpu->retrieve(switching_mat_cpu[next_frame])){
 		isNextFrameUploaded = false;
-		return true;
+		return false;
 	}
-//	std::cerr << switching_mat_cpu[!_switch].cols << " x " << switching_mat_cpu[!_switch].rows << std::endl;
-	cv::gpu::ensureSizeIsEnough(switching_mat_cpu[!_switch].size(),switching_mat_cpu[!_switch].type(),switching_mat[!_switch]);
-	s.enqueueUpload(switching_mat_cpu[!_switch],switching_mat[!_switch]);
-	isNextFrameUploaded = true;
+//	std::cerr << switching_mat_cpu[next_frame].cols << " x " << switching_mat_cpu[next_frame].rows << std::endl;
+	cv::gpu::ensureSizeIsEnough(switching_mat_cpu[next_frame].size(),switching_mat_cpu[next_frame].type(),switching_mat[next_frame]);
+	s.enqueueUpload(switching_mat_cpu[next_frame],switching_mat[next_frame]);
 	return true;
 }
 

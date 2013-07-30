@@ -30,6 +30,7 @@ VideoCapture::~VideoCapture(){
 bool VideoCapture::isOpened()const{
 	if(size()==0) return false;
 	for(size_t i=0;i<size();i++){
+		if(cam_interface[i].empty()) return false;
 		if(!cam_interface[i]->isOpened()) return false;
 	}
 	return true;
@@ -37,7 +38,9 @@ bool VideoCapture::isOpened()const{
 
 void VideoCapture::release(){
 	for(size_t i=0;i<size();i++){
-		cam_interface[i]->release();
+		if(!cam_interface[i].empty()){
+			cam_interface[i]->release();
+		}
 	}
 	cam_interface.clear();
 }

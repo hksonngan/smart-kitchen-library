@@ -204,6 +204,7 @@ void gpu::TexCut::setBackground(const cv::gpu::GpuMat& bg, bool noSmoothing){
 	graph_size = getGraphSize(bg.size());
 	cv::gpu::split(bg,blur_temp);
 
+	size_t hoge = 1;
 	size_t channels = bg.channels();
 
 	_bg_sobel_x.resize(channels);
@@ -333,13 +334,13 @@ bool gpu::TexCut::compute(const cv::gpu::GpuMat& _src, cv::gpu::GpuMat& dest,cv:
 		else{
 			blur_temp[c] = src[c];
 		}
-#ifdef __linux__ 
+//#ifdef __linux__ 
 		cv::gpu::Sobel(blur_temp[c], sobel_x[c], CV_32S, 1, 0, buf_sobel_x, 3,1.0, cv::BORDER_DEFAULT,-1,stream_data_terms);
 		cv::gpu::Sobel(blur_temp[c], sobel_y[c], CV_32S, 0, 1, buf_sobel_y, 3, 1.0, cv::BORDER_DEFAULT,-1,stream_data_terms);
-#else
-		cv::gpu::Sobel(blur_temp[c], sobel_x[c], CV_32S, 1, 0, 3,1.0,cv::BORDER_DEFAULT,-1,stream_data_terms);
-		cv::gpu::Sobel(blur_temp[c], sobel_y[c], CV_32S, 0, 1, 3,1.0,cv::BORDER_DEFAULT,-1,stream_data_terms);
-#endif
+//#else
+//		cv::gpu::Sobel(blur_temp[c], sobel_x[c], CV_32S, 1, 0, 3,1.0,cv::BORDER_DEFAULT,-1,stream_data_terms);
+//		cv::gpu::Sobel(blur_temp[c], sobel_y[c], CV_32S, 0, 1, 3,1.0,cv::BORDER_DEFAULT,-1,stream_data_terms);
+//#endif
 	}
 	stream_exposure.enqueueMemSet(fg_is_over_exposure,cv::Scalar(255));
 	stream_exposure.enqueueMemSet(fg_is_under_exposure,cv::Scalar(255));

@@ -19,7 +19,7 @@ TableObjectManagerWithTouchReasoning::TableObjectManagerWithTouchReasoning(
 		cv::Ptr<HumanDetector> __hd_algo,
 		cv::Ptr<RegionLabelingAlgorithm> __srd_algo,
 		cv::Ptr<RegionLabelingAlgorithm> __trd_algo,
-		cv::Ptr<PatchModel> __patch_model):
+		cv::Ptr<skl::PatchModel> __patch_model):
 	TableObjectManager(__learning_rate,__bgs_algo,__rl_algo,__hd_algo,__srd_algo,__patch_model),_trd_algo(__trd_algo){
 
 }

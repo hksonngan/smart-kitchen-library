@@ -1,0 +1,6 @@
+lib
+/OpenCV/VisualStudioProject/*.sdf
+/OpenCV/VisualStudioProject/*.sln
+/OpenCV/VisualStudioProject/*.suo
+x64
+Debug

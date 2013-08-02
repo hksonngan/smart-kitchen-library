@@ -18,6 +18,45 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\block.h" />
+    <ClInclude Include="..\include\Comparable.h" />
+    <ClInclude Include="..\include\Filter.h" />
+    <ClInclude Include="..\include\graph.h" />
+    <ClInclude Include="..\include\InterPolater.h" />
+    <ClInclude Include="..\include\KeyInput.h" />
+    <ClInclude Include="..\include\OptParser.h" />
+    <ClInclude Include="..\include\Printable.h" />
+    <ClInclude Include="..\include\SensorModuleBase.h" />
+    <ClInclude Include="..\include\Serializable.h" />
+    <ClInclude Include="..\include\sklstring.h" />
+    <ClInclude Include="..\include\sklTime.h" />
+    <ClInclude Include="..\include\sklutils.h" />
+    <ClInclude Include="..\include\StopWatch.h" />
+    <ClInclude Include="..\include\TimeFormatException.h" />
+    <ClInclude Include="..\include\TimeFormatter.h" />
+    <ClInclude Include="..\include\TimeFormatterDefault.h" />
+    <ClInclude Include="..\include\TimeInterval.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\include\graph_instances.inc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\graph.cpp" />
+    <ClCompile Include="..\src\InterPolater.cpp" />
+    <ClCompile Include="..\src\KeyInput.cpp" />
+    <ClCompile Include="..\src\maxflow.cpp" />
+    <ClCompile Include="..\src\OptParser.cpp" />
+    <ClCompile Include="..\src\Serializable.cpp" />
+    <ClCompile Include="..\src\sklstring.cpp" />
+    <ClCompile Include="..\src\sklTime.cpp" />
+    <ClCompile Include="..\src\sklutils.cpp" />
+    <ClCompile Include="..\src\StopWatch.cpp" />
+    <ClCompile Include="..\src\TimeFormatException.cpp" />
+    <ClCompile Include="..\src\TimeFormatter.cpp" />
+    <ClCompile Include="..\src\TimeFormatterDefault.cpp" />
+    <ClCompile Include="..\src\TimeInterval.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D8439330-FD5F-43A0-8C55-A477DBF4CBA7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -170,41 +209,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <None Include="..\include\graph_instances.inc" />
-    <None Include="ReadMe.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\src\graph.cpp" />
-    <ClCompile Include="..\src\maxflow.cpp" />
-    <ClCompile Include="..\src\OptParser.cpp" />
-    <ClCompile Include="..\src\Serializable.cpp" />
-    <ClCompile Include="..\src\sklstring.cpp" />
-    <ClCompile Include="..\src\sklTime.cpp" />
-    <ClCompile Include="..\src\sklutils.cpp" />
-    <ClCompile Include="..\src\StopWatch.cpp" />
-    <ClCompile Include="..\src\TimeFormatException.cpp" />
-    <ClCompile Include="..\src\TimeFormatter.cpp" />
-    <ClCompile Include="..\src\TimeFormatterDefault.cpp" />
-    <ClCompile Include="..\src\TimeInterval.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\include\block.h" />
-    <ClInclude Include="..\include\Comparable.h" />
-    <ClInclude Include="..\include\Filter.h" />
-    <ClInclude Include="..\include\graph.h" />
-    <ClInclude Include="..\include\OptParser.h" />
-    <ClInclude Include="..\include\Printable.h" />
-    <ClInclude Include="..\include\Serializable.h" />
-    <ClInclude Include="..\include\sklstring.h" />
-    <ClInclude Include="..\include\sklTime.h" />
-    <ClInclude Include="..\include\sklutils.h" />
-    <ClInclude Include="..\include\StopWatch.h" />
-    <ClInclude Include="..\include\TimeFormatException.h" />
-    <ClInclude Include="..\include\TimeFormatter.h" />
-    <ClInclude Include="..\include\TimeFormatterDefault.h" />
-    <ClInclude Include="..\include\TimeInterval.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

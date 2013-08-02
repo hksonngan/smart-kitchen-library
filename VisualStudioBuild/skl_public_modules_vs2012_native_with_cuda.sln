@@ -1,23 +1,31 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SKLFlyCapture_vs2012_clr", "..\FlyCapture\VisualStudioProject\SKLFlyCapture_vs2012_clr.vcxproj", "{94DEF684-6EC1-42CF-A061-ECE0D66A5ED4}"
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SKLFlyCapture_vs2012_native", "..\FlyCapture\VisualStudioProject\SKLFlyCapture_vs2012_native.vcxproj", "{94DEF684-6EC1-42CF-A061-ECE0D66A5ED4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D8439330-FD5F-43A0-8C55-A477DBF4CBA7} = {D8439330-FD5F-43A0-8C55-A477DBF4CBA7}
 		{93061371-0230-41AA-80AE-7E213765361D} = {93061371-0230-41AA-80AE-7E213765361D}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SKLBoost_vs2012_clr", "..\Boost\VisualStudioProject\SKLBoost_vs2012_clr.vcxproj", "{7B924656-BC04-4D71-A7AC-56C7EF87B8B4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SKLBoost_vs2012_native", "..\Boost\VisualStudioProject\SKLBoost_vs2012_native.vcxproj", "{7B924656-BC04-4D71-A7AC-56C7EF87B8B4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D8439330-FD5F-43A0-8C55-A477DBF4CBA7} = {D8439330-FD5F-43A0-8C55-A477DBF4CBA7}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SKLOpenCV_vs2012_clr", "..\OpenCV\VisualStudioProject\SKLOpenCV_vs2012_clr.vcxproj", "{93061371-0230-41AA-80AE-7E213765361D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SKLOpenCV_vs2012_native", "..\OpenCV\VisualStudioProject\SKLOpenCV_vs2012_native.vcxproj", "{93061371-0230-41AA-80AE-7E213765361D}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D8439330-FD5F-43A0-8C55-A477DBF4CBA7} = {D8439330-FD5F-43A0-8C55-A477DBF4CBA7}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SKLCore_vs2012_clr", "..\Core\VisualStudioProject\SKLCore_vs2012_clr.vcxproj", "{D8439330-FD5F-43A0-8C55-A477DBF4CBA7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SKLOpenCVGPU_vs2012_native", "..\OpenCVGPU\VisualStudioProject\SKLOpenCVGPU_vs2012_native.vcxproj", "{97E86027-61D5-42C4-BDAA-756A78357622}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8A37F106-5952-406A-8D53-96C9F436AF6F} = {8A37F106-5952-406A-8D53-96C9F436AF6F}
+		{D8439330-FD5F-43A0-8C55-A477DBF4CBA7} = {D8439330-FD5F-43A0-8C55-A477DBF4CBA7}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SKLCuda_vs2012_native", "..\OpenCVGPU\VisualStudioProject\SKLCuda_vs2012_native.vcxproj", "{8A37F106-5952-406A-8D53-96C9F436AF6F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SKLCore_vs2012_native", "..\Core\VisualStudioProject\SKLCore_vs2012_native.vcxproj", "{D8439330-FD5F-43A0-8C55-A477DBF4CBA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +59,22 @@ Global
 		{93061371-0230-41AA-80AE-7E213765361D}.Release|Win32.Build.0 = Release|Win32
 		{93061371-0230-41AA-80AE-7E213765361D}.Release|x64.ActiveCfg = Release|x64
 		{93061371-0230-41AA-80AE-7E213765361D}.Release|x64.Build.0 = Release|x64
+		{97E86027-61D5-42C4-BDAA-756A78357622}.Debug|Win32.ActiveCfg = Debug|Win32
+		{97E86027-61D5-42C4-BDAA-756A78357622}.Debug|Win32.Build.0 = Debug|Win32
+		{97E86027-61D5-42C4-BDAA-756A78357622}.Debug|x64.ActiveCfg = Debug|x64
+		{97E86027-61D5-42C4-BDAA-756A78357622}.Debug|x64.Build.0 = Debug|x64
+		{97E86027-61D5-42C4-BDAA-756A78357622}.Release|Win32.ActiveCfg = Release|Win32
+		{97E86027-61D5-42C4-BDAA-756A78357622}.Release|Win32.Build.0 = Release|Win32
+		{97E86027-61D5-42C4-BDAA-756A78357622}.Release|x64.ActiveCfg = Release|x64
+		{97E86027-61D5-42C4-BDAA-756A78357622}.Release|x64.Build.0 = Release|x64
+		{8A37F106-5952-406A-8D53-96C9F436AF6F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8A37F106-5952-406A-8D53-96C9F436AF6F}.Debug|Win32.Build.0 = Debug|Win32
+		{8A37F106-5952-406A-8D53-96C9F436AF6F}.Debug|x64.ActiveCfg = Debug|x64
+		{8A37F106-5952-406A-8D53-96C9F436AF6F}.Debug|x64.Build.0 = Debug|x64
+		{8A37F106-5952-406A-8D53-96C9F436AF6F}.Release|Win32.ActiveCfg = Release|Win32
+		{8A37F106-5952-406A-8D53-96C9F436AF6F}.Release|Win32.Build.0 = Release|Win32
+		{8A37F106-5952-406A-8D53-96C9F436AF6F}.Release|x64.ActiveCfg = Release|x64
+		{8A37F106-5952-406A-8D53-96C9F436AF6F}.Release|x64.Build.0 = Release|x64
 		{D8439330-FD5F-43A0-8C55-A477DBF4CBA7}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D8439330-FD5F-43A0-8C55-A477DBF4CBA7}.Debug|Win32.Build.0 = Debug|Win32
 		{D8439330-FD5F-43A0-8C55-A477DBF4CBA7}.Debug|x64.ActiveCfg = Debug|x64

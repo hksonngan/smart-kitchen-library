@@ -23,7 +23,6 @@
     <ClInclude Include="..\include\Comparable.h" />
     <ClInclude Include="..\include\Filter.h" />
     <ClInclude Include="..\include\graph.h" />
-    <ClInclude Include="..\include\InterPolater.h" />
     <ClInclude Include="..\include\KeyInput.h" />
     <ClInclude Include="..\include\OptParser.h" />
     <ClInclude Include="..\include\Printable.h" />
@@ -43,7 +42,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\graph.cpp" />
-    <ClCompile Include="..\src\InterPolater.cpp" />
     <ClCompile Include="..\src\KeyInput.cpp" />
     <ClCompile Include="..\src\maxflow.cpp" />
     <ClCompile Include="..\src\OptParser.cpp" />

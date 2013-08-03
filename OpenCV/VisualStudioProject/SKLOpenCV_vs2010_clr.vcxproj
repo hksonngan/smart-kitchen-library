@@ -175,14 +175,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\BackgroundSubtractAlgorithm.cpp" />
-    <ClCompile Include="..\src\ImplicitShapeModel.cpp" />
     <ClCompile Include="..\src\sklcvutils_colorpalette.cpp" />
     <ClCompile Include="..\src\CvMouseEventHandler.cpp" />
     <ClCompile Include="..\src\Flow.cpp" />
     <ClCompile Include="..\src\Graphcut.cpp" />
     <ClCompile Include="..\src\HumanDetectorWorkspaceEnd.cpp" />
-    <ClCompile Include="..\src\ImplicitShapeModel_Entries.cpp" />
-    <ClCompile Include="..\src\ImplicitShapeModel_Entry.cpp" />
     <ClCompile Include="..\src\MotionHistory.cpp" />
     <ClCompile Include="..\src\Patch.cpp" />
     <ClCompile Include="..\src\PatchLayer.cpp" />
@@ -208,31 +205,25 @@
     <ClCompile Include="..\src\sklcvutils_arrow.cpp" />
     <ClCompile Include="..\src\sklcvutils_bayer_conversion.cpp" />
     <ClCompile Include="..\src\sklcvutils_rect_operation.cpp" />
-    <ClCompile Include="..\src\GraphCutMultiLabel.cpp" />
     <ClCompile Include="..\src\ObjectState.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\BackgroundCut.h" />
     <ClInclude Include="..\include\Labeling.h" />
     <ClInclude Include="..\include\RegionLabelingEfficientGraph.h" />
     <ClInclude Include="..\include\Flow.h" />
     <ClInclude Include="..\include\sklcvutils_bayer_conversion.h" />
     <ClInclude Include="..\include\sklcvutils_blending.h" />
     <ClInclude Include="..\include\VideoCaptureOptFlowImageList.h" />
-    <ClInclude Include="..\include\ImplicitShapeModel.h" />
     <ClInclude Include="..\include\BackgroundSubtractAlgorithm.h" />
     <ClInclude Include="..\include\CvMouseEventHandler.h" />
     <ClInclude Include="..\include\FilterMat2Mat.h" />
     <ClInclude Include="..\include\Graphcut.h" />
     <ClInclude Include="..\include\HumanDetectorWorkspaceEnd.h" />
-    <ClInclude Include="..\include\JointBoost.h" />
     <ClInclude Include="..\include\MatReader.h" />
     <ClInclude Include="..\include\MotionHistory.h" />
     <ClInclude Include="..\include\PatchModel.h" />
     <ClInclude Include="..\include\PatchModelBiBackground.h" />
     <ClInclude Include="..\include\RegionLabelingSimple.h" />
-    <ClInclude Include="..\include\RegressionStump.h" />
-    <ClInclude Include="..\include\RegressionStump_parallel.h" />
     <ClInclude Include="..\include\SampleSetReader.h" />
     <ClInclude Include="..\include\SampleSetWriter.h" />
     <ClInclude Include="..\include\StaticRegionDetector.h" />
@@ -249,7 +240,6 @@
     <ClInclude Include="..\include\cvtypes.h" />
     <ClInclude Include="..\include\sklVideoCapture.h" />
     <ClInclude Include="..\include\sklcvutils.h" />
-    <ClInclude Include="..\include\GraphCutMultiLabel.h" />
     <ClInclude Include="..\include\ParticleFilter.hpp" />
     <ClInclude Include="..\include\ObjectState.h" />
   </ItemGroup>

@@ -66,11 +66,7 @@
     <ClCompile Include="..\src\CvMouseEventHandler.cpp" />
     <ClCompile Include="..\src\Flow.cpp" />
     <ClCompile Include="..\src\Graphcut.cpp" />
-    <ClCompile Include="..\src\GraphCutMultiLabel.cpp" />
     <ClCompile Include="..\src\HumanDetectorWorkspaceEnd.cpp" />
-    <ClCompile Include="..\src\ImplicitShapeModel.cpp" />
-    <ClCompile Include="..\src\ImplicitShapeModel_Entries.cpp" />
-    <ClCompile Include="..\src\ImplicitShapeModel_Entry.cpp" />
     <ClCompile Include="..\src\MotionHistory.cpp" />
     <ClCompile Include="..\src\ObjectState.cpp" />
     <ClCompile Include="..\src\Patch.cpp" />

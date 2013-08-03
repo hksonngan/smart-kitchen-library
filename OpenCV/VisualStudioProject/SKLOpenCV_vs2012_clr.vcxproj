@@ -19,17 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\BackgroundCut.h" />
     <ClInclude Include="..\include\BackgroundSubtractAlgorithm.h" />
     <ClInclude Include="..\include\CvMouseEventHandler.h" />
     <ClInclude Include="..\include\cvtypes.h" />
     <ClInclude Include="..\include\FilterMat2Mat.h" />
     <ClInclude Include="..\include\Flow.h" />
     <ClInclude Include="..\include\Graphcut.h" />
-    <ClInclude Include="..\include\GraphCutMultiLabel.h" />
     <ClInclude Include="..\include\HumanDetectorWorkspaceEnd.h" />
-    <ClInclude Include="..\include\ImplicitShapeModel.h" />
-    <ClInclude Include="..\include\JointBoost.h" />
     <ClInclude Include="..\include\Labeling.h" />
     <ClInclude Include="..\include\MatReader.h" />
     <ClInclude Include="..\include\MotionHistory.h" />
@@ -38,10 +34,7 @@
     <ClInclude Include="..\include\PatchModel.h" />
     <ClInclude Include="..\include\PatchModelBiBackground.h" />
     <ClInclude Include="..\include\RegionLabelingEfficientGraph.h" />
-    <ClInclude Include="..\include\RegionLabelingMerge.h" />
     <ClInclude Include="..\include\RegionLabelingSimple.h" />
-    <ClInclude Include="..\include\RegressionStump.h" />
-    <ClInclude Include="..\include\RegressionStump_parallel.h" />
     <ClInclude Include="..\include\SampleSetReader.h" />
     <ClInclude Include="..\include\SampleSetWriter.h" />
     <ClInclude Include="..\include\sklcvutils.h" />

@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SKLFlyCapture_vs2010_clr", "..\FlyCapture\VisualStudioProject\SKLFlyCapture_vs2010_clr.vcxproj", "{94DEF684-6EC1-42CF-A061-ECE0D66A5ED4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D8439330-FD5F-43A0-8C55-A477DBF4CBA7} = {D8439330-FD5F-43A0-8C55-A477DBF4CBA7}

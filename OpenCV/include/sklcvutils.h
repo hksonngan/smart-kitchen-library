@@ -6,6 +6,7 @@
 #endif
 #include <cv.h>
 
+#define SKL_GRAY 127
 
 // &(get the "and" region, cap operation)
 // |(get the "or" region, cup operation)

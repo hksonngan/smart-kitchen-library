@@ -2,7 +2,7 @@
 #ifndef __SKL__VIDEO_CAPTURE_OPT_PARSER_H__
 #define __SKL__VIDEO_CAPTURE_OPT_PARSER_H__
 
-#define opt_on_cam_prop(PROP_NAME) opt_on(double, PROP_NAME, -DBL_MAX,"","<PROP_VAL>", "set camera parameter PROP_NAME")
+#define opt_on_cam_prop(PROP_NAME) opt_on(double, PROP_NAME, -DBL_MAX,"","<PROP_VAL>", std::string("set camera parameter ") + std::string(#PROP_NAME))
 namespace skl{
 	namespace options{
 		opt_on_cam_prop(POS_MSEC);

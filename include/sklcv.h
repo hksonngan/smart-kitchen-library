@@ -17,7 +17,6 @@
 
 #include "../OpenCV/include/RegionLabelingSimple.h"
 #include "../OpenCV/include/RegionLabelingEfficientGraph.h"
-#include "../OpenCV/include/RegionLabelingMerge.h"
 //#include "../OpenCV/include/RegressionStump.h"
 //#include "../OpenCV/include/RegressionStump_parallel.h"
 
@@ -42,6 +41,5 @@
 #include "../OpenCV/include/TableObjectManagerWithTouchReasoning.h"
 #include "../OpenCV/include/TableObjectManagerBiBackground.h"
 
-#include "../OpenCV/include/GraphCutMultiLabel.h"
 #include "../OpenCV/include/ParticleFilter.hpp"
 #endif // __SKL_CV_H__

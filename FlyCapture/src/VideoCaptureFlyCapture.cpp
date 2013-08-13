@@ -2,7 +2,7 @@
  * @file VideoCaptureFlyCapture.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/18
- * @date Last Change: 2012/Oct/01.
+ * @date Last Change: 2013/Aug/13.
  */
 #include "VideoCaptureFlyCapture.h"
 
@@ -17,9 +17,9 @@ VideoCaptureFlyCapture::VideoCaptureFlyCapture(cv::Ptr<FlyCapture2::BusManager> 
 	if(prop_type_map.empty()){
 		initialize_prop_type_map();
 	}
-	set(skl::FPS, 15);
-	set(skl::FRAME_WIDTH, 1024);
-	set(skl::FRAME_HEIGHT, 768);
+//	set(skl::FPS, 15);
+//	set(skl::FRAME_WIDTH, 1024);
+//	set(skl::FRAME_HEIGHT, 768);
 }
 
 /*!
@@ -60,7 +60,7 @@ bool VideoCaptureFlyCapture::open(int device){
 	std::cout << "\n*** INFORMATION FOR CAMERA " << device << " ***" << std::endl;
 	FlyCapture2PrintCameraInfo(camInfo);
 #endif
-	error = camera.SetVideoModeAndFrameRate(
+/*	error = camera.SetVideoModeAndFrameRate(
 			getVideoMode(),
 			getFrameRate());
 	if(!SKL_FLYCAP2_CHECK_ERROR(error)){
@@ -68,7 +68,7 @@ bool VideoCaptureFlyCapture::open(int device){
 		std::cerr << "VideoMode: " << (int)get(skl::FRAME_WIDTH) << "x" << (int)get(skl::FRAME_HEIGHT) << "Y8" <<  std::endl;
 		std::cerr << "FrameRate: " << get(skl::FPS) << std::endl;
 	}
-
+*/
 	// Set mode for Y8 returning image
 	// 0x80000080 -> return by bayer array
 	// 0x80000000 -> return by normal gray scale.

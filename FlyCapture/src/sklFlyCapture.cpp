@@ -2,7 +2,7 @@
  * @file FlyCapture.cpp
  * @author a_hasimoto
  * @date Date Created: 2012/Jan/12
- * @date Last Change: 2012/Oct/01.
+ * @date Last Change: 2013/Aug/15.
  */
 #include "sklFlyCapture.h"
 
@@ -12,7 +12,7 @@ cv::Ptr<FlyCapture2::BusManager> FlyCapture::busMgr;
 /*!
  * @brief デフォルトコンストラクタ
  */
-FlyCapture::FlyCapture():is_started(false){
+FlyCapture::FlyCapture(bool _is_sync):is_started(false),is_sync(_is_sync){
 	initialize();
 }
 
@@ -67,6 +67,18 @@ bool FlyCapture::open(){
 	return true;
 }
 
+bool FlyCapture::async_capture_start(FlyCapture2::Camera** ppCameras){
+	if(size()==0) return false;
+	FlyCapture2::Error error;
+	for(size_t i=0;i<(size_t)fcam_interface.size();i++){
+		error = ppCameras[i]->StartCapture();
+		if(!SKL_FLYCAP2_CHECK_ERROR(error)) return false;
+		fcam_interface[i]->is_started = true;
+	}
+	is_started = true;
+	return true;
+}
+
 bool FlyCapture::sync_capture_start(FlyCapture2::Camera** ppCameras){
 	if(size()==0) return false;
 	FlyCapture2::Error error = FlyCapture2::Camera::StartSyncCapture((unsigned int)fcam_interface.size(), (const FlyCapture2::Camera**)ppCameras );
@@ -95,7 +107,12 @@ bool FlyCapture::grab(){
 		for(size_t i=0;i<fcam_interface.size();i++){
 			ppCameras[i] = &(fcam_interface[i]->camera);
 		}
-		sync_capture_start(ppCameras);
+		if(is_sync){
+			sync_capture_start(ppCameras);
+		}
+		else{
+			async_capture_start(ppCameras);
+		}
 		delete ppCameras;
 	}
 	return VideoCapture::grab();

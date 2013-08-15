@@ -1,9 +1,9 @@
-VSPROJ = VisualStudioProject/SKLFlyCapture.vcxproj
+#VSPROJ = VisualStudioProject/SKLFlyCapture.vcxproj
 
 all:
 	cd src;$(MAKE)
 	cp src/libskl_flycapture.a ../lib
-	ruby ../support/VSProjectFileMaintainer.rb -i $(VSPROJ) -s src -h include > temp.proj;mv temp.proj $(VSPROJ)
+#	ruby ../support/VSProjectFileMaintainer.rb -i $(VSPROJ) -s src -h include > temp.proj;mv temp.proj $(VSPROJ)
 
 
 .PHONY: clean debug

@@ -10,6 +10,8 @@ opt_on(std::string, input_file,"","-i","<FILE>","load video file");
 opt_on(std::string, output_dir,"","-o","<DIR>","direct directory for saving images");
 opt_on_bool(time_stamp,"-t","save images with time stamp filename.");
 
+opt_on(bool,visualize,true,"-v","<BOOL>","visualize captured images when true.");
+
 int main(int argc,char* argv[]){
 	skl::OptParser options;
 	std::vector<std::string> args;
@@ -32,7 +34,10 @@ int main(int argc,char* argv[]){
 
 
 	if(input_file.empty()){
-		if(!cam.open()) return EXIT_FAILURE;
+		if(!cam.open()){
+			std::cerr << "ERROR: failed to Open Flycapture Camera." << std::endl;
+			return EXIT_FAILURE;
+		}
 	}
 	else{
 		cam.open(input_file);
@@ -52,15 +57,17 @@ int main(int argc,char* argv[]){
 	}
 
 	std::stringstream ss;
-	for(size_t i=0;i<cam.size();i++){
-		ss << "image" << i;
-		cv::namedWindow(ss.str(),0);
-		ss.str("");
+	if(visualize){
+		for(size_t i=0;i<cam.size();i++){
+			ss << "image" << i;
+			cv::namedWindow(ss.str(),0);
+			ss.str("");
+		}
 	}
 	std::vector<cv::Mat> images(cam.size());
 
 	int frame_num = 0;
-	while('q'!=cv::waitKey(10) && cam.grab() && cam.isOpened()){
+	while('q'!=cv::waitKey(1) && cam.grab() && cam.isOpened()){
 
 		for(size_t i=0;i<cam.size();i++){
 			cam[i].retrieve(images[i]);
@@ -68,7 +75,9 @@ int main(int argc,char* argv[]){
 
 		for(size_t i=0;i<cam.size();i++){
 			ss << "image" << i;
-			cv::imshow(ss.str(),images[i]);
+			if(visualize){
+				cv::imshow(ss.str(),images[i]);
+			}
 			if(!output_dir.empty()){
 				if(time_stamp){
 					ss << "_" << skl::Time::now() << ".bmp";

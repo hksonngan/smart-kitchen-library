@@ -1,9 +1,9 @@
-VSPROJ = VisualStudioProject/SKLCore.vcxproj
+#VSPROJ = VisualStudioProject/SKLCore.vcxproj
 
 all:
 	cd src;$(MAKE)
 	cp src/libskl_core.a ../lib
-	ruby ../support/VSProjectFileMaintainer.rb -i $(VSPROJ) -s src -h include > temp.proj;mv temp.proj $(VSPROJ)
+#	ruby ../support/VSProjectFileMaintainer.rb -i $(VSPROJ) -s src -h include > temp.proj;mv temp.proj $(VSPROJ)
 
 .PHONY: clean debug
 
